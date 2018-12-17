@@ -1,0 +1,375 @@
+\documentclass[]{article}
+\usepackage{lmodern}
+\usepackage{amssymb,amsmath}
+\usepackage{ifxetex,ifluatex}
+\usepackage{fixltx2e} % provides \textsubscript
+\ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+\else % if luatex or xelatex
+  \ifxetex
+    \usepackage{mathspec}
+  \else
+    \usepackage{fontspec}
+  \fi
+  \defaultfontfeatures{Ligatures=TeX,Scale=MatchLowercase}
+\fi
+% use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+% use microtype if available
+\IfFileExists{microtype.sty}{%
+\usepackage{microtype}
+\UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\usepackage[margin=1in]{geometry}
+\usepackage{hyperref}
+\hypersetup{unicode=true,
+            pdftitle={artdeco vignette},
+            pdfauthor={Raik Otto},
+            pdfborder={0 0 0},
+            breaklinks=true}
+\urlstyle{same}  % don't use monospace font for urls
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{248,248,248}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\ImportTok}[1]{#1}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\BuiltInTok}[1]{#1}
+\newcommand{\ExtensionTok}[1]{#1}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.77,0.63,0.00}{#1}}
+\newcommand{\RegionMarkerTok}[1]{#1}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{#1}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.64,0.00,0.00}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{#1}
+\usepackage{graphicx,grffile}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+\IfFileExists{parskip.sty}{%
+\usepackage{parskip}
+}{% else
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt plus 2pt minus 1pt}
+}
+\setlength{\emergencystretch}{3em}  % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{0}
+% Redefines (sub)paragraphs to behave more like sections
+\ifx\paragraph\undefined\else
+\let\oldparagraph\paragraph
+\renewcommand{\paragraph}[1]{\oldparagraph{#1}\mbox{}}
+\fi
+\ifx\subparagraph\undefined\else
+\let\oldsubparagraph\subparagraph
+\renewcommand{\subparagraph}[1]{\oldsubparagraph{#1}\mbox{}}
+\fi
+
+%%% Use protect on footnotes to avoid problems with footnotes in titles
+\let\rmarkdownfootnote\footnote%
+\def\footnote{\protect\rmarkdownfootnote}
+
+%%% Change title format to be more compact
+\usepackage{titling}
+
+% Create subtitle command for use in maketitle
+\newcommand{\subtitle}[1]{
+  \posttitle{
+    \begin{center}\large#1\end{center}
+    }
+}
+
+\setlength{\droptitle}{-2em}
+
+  \title{artdeco vignette}
+    \pretitle{\vspace{\droptitle}\centering\huge}
+  \posttitle{\par}
+    \author{Raik Otto}
+    \preauthor{\centering\large\emph}
+  \postauthor{\par}
+      \predate{\centering\large\emph}
+  \postdate{\par}
+    \date{2018-12-14}
+
+
+\begin{document}
+\maketitle
+
+\section{artdeco R package}\label{artdeco-r-package}
+
+A R package that determine the differentiation stage of pancreatic
+neuroendocrinal neoplasia (PANnen) based on bulk RNA-seq of or mRNA
+array exepriments on cancer-tissue.
+
+\section{1 How to make it work:
+Quickstart}\label{how-to-make-it-work-quickstart}
+
+\subsection{Installing artdeco}\label{installing-artdeco}
+
+Start an R session e.g.~using RStudio
+
+\texttt{if\ (!requireNamespace("BiocManager",\ quietly=TRUE))}
+\texttt{install.packages("BiocManager")}
+
+\texttt{BiocManager::install("artdeco")}
+
+\subsection{Test run}\label{test-run}
+
+57 representative PANnen bulk RNA-seq samples are shipped along with the
+R package. These will in the following be analyzed by the artdeco
+algorithm to demonstrate the utilization of artdeco.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{library}\NormalTok{(}\StringTok{"artdeco"}\NormalTok{)}
+
+\CommentTok{# obtain path to testdata}
+\NormalTok{path_transcriptome_file =}\StringTok{ }\KeywordTok{system.file}\NormalTok{(}
+    \StringTok{"/Data/Expression_data/PANnen_Test_Data.tsv"}\NormalTok{,}
+    \DataTypeTok{package=}\StringTok{"artdeco"}\NormalTok{)}
+
+\CommentTok{# testrun}
+\NormalTok{deconvolution_results =}\StringTok{ }\KeywordTok{Determine_differentiation_stage}\NormalTok{(}
+    \DataTypeTok{transcriptome_file_path =}\NormalTok{ path_transcriptome_file}
+\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] "No meta data sheet provided, creating meta data sheet from transcriptome file."
+## [1] "Model(s) loaded"
+## [1] "Deconvolving with model: Alpha_Beta_Gamma_Delta_Lawlor"
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# show results}
+\NormalTok{deconvolution_results[}\DecValTok{1}\OperatorTok{:}\DecValTok{5}\NormalTok{,}\DecValTok{1}\OperatorTok{:}\DecValTok{5}\NormalTok{]}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##    Sample beta_similarity beta_similarity_percent alpha_similarity
+## S1     S1            none                       8             none
+## S2     S2            none                       7             none
+## S3     S3          traces                      12             none
+## S4     S4            none                      10             none
+## S5     S5            none                      10             none
+##    alpha_similarity_percent
+## S1                        0
+## S2                        0
+## S3                        0
+## S4                        0
+## S5                        0
+\end{verbatim}
+
+The call returns a dataframe that contains the differentiation stage
+similarity predictions.
+
+\subsubsection{Explanation test run
+results}\label{explanation-test-run-results}
+
+Percent-wise similarities of the testdata samples to all scRNA derived
+training samples are shown, both as written interpretation e.g.
+``significant similarity (to this cell type)'' or ``no significant
+similarity (to this cell type)'' as well as percent scalars.
+
+\subsection{Explanation percent
+similarities}\label{explanation-percent-similarities}
+
+The percent value quantifies to what extend a given transkriptome can be
+reconstructed utilizing a given reference cell type e.g.~by the insulin
+producing `beta' cell type as basis. The nu-SVM regression based
+similarity determination has the limitation that the returned unit-less
+scalar is challenging to interpret: It is not clearly decidable when a
+scaler indicates a high or low similarity. Thus, artdeco interprets the
+returned scalar. Measurements may be calculated based on a trained model
+(absolute) or relative to all analyzed of within a given run (relative).
+The default `absolute' mode interprets the return scalar for a given
+samples relative to the maximal similarity measured for each model
+subtype during training. I.e. the returned scaler is divided by the
+maximal similarity observed for training set samples. E.g. when a scRNA
+beta cell received the similarity 5.7 to the beta set, than all
+subsequent beta similarities are divided by 5.7 to show how similar they
+are relative to the self-identification of cell subtypes. The `relative'
+mode divides by the maximal similarity measured for a given set of query
+data, i.e. the maximally measured similarity is taken as divisor.
+
+\section{2 Visualization of similarity
+predictions}\label{visualization-of-similarity-predictions}
+
+It is important to interpret the simialrity predictions given the
+clustering of the data. In order to detect clusters, a correlation
+heatmap can be used along with an overlay of similarity predictions. The
+rational is, that samples that show a comparable differentiation state
+should cluster together, which is why a heatmap creator is included in
+the artdeco package and can be utilized as follows. First the analyzed
+transcriptome data is load and afterwards the similarity predictions
+from step one are being passed on to the visualization function.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{visualization_data_path =}\StringTok{ }\KeywordTok{system.file}\NormalTok{(}
+    \StringTok{"/Data/Expression_data/Visualization_PANnen.tsv"}\NormalTok{,}
+    \DataTypeTok{package=}\StringTok{"artdeco"}\NormalTok{)}
+
+\KeywordTok{create_heatmap_differentiation_stages}\NormalTok{(}
+\NormalTok{    visualization_data_path,}
+\NormalTok{    deconvolution_results}
+\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\section{3 Adding and removing models}\label{adding-and-removing-models}
+
+Adding a new model requires 1) training data and 2) a labeling vector of
+the training data specifying the cell type of each training sample
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{meta_data_path =}\StringTok{ }\KeywordTok{system.file}\NormalTok{(}\StringTok{"Data/Meta_Data.tsv"}\NormalTok{, }\DataTypeTok{package =} \StringTok{"artdeco"}\NormalTok{)}
+\NormalTok{meta_data      =}\StringTok{ }\KeywordTok{read.table}\NormalTok{(}
+\NormalTok{    meta_data_path, }\DataTypeTok{sep =}\StringTok{"}\CharTok{\textbackslash{}t}\StringTok{"}\NormalTok{, }\DataTypeTok{header =}\NormalTok{ T,}
+    \DataTypeTok{stringsAsFactors =}\NormalTok{ F)}
+\NormalTok{subtype_vector =}\StringTok{ }\NormalTok{meta_data}\OperatorTok{$}\NormalTok{Subtype }\CommentTok{# extract the training sample subtype labels}
+
+\NormalTok{subtype_vector[}\DecValTok{1}\OperatorTok{:}\DecValTok{6}\NormalTok{] }\CommentTok{# show subtype definition}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] "Alpha" "Alpha" "Alpha" "Alpha" "Alpha" "Alpha"
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{training_data_path =}\StringTok{ }\KeywordTok{system.file}\NormalTok{(}
+    \StringTok{"Data/Expression_data/PANnen_Test_Data.tsv"}\NormalTok{, }\DataTypeTok{package =} \StringTok{"artdeco"}\NormalTok{)}
+
+\KeywordTok{add_deconvolution_training_model}\NormalTok{(}
+    \DataTypeTok{training_data =}\NormalTok{ training_data_path,}
+    \DataTypeTok{model_name =} \StringTok{"My_model"}\NormalTok{,}
+    \DataTypeTok{subtype_vector =}\NormalTok{ subtype_vector,}
+    \DataTypeTok{training_nr_marker_genes =} \DecValTok{5}
+\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] "Loading training data"
+## [1] "Calculating marker genes for subtype: alpha"
+## [1] "Calculating marker genes for subtype: beta"
+## [1] "Calculating marker genes for subtype: gamma"
+## [1] "Calculating marker genes for subtype: delta"
+## [1] "Calculating marker genes for subtype: acinar"
+## [1] "Calculating marker genes for subtype: ductal"
+## [1] "Finished extracting marker genes for subtypes"
+## [1] "Basis trained, estimating deconvolution thresholds,this may take some time"
+## [1] "Finished threshold determination"
+## [1] "Storing model: /home/ottoraik/R/x86_64-pc-linux-gnu-library/3.5/artdeco/Models//My_model.RDS"
+## [1] "Finished training model: My_model"
+\end{verbatim}
+
+Note that the training in the current version (1.0.0) of artdeco has to
+have HGNC symbols as rownames.
+
+Remove models is fairly straight forward:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{models =}\StringTok{ }\KeywordTok{list.files}\NormalTok{(}\KeywordTok{system.file}\NormalTok{(}\StringTok{"Models/"}\NormalTok{, }\DataTypeTok{package =} \StringTok{"artdeco"}\NormalTok{))}
+\KeywordTok{print}\NormalTok{(models)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] "Alpha_Beta_Gamma_Delta_Acinar_Ductal_Lawlor.RDS"                      
+## [2] "Alpha_Beta_Gamma_Delta_Baron_Hisc_Haber.RDS"                          
+## [3] "Alpha_Beta_Gamma_Delta_Baron_Progenitor_Stanescu_HESC_Yan.RDS"        
+## [4] "Alpha_Beta_Gamma_Delta_Baron_Progenitor_Stanescu.RDS"                 
+## [5] "Alpha_Beta_Gamma_Delta_Baron_Progrenitor_Stanescu_Hisc_Haber.RDS"     
+## [6] "Alpha_Beta_Gamma_Delta_Lawlor.RDS"                                    
+## [7] "Alpha_Beta_Gamma_Delta_Segerstolpe_Progenitor_Stanescu_Hisc_Haber.RDS"
+## [8] "My_model.RDS"
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{model_to_be_removed =}\StringTok{ }\NormalTok{models[}\KeywordTok{length}\NormalTok{(models)]}
+\KeywordTok{remove_model}\NormalTok{(}
+    \DataTypeTok{model_name =}\NormalTok{ model_to_be_removed}
+\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] "Deleted model: My_model"
+\end{verbatim}
+
+\section{4 Important: data format}\label{important-data-format}
+
+Please note that the expression data always has to have HGNC symbols as
+rownames and that the first entry of the column names indicates the hgnc
+symbols, not the first sample name.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{training_data_path =}\StringTok{ }\KeywordTok{system.file}\NormalTok{(}
+    \StringTok{"Data/Expression_data/PANnen_Test_Data.tsv"}\NormalTok{, }\DataTypeTok{package =} \StringTok{"artdeco"}\NormalTok{)}
+\NormalTok{expression_matrix =}\StringTok{ }\KeywordTok{read.table}\NormalTok{(}
+\NormalTok{    training_data_path,}
+    \DataTypeTok{sep =}\StringTok{"}\CharTok{\textbackslash{}t}\StringTok{"}\NormalTok{,}
+    \DataTypeTok{header =}\NormalTok{ T,}
+    \DataTypeTok{row.names =} \DecValTok{1}\NormalTok{)}
+
+\NormalTok{expression_matrix[}\DecValTok{1}\OperatorTok{:}\DecValTok{5}\NormalTok{,}\DecValTok{1}\OperatorTok{:}\DecValTok{5}\NormalTok{]}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##                S1           S2           S3           S4           S5
+## INS  1.287430e+02   402.175244    0.0354701 1.658323e+01 4.805062e-01
+## COX1 1.426009e+04 20922.117339 9829.7618331 1.768796e+04 1.295777e+04
+## IAPP 5.249958e-01     3.213968    0.1044866 1.627951e-02 7.418050e-03
+## ND4  4.721256e+03  7036.506560 2600.5447703 1.804696e+03 3.997664e+03
+## CYTB 4.526890e+03  5329.243390 1262.9641899 3.803131e+03 2.531839e+03
+\end{verbatim}
+
+Contact:
+\href{mailto:raik.otto@hu-berlin.de}{\nolinkurl{raik.otto@hu-berlin.de}}
+
+
+\end{document}
