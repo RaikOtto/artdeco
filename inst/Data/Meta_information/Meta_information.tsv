@@ -1,46 +1,58 @@
-Sample	Grading	Subtype
-S1	G1	NET
-S2	G2	NET
-S3	G2	NET
-S4	G1	NET
-S5	G1	NET
-S6	G2	NET
-S7	G1	NET
-S8	G2	NET
-S9	G1	NET
-S10	G2	NET
-S11	G1	NET
-S12	G1	NET
-S13	G2	NET
-S14	G1	NET
-S15	G1	NET
-S16	G3	NEC
-S17	G2	NET
-S18	G3	NEC
-S19	G1	NET
-S20	G2	NET
-S21	G1	NET
-S22	G2	NET
-S23	G2	NET
-S24	G2	NET
-S25	G2	NET
-S26	G3	NEC
-S27	G3	NET
-S28	G3	NET
-S29	G3	NET
-S30	G2	NET
-S31	G3	NEC
-S32	G3	NEC
-S33	G3	NEC
-S34	G3	NEC
-S35	G3	NET
-S36	G3	NEC
-S37	G3	NEC
-S38	G3	NEC
-S39	G3	NEC
-S40	G3	NEC
-S41	G2	NEC
-S42	G3	NEC
-S43	G3	NEC
-S44	G3	NEC
-S45	G2	NET
+Sample	Grading	Subtype	beta_similarity	beta_similarity_percent	alpha_similarity	alpha_similarity_percent	gamma_similarity	gamma_similarity_percent	delta_similarity	delta_similarity_percent	Differentiation_Stages_Subtypes	Differentiatedness	Differentiation_Stages_Aggregated
+S1	G3	NET	none	8	none	0	none	6	none	0	not_significant	14	not_significant
+S2	G2	NET	none	7	none	0	none	7	none	0	not_significant	14	not_significant
+S3	G3	NEC	traces	12	none	0	none	0	none	0	not_significant	12	not_significant
+S4	G3	NEC	none	10	none	0	none	0	none	2	not_significant	12	not_significant
+S5	G2	NET	none	10	none	0	none	4	none	0	not_significant	14	not_significant
+S6	G3	NET	none	5	none	0	none	9	none	0	not_significant	14	not_significant
+S7	G2	NET	none	4	none	1	none	7	none	3	not_significant	15	not_significant
+S8	G2	NET	none	0	none	0	none	3	none	10	not_significant	13	not_significant
+S9	G2	NET	none	9	none	0	none	4	none	0	not_significant	13	not_significant
+S10	G2	NEC	traces	12	none	0	none	0	none	0	not_significant	12	not_significant
+S11	G3	NET	none	7	none	0	none	7	none	0	not_significant	14	not_significant
+S12	G2	NET	none	7	none	0	none	6	none	0	not_significant	13	not_significant
+S13	G1	NET	traces	12	none	0	none	0	none	0	not_significant	12	not_significant
+S14	G3	NEC	traces	12	none	0	none	0	none	0	not_significant	12	not_significant
+S15	G2	NET	none	6	none	0	none	8	none	0	not_significant	14	not_significant
+S16	G1	NET	none	0	none	0	traces	12	none	0	not_significant	12	not_significant
+S17	G1	NET	none	4	none	0	none	5	none	5	not_significant	14	not_significant
+S18	G2	NET	none	8	none	0	none	6	none	0	not_significant	14	not_significant
+S19	G1	NET	none	9	none	0	none	4	none	0	not_significant	13	not_significant
+S20	G2	NET	none	6	none	1	none	8	none	0	not_significant	15	not_significant
+S21	G3	NEC	traces	12	none	0	none	0	none	0	not_significant	12	not_significant
+S22	G3	NET	none	8	none	0	none	6	none	0	not_significant	14	not_significant
+S23	G3	NEC	none	10	none	0	none	2	none	1	not_significant	13	not_significant
+S24	G3	NEC	traces	12	none	0	none	0	none	0	not_significant	12	not_significant
+S25	G2	NET	none	7	none	0	none	7	none	0	not_significant	14	not_significant
+S26	G3	NEC	none	9	none	0	none	0	none	4	not_significant	13	not_significant
+S27	G3	NEC	none	10	none	0	none	3	none	0	not_significant	13	not_significant
+S28	G3	NEC	traces	11	none	0	none	2	none	0	not_significant	13	not_significant
+S29	G3	NET	none	10	none	0	none	3	none	0	not_significant	13	not_significant
+S30	G3	NEC	traces	12	none	0	none	0	none	0	not_significant	12	not_significant
+S31	G2	NET	none	0	none	0	traces	12	none	0	not_significant	12	not_significant
+S32	G3	NEC	traces	12		0	none	0	none	0	not_significant	12	not_significant
+S33	G3	NET	none	9	none	0	none	4	none	1	not_significant	14	not_significant
+S34	G3	NEC	traces	11	none	0	none	0	none	1	not_significant	12	not_significant
+S35	G1	NET	none	6	none	5	none	4	none	0	not_significant	15	not_significant
+S36	G3	NEC	none	9	none	0	none	4	none	0	not_significant	13	not_significant
+S37	G2	NET	none	6	none	0	none	8	none	0	not_significant	14	not_significant
+S38	G2	NET	traces	12	none	0	none	0	none	0	not_significant	12	not_significant
+S39	G2	NET	none	10	none	0	none	3	none	0	not_significant	13	not_significant
+S40	G3	NEC	none	9	none	0	none	5	none	0	not_significant	14	not_significant
+S41	G2	NET	none	0	none	1	traces	12	none	0	not_significant	13	not_significant
+S42	G1	NET	none	7	none	6	none	1	none	0	not_significant	14	not_significant
+S43	G1	NET	traces	12	none	0	none	0	none	0	not_significant	12	not_significant
+S44	G3	NEC	traces	12	none	0	none	0	none	0	not_significant	12	not_significant
+S45	G2	NET	none	8	none	0	none	6	none	0	not_significant	14	not_significant
+S46	G3	NEC	traces	12	none	0	none	0	none	0	not_significant	12	not_significant
+S47	G3	NEC	none	4	none	0	none	10	none	0	not_significant	14	not_significant
+S48	G1	NET	none	0	none	0	traces	12	none	0	not_significant	12	not_significant
+S49	G3	NEC	traces	12	none	0	none	0	none	0	not_significant	12	not_significant
+S50	G3	NEC	traces	12	none	0	none	0	none	0	not_significant	12	not_significant
+S51	G1	NET	none	0	none	2	traces	11	none	0	not_significant	13	not_significant
+S52	G2	NET	none	8	none	0	none	1	none	5	not_significant	14	not_significant
+S53	G2	NET	none	8	none	0	none	6	none	0	not_significant	14	not_significant
+S54	G1	NET	none	1	none	0	traces	11	none	0	not_significant	12	not_significant
+S55	G3	NEC	none	10	none	0	none	0	none	2	not_significant	12	not_significant
+S56	G1	NET	none	8	none	0	none	6	none	0	not_significant	14	not_significant
+S57	G3	NEC	traces	12	none	0	none	0	none	0	not_significant	12	not_significant
