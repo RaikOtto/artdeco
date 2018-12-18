@@ -30,7 +30,7 @@ S28	G3	NEC	traces	11	none	0	none	2	none	0	not_significant	13	not_significant
 S29	G3	NET	none	10	none	0	none	3	none	0	not_significant	13	not_significant
 S30	G3	NEC	traces	12	none	0	none	0	none	0	not_significant	12	not_significant
 S31	G2	NET	none	0	none	0	traces	12	none	0	not_significant	12	not_significant
-S32	G3	NEC	traces	12		0	none	0	none	0	not_significant	12	not_significant
+S32	G3	NEC	traces	12	none	0	none	0	none	0	not_significant	12	not_significant
 S33	G3	NET	none	9	none	0	none	4	none	1	not_significant	14	not_significant
 S34	G3	NEC	traces	11	none	0	none	0	none	1	not_significant	12	not_significant
 S35	G1	NET	none	6	none	5	none	4	none	0	not_significant	15	not_significant

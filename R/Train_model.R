@@ -34,7 +34,7 @@
 #' @examples
 #' transcriptome_data_path = system.file(
 #' "Data/Expression_data/PANnen_Test_Data.tsv",package ="artdeco")
-#' meta_data_path = system.file("Data/Meta_Data.tsv", package = "artdeco")
+#' meta_data_path = system.file("Data/Meta_information/Meta_information.tsv", package = "artdeco")
 #' meta_data      = read.table(
 #'     meta_data_path, sep = "\t",
 #'     header = TRUE,
