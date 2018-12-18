@@ -5,7 +5,7 @@
 \title{add_deconvolution_training_model}
 \usage{
 add_deconvolution_training_model(
-    training_data = "",
+    transcriptome_data_path = "",
     model_name = "",
     subtype_vector,
     marker_gene_list = list(),
@@ -15,11 +15,11 @@ add_deconvolution_training_model(
 )
 }
 \arguments{
-\item{training_data}{Transcriptomic data to be used for training.
-Has to contain the cell subtypes to which the similarity has to
-be calculated. Note that the first column has to contain the
-HGNC symbols and the header not! not the first sample name
-but a mere label for this HGNC row.}
+\item{transcriptome_data_path}{Path to transcriptomic data to be
+used for training. Has to contain the cell subtypes to which the
+similarity has to be calculated. Note that the first column has
+to contain the HGNC symbols and the header not! not the first
+sample name but a mere label for this HGNC row.}
 
 \item{model_name}{Name of the model}
 
@@ -47,9 +47,9 @@ Stores a new model in the package directory
 \code{add_deconvolution_training_model} adds a new model
 }
 \examples{
-transcriptome_data = system.file(
+transcriptome_data_path = system.file(
 "Data/Expression_data/PANnen_Test_Data.tsv",package ="artdeco")
-meta_data_path = system.file("Data/Meta_Data.tsv", package = "artdeco")
+meta_data_path = system.file("Data/Meta_information/Meta_information.tsv", package = "artdeco")
 meta_data      = read.table(
     meta_data_path, sep = "\\t",
     header = TRUE,
@@ -57,7 +57,7 @@ meta_data      = read.table(
 )
 subtype_vector = meta_data$Subtype # extract the training sample subtype labels
 add_deconvolution_training_model(
-    training_data = transcriptome_data,
+    transcriptome_data_path = transcriptome_data_path,
     model_name = "Test_model",
     subtype_vector,
     training_p_value_threshold = 0.05,

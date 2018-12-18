@@ -315,7 +315,9 @@ create_heatmap_differentiation_stages = function(
     if (baseline_mode == "relative"){
 
     }
-
+    annotation_data$Differentiation_Stages_Subtypes[
+        annotation_data$Differentiation_Stages_Subtypes %in% c("hesc","hisc")
+    ] = "stem_cell"
     # correlation heatmap
     pheatmap::pheatmap(
         correlation_matrix,
