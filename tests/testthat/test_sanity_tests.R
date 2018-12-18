@@ -27,14 +27,7 @@ test_that("Assert that data can be analyzed by Determine_differentiation_stage",
     )
     deconvolution_results_path = paste0(
         deconvolution_results_path,
-        "Deconvolution_test_data.tsv"
-    )
-    write.table(
-        deconvolution_results,
-        deconvolution_results_path,
-        sep ="\t",
-        row.names = FALSE,
-        quote = FALSE
+        "/Deconvolution_test_data.tsv"
     )
 })
 
@@ -47,7 +40,7 @@ test_that("Test if visualization works", {
     expect_true( length(visualization_data_path) > 0)
 
     meta_data_path = system.file(
-        "Data/Expression_data/Deconvolution_test_data.tsv",
+        "Data/Meta_information/Meta_information.tsv",
         package = "artdeco"
     )
     meta_data      = read.table(
@@ -66,7 +59,10 @@ test_that("Test if visualization works", {
 test_that("Adding models", {
     ### adding models
 
-    meta_data_path = system.file("Data/Meta_Data.tsv", package = "artdeco")
+    meta_data_path = system.file(
+        "Data/Meta_information/Meta_information.tsv",
+        package = "artdeco"
+    )
     meta_data      = read.table(
         meta_data_path, sep ="\t", header = TRUE,
         stringsAsFactors = FALSE)
@@ -79,17 +75,22 @@ test_that("Adding models", {
         "Data/Expression_data/PANnen_Test_Data.tsv", package = "artdeco")
     expect_true( length(training_data_path) > 0)
 
-    model_name = "My_model"
+    model_name = "Test_model"
     model_path = paste(
         c(system.file("Models/", package="artdeco"),"/",model_name,".RDS"),
         collapse = ""
     )
 
+    if (file.exists(model_path))
+        file.remove(model_path)
+
     add_deconvolution_training_model(
-        training_data = training_data_path,
-        model_name = model_name,
-        subtype_vector = subtype_vector,
-        training_nr_marker_genes = 5
+        transcriptome_data_path = training_data_path,
+        model_name = "Test_model",
+        subtype_vector,
+        training_p_value_threshold = 0.05,
+        training_nr_permutations = 100,
+        training_nr_marker_genes = 100
     )
     expect_true(file.exists(model_path))
 
