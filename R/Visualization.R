@@ -1,7 +1,7 @@
-#' create_heatmap_differentiation_stages
+#' create_PCA_differentiation_stages
 #'
-#' \code{create_heatmap_differentiation_stages}
-#' visualizes the differentiation stage predictions.
+#' \code{create_PCA_differentiation_stages}
+#' visualizes the differentiation stage predictions as PCA.
 #' Please note that the first column of the expression
 #' data matrix has to contain the HGNC identifier
 #'
@@ -20,7 +20,7 @@
 #' similarity of the training sample to its subtype e.g.
 #' alpha cell similarity to alpha cell =
 #' @usage
-#' create_heatmap_differentiation_stages(
+#' create_PCA_differentiation_stages(
 #'     transcriptome_file_path,
 #'     deconvolution_results,
 #'     annotation_columns,
@@ -28,13 +28,10 @@
 #'     baseline_mode
 #' )
 #' @examples
-#' transcriptome_file_path = system.file(
-#' "/Data/Expression_data/Visualization_PANnen.tsv", package = "artdeco")
 #' meta_data_path = system.file(
-#'     "Data/Expression_data/Deconvolution_test_data.tsv",
+#'     "Data/Meta_information/Meta_information.tsv",
 #'     package = "artdeco"
 #' )
-#'
 #' meta_data      = read.table(
 #'     meta_data_path, sep ="\t",
 #'     header = TRUE,
@@ -42,7 +39,11 @@
 #' )
 #' rownames(meta_data) = meta_data$Sample
 #'
-#' create_heatmap_differentiation_stages(
+#' transcriptome_file_path = system.file(
+#'     "/Data/Expression_data/Visualization_PANnen.tsv",
+#'      package = "artdeco"
+#' )
+#' create_PCA_differentiation_stages(
 #'     transcriptome_file_path = transcriptome_file_path,
 #'     deconvolution_results = meta_data,
 #'     annotation_columns = c(
@@ -56,7 +57,7 @@
 #' @import stringr ggplot2 ggbiplot pheatmap
 #' @return Plots
 #' @export
-create_heatmap_differentiation_stages = function(
+create_PCA_differentiation_stages = function(
     transcriptome_file_path,
     deconvolution_results,
     annotation_columns = c(
@@ -137,23 +138,6 @@ create_heatmap_differentiation_stages = function(
             )
         )
 
-    # correlation heatmap
-    pheatmap::pheatmap(
-        correlation_matrix,
-        annotation_col = annotation_data,
-        annotation_colors = Graphics_parameters,
-        annotation_legend = TRUE,
-        treeheight_col = 0,
-        treeheight_row = 0,
-        show_colnames = TRUE,
-        show_rownames = FALSE
-    )
-
-    #hitReturn <- function(msg){
-    #    invisible(readline(sprintf("%s -- hit return", "")));
-    #}
-    #hitReturn()
-
     p = ggbiplot::ggbiplot(
         pcr,
         obs.scale = .75,
@@ -187,6 +171,165 @@ create_heatmap_differentiation_stages = function(
     )
     p
 }
+
+#' create_heatmap_differentiation_stages
+#'
+#' \code{create_heatmap_differentiation_stages}
+#' visualizes the differentiation stage predictions as heatmap.
+#' Please note that the first column of the expression
+#' data matrix has to contain the HGNC identifier
+#'
+#' @param transcriptome_file_path Path to the transcriptome
+#' data that shall be visualized. Notice the convention
+#' that the first row has to contain the HGNC identifier
+#' @param deconvolution_results The dataframe returned
+#' by the deconvolution analysis
+#' @param annotation_columns Column names that are to be visualized
+#' ontop of the correlation matrix
+#' @param Graphics_parameters Pheatmap visualization paramters.
+#' You can customize visualization colors.
+#' Read the vignette for more information.
+#' @param baseline_mode Which measurement represents the baseline
+#' of the differentiation similarity: 'absolute' = maximal
+#' similarity of the training sample to its subtype e.g.
+#' alpha cell similarity to alpha cell =
+#' @usage
+#' create_heatmap_differentiation_stages(
+#'     transcriptome_file_path,
+#'     deconvolution_results,
+#'     annotation_columns,
+#'     Graphics_parameters,
+#'     baseline_mode
+#' )
+#' @examples
+#' meta_data_path = system.file(
+#'     "Data/Meta_information/Meta_information.tsv",
+#'     package = "artdeco"
+#' )
+#' meta_data      = read.table(
+#'     meta_data_path, sep ="\t",
+#'     header = TRUE,
+#'     stringsAsFactors = FALSE
+#' )
+#' rownames(meta_data) = meta_data$Sample
+#'
+#' transcriptome_file_path = system.file(
+#'     "/Data/Expression_data/Visualization_PANnen.tsv",
+#'      package = "artdeco"
+#' )
+#' create_heatmap_differentiation_stages(
+#'     transcriptome_file_path = transcriptome_file_path,
+#'     deconvolution_results = meta_data,
+#'     annotation_columns = c(
+#'         "Differentiation_Stages_Subtypes",
+#'         "Differentiation_Stages_Aggregated",
+#'         "Differentiatedness"
+#'      ),
+#'      Graphics_parameters = "",
+#'      baseline_mode = "absolute"
+#' )
+#' @import stringr ggplot2 ggbiplot pheatmap
+#' @return Plots
+#' @export
+create_heatmap_differentiation_stages = function(
+    transcriptome_file_path,
+    deconvolution_results,
+    annotation_columns = c(
+        "Differentiation_Stages_Subtypes",
+        "Differentiation_Stages_Aggregated",
+        "Differentiatedness"
+    ),
+    Graphics_parameters = "",
+    baseline_mode = "relative"
+){
+
+    # check for input data availability
+    if (!file.exists(transcriptome_file_path)){
+        stop(paste0("Could not find file ",transcriptome_file_path))
+    }
+
+    # load transcriptome data
+    transcriptome_mat_vis = read.table(
+        transcriptome_file_path,
+        sep="\t",
+        header = TRUE,
+        stringsAsFactors = FALSE,
+        row.names = 1
+    )
+    colnames(transcriptome_mat_vis) = str_replace_all(
+        colnames(transcriptome_mat_vis),
+        pattern = "^X",
+        ""
+    )
+
+    correlation_matrix = cor(transcriptome_mat_vis)
+    pcr = prcomp(t(correlation_matrix))
+
+    # ensure correct ordering of expression and annotation data
+    rownames(deconvolution_results) = deconvolution_results$Sample
+    deconvolution_results = deconvolution_results[
+        colnames(correlation_matrix),
+        ]
+
+    # assert that graphics parameters are available
+    if ( head(Graphics_parameters,1) == "" )
+        Graphics_parameters = configure_graphics()
+
+    # extract similarity measurements
+    sim_index = grep(
+        x = colnames(deconvolution_results),
+        pattern = paste0( c(
+            "(_similarity$)",
+            "(Differentiation_Stage)",
+            "Differentiatedness"
+        ), collapse = "|")
+    )
+    annotation_data = deconvolution_results[, sim_index]
+
+    # case the results data frame does not have a column
+    for (annotation in annotation_columns){
+        if (!( annotation %in% colnames(deconvolution_results))){
+            print(paste0(c(
+                "Did not find ",
+                annotation,
+                " column in the deconvolution matrix. No Visualization will occur."
+            )))
+        } else {
+            annotation_data[,annotation] = rep("",nrow(annotation_data))
+            annotation_data[rownames(deconvolution_results),annotation] =
+                deconvolution_results[,annotation]
+        }
+    }
+
+    # assert uniqueness of results
+    annotation_data = annotation_data[,unique(colnames(annotation_data))]
+
+    # ensure correct type cast
+    if(length(annotation_data$Differentiatedness) > 0)
+        annotation_data$Differentiatedness = as.double(
+            as.character(
+                annotation_data$Differentiatedness
+            )
+        )
+
+    if (baseline_mode == "relative"){
+
+    }
+
+    # correlation heatmap
+    pheatmap::pheatmap(
+        correlation_matrix,
+        annotation_col = annotation_data,
+        annotation_colors = Graphics_parameters,
+        annotation_legend = TRUE,
+        treeheight_col = 0,
+        treeheight_row = 0,
+        show_colnames = TRUE,
+        show_rownames = FALSE
+    )
+
+}
+
 
 #' configure_graphics
 #'
