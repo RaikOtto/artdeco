@@ -310,6 +310,7 @@ quantify_similarity = function(
         meta_data[ traces_index     , subtype_label ] = "traces"
         meta_data[ none_index       , subtype_label ] = "none"
         meta_data[ not_sig_index    , subtype_label ] = "not_significant"
+        meta_data[ meta_data[ , subtype_label ] == "" , subtype_label ] = "none"
     }
     return(meta_data)
 }

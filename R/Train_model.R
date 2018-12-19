@@ -34,7 +34,7 @@
 #' @examples
 #' transcriptome_data_path = system.file(
 #' "Data/Expression_data/PANnen_Test_Data.tsv",package ="artdeco")
-#' meta_data_path = system.file("Data/Meta_Data.tsv", package = "artdeco")
+#' meta_data_path = system.file("Data/Meta_information/Meta_information.tsv", package = "artdeco")
 #' meta_data      = read.table(
 #'     meta_data_path, sep = "\t",
 #'     header = TRUE,
@@ -71,7 +71,7 @@ add_deconvolution_training_model = function(
     if(file.exists(model_path))
         stop(paste0( collapse= "",
                      c("Modelname ",model_name,
-                       " already exsits, please choose different name or delete existing model"))
+                       " already exists, please choose different name or delete existing model"))
         )
 
     if( ! file.exists(transcriptome_data_path)){
@@ -118,7 +118,6 @@ add_deconvolution_training_model = function(
     }
 
     # Prepare bseq training
-
     training_mat_bseq = new(
         "ExpressionSet",
         exprs = as.matrix(expression_training_mat)
@@ -131,7 +130,7 @@ add_deconvolution_training_model = function(
             training_mat_bseq,
             Marker_Gene_List,
             clusters = 'subtype_vector',
-            samples = colnames(exprs(training_mat_bseq)),
+            samples = colnames(expression_training_mat),
             ct.scale = FALSE
     ))
 
@@ -148,7 +147,6 @@ add_deconvolution_training_model = function(
         Basis,
         verbose = FALSE,
         absolute = TRUE,
-        log = FALSE,
         perm = training_nr_permutations
     )
 

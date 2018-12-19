@@ -3,6 +3,7 @@
 export(Determine_differentiation_stage)
 export(add_deconvolution_training_model)
 export(configure_graphics)
+export(create_PCA_differentiation_stages)
 export(create_heatmap_differentiation_stages)
 export(quantify_similarity)
 export(remove_model)

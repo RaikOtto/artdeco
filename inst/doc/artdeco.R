@@ -25,11 +25,12 @@ create_heatmap_differentiation_stages(
 )
 
 ## ------------------------------------------------------------------------
-meta_data_path = system.file("Data/Meta_Data.tsv", package = "artdeco")
+meta_data_path = system.file("Data/Meta_information/Meta_information.tsv", package = "artdeco")
 meta_data      = read.table(
     meta_data_path, sep ="\t", header = TRUE,
-    stringsAsFactors = FALSE)
-subtype_vector = meta_data$Subtype # extract the training sample subtype labels
+    stringsAsFactors = FALSE
+)
+subtype_vector = meta_data$Test_Subtype # extract the training sample subtype labels
 
 subtype_vector[1:6] # show subtype definition
 
@@ -37,10 +38,13 @@ training_data_path = system.file(
     "Data/Expression_data/PANnen_Test_Data.tsv", package = "artdeco")
 
 add_deconvolution_training_model(
-    training_data = training_data_path,
+    transcriptome_data_path = training_data_path,
     model_name = "My_model",
     subtype_vector = subtype_vector,
-    training_nr_marker_genes = 5
+    marker_gene_list = list(),
+    training_nr_marker_genes = 5,
+    training_p_value_threshold = 0.05,
+    training_nr_permutations = 100
 )
 
 ## ------------------------------------------------------------------------

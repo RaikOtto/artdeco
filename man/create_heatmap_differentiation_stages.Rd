@@ -37,18 +37,15 @@ Plots
 }
 \description{
 \code{create_heatmap_differentiation_stages}
-visualizes the differentiation stage predictions.
+visualizes the differentiation stage predictions as heatmap.
 Please note that the first column of the expression
 data matrix has to contain the HGNC identifier
 }
 \examples{
-transcriptome_file_path = system.file(
-"/Data/Expression_data/Visualization_PANnen.tsv", package = "artdeco")
 meta_data_path = system.file(
-    "Data/Expression_data/Deconvolution_test_data.tsv",
+    "Data/Meta_information/Meta_information.tsv",
     package = "artdeco"
 )
-
 meta_data      = read.table(
     meta_data_path, sep ="\\t",
     header = TRUE,
@@ -56,6 +53,10 @@ meta_data      = read.table(
 )
 rownames(meta_data) = meta_data$Sample
 
+transcriptome_file_path = system.file(
+    "/Data/Expression_data/Visualization_PANnen.tsv",
+     package = "artdeco"
+)
 create_heatmap_differentiation_stages(
     transcriptome_file_path = transcriptome_file_path,
     deconvolution_results = meta_data,
