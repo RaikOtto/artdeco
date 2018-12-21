@@ -46,7 +46,7 @@
 #'     transcriptome_file_path = transcriptome_file_path,
 #'     models = "Alpha_Beta_Gamma_Delta_Lawlor"
 #' )
-#' @return Similarity measurements to differentiation
+#' @return Similarity measurements of differentiation
 #' stages
 #' @export
 Determine_differentiation_stage = function(

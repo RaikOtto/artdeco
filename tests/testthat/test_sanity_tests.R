@@ -10,25 +10,23 @@ test_that("Assert that data can be analyzed by Determine_differentiation_stage",
 
     expect_true( length(path_transcriptome_file) > 0)
 
-    # testrun
-    deconvolution_results = Determine_differentiation_stage(
-        transcriptome_file_path = path_transcriptome_file
+    deconvolution_results_relative = Determine_differentiation_stage(
+        transcriptome_file_path = path_transcriptome_file,
+        baseline = "relative"
     )
+
+    deconvolution_results_absolute = Determine_differentiation_stage(
+        transcriptome_file_path = path_transcriptome_file,
+        baseline = "absolute"
+    )
+
 
     expect_true(
-        nrow(deconvolution_results) == 57)
+        nrow(deconvolution_results_relative) == 57)
 
     expect_true(
-        ncol(deconvolution_results) == 12)
+        ncol(deconvolution_results_relative) == 13)
 
-    deconvolution_results_path = system.file(
-        "/Data/Expression_data/",
-        package="artdeco"
-    )
-    deconvolution_results_path = paste0(
-        deconvolution_results_path,
-        "/Deconvolution_test_data.tsv"
-    )
 })
 
 test_that("Test if visualization works", {

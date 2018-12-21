@@ -47,7 +47,7 @@ handed over}
 no hard-disk written output will occur.}
 }
 \value{
-Similarity measurements to differentiation
+Similarity measurements of differentiation
 stages
 }
 \description{
