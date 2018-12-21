@@ -16,6 +16,13 @@
 #' @param p_value P-value that determines when a deconvolution
 #' is to be considered significant. Lower p-values lead to loss
 #' of sensitivity but increase in specificity.
+#' @param baseline Required for the interpretation of the results.
+#' Defines the level of expected similarity i.e. what degree of
+#' similarity in terms of percent is deemed as e.g. 'high' or
+#' 'low'. You can select the 'absolute' mode that sets the highest
+#' measured similarity of the training data as baseline or 'relative'
+#' which defines the highest measured similarity of the test samples
+#' as baseline
 #' @param meta_data Dataframe that stores the meta information
 #' of the transcriptomes. Can be build by the function itself or
 #' handed over
@@ -28,6 +35,7 @@
 #'     models,
 #'     nr_permutations,
 #'     p_value,
+#'     baseline,
 #'     meta_data,
 #'     output_file
 #' )
@@ -46,12 +54,16 @@ Determine_differentiation_stage = function(
     models = "Alpha_Beta_Gamma_Delta_Lawlor",
     nr_permutations = 100,
     p_value = 0.05,
+    baseline = "relative",
     meta_data = data.frame(),
     output_file = ""
 ){
     # check whether model is available
     if (length(models) == 0)
         stop("Require at least one models")
+
+    if (!(baseline %in% c("absolute","relative") ) )
+        stop("You must set the 'baseline' variable to either 'absolute' or 'relative'")
 
     # check for input data availability
     if (!file.exists(transcriptome_file_path)){
@@ -66,6 +78,7 @@ Determine_differentiation_stage = function(
         stringsAsFactors = FALSE,
         row.names= 1
     )
+
     # data cleansing
     colnames(transcriptome_file) =
         stringr::str_replace_all(
@@ -88,6 +101,8 @@ Determine_differentiation_stage = function(
             row.names = colnames(deconvolution_data),
             "Sample" = colnames(deconvolution_data)
         )
+        meta_data$model = rep("",nrow(meta_data))
+        meta_data$model = paste0(c(models),collapse="|")
     }
 
     models_list = list()
@@ -127,14 +142,16 @@ Determine_differentiation_stage = function(
             log = FALSE,
             perm = nr_permutations
         ))
-        prediction_stats_list[[model]] = fit$stats
+        prediction_stats_list[[pred_model]] = fit$stats
     }
 
+    # create results matrix called meta_data
     meta_data = prepare_result_matrix(
         prediction_stats_list,
         parameter_list,
         p_value,
         meta_data,
+        baseline = baseline,
         models = models
     )
 

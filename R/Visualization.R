@@ -269,7 +269,7 @@ create_heatmap_differentiation_stages = function(
     rownames(deconvolution_results) = deconvolution_results$Sample
     deconvolution_results = deconvolution_results[
         colnames(correlation_matrix),
-        ]
+    ]
 
     # assert that graphics parameters are available
     if ( head(Graphics_parameters,1) == "" )
@@ -312,12 +312,69 @@ create_heatmap_differentiation_stages = function(
             )
         )
 
-    if (baseline_mode == "relative"){
-
-    }
     annotation_data$Differentiation_Stages_Subtypes[
         annotation_data$Differentiation_Stages_Subtypes %in% c("hesc","hisc")
     ] = "stem_cell"
+
+    if (baseline_mode == "relative"){
+
+        # procure subtype information
+
+        sub_index = grep(
+            x = colnames(deconvolution_results),
+            pattern = paste0( c(
+                "(_similarity$)"),
+                collapse = "|"
+            )
+        )
+        subtypes = colnames(deconvolution_results)[ sub_index]
+        subtypes[
+            str_replace_all(
+                subtypes,
+                "_similarity$",
+                ""
+            )  %in% c("hesc","hisc")
+        ] = "stem_cell_similarity"
+
+        # load the model information
+
+        models = as.character(
+            unlist(
+                str_split(meta_data$model[1],pattern = "\\|")
+            )
+        )
+        # readjust similarity predictions
+
+        for ( model in models){
+
+            model_path = paste0(c(
+                system.file(
+                    "Models/",
+                    package="artdeco"),
+                "/",
+                model,".RDS"
+            ),
+            collapse = ""
+            )
+            model_and_parameter = readRDS(model_path)
+            fit = model_and_parameter[1]
+            fit = fit[[1]]
+            parameter_list = model_and_parameter[2]
+            model_parameter = model_parameter[[1]]
+            not_sig_samples = rownames(fit)[fit["P-value"] >= 0.05]
+
+            annotation_data = quantify_similarity(
+                meta_data = deconvolution_results,
+                subtypes = subtypes,
+                model = model,
+                fit = fit,
+                parameter_list,
+                mode = mode,
+                not_sig_samples = not_sig_samples
+            )
+        }
+    }
+
     # correlation heatmap
     pheatmap::pheatmap(
         correlation_matrix,

@@ -174,7 +174,7 @@ add_deconvolution_training_model = function(
             res_coeff[
                 which(subtype_vector == subtype),
                 subtype
-                ]
+            ]
         )
     }
 

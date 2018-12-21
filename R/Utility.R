@@ -82,6 +82,7 @@ show_models = function(
 #' @param parameter_list List containing the model parameters
 #' @param p_value P-value significance threshold
 #' @param meta_data Contains the deconvolution results as dataframe
+#' @param baseline Specifying the baseline mode
 #' @param models List of training models
 #' @usage
 #' prepare_result_matrix(
@@ -89,6 +90,7 @@ show_models = function(
 #'     parameter_list,
 #'     p_value,
 #'     meta_data,
+#'     baseline,
 #'     models
 #' )
 #' @import stringr
@@ -98,6 +100,7 @@ prepare_result_matrix = function(
     parameter_list,
     p_value,
     meta_data,
+    baseline,
     models
 ){
 
@@ -119,7 +122,7 @@ prepare_result_matrix = function(
         res_cor   = fit[!(colnames(fit) %in% subtypes)]
 
         res_coeff[ is.na(res_coeff) ] = 0.0
-        res_cor[ is.na(res_cor) ] = 0.0
+        res_cor[ is.na(res_cor) ]     = 0.0
 
         not_sig_samples = rownames(res_cor)[
             which(res_cor[,"P-value"] > p_value)]
@@ -131,7 +134,7 @@ prepare_result_matrix = function(
             fit       = fit,
             parameter_list = parameter_list,
             model     = model,
-            mode      = "absolute",
+            baseline  = baseline,
             not_sig_samples   = not_sig_samples
         )
 
@@ -223,7 +226,6 @@ prepare_result_matrix = function(
             }
         }
     }
-
     return(meta_data)
 }
 
@@ -237,7 +239,7 @@ prepare_result_matrix = function(
 #'@param model Deconvolution model
 #'@param fit Deconvolution fit
 #'@param parameter_list List of parameters of the models
-#'@param mode Absolut or relative mode
+#'@param baseline Absolut or relative mode
 #'@param not_sig_samples list of not significantly deconvolable samples
 #'@usage
 #' quantify_similarity(
@@ -246,71 +248,164 @@ prepare_result_matrix = function(
 #'     model,
 #'     fit,
 #'     parameter_list,
-#'     mode = "absolute",
+#'     baseline,
 #'     not_sig_samples
 #' )
 #'@import stringr
 #'@export
-#'@return dataframe containig baseline adjusted similarities
+#'@return dataframe containing baseline adjusted similarities
 quantify_similarity = function(
     meta_data,
     subtypes,
     model,
     fit,
     parameter_list,
-    mode = "absolute",
+    baseline,
     not_sig_samples
 ){
 
-    if (!(mode %in% c("absolute","relative") ) )
-        stop("You must set the 'mode' variable to either 'absolute' or 'relative'")
+    subtypes = str_replace_all(
+        subtypes,
+        pattern = "_similarity",
+        ""
+    )
+    subtypes[subtypes %in% c("hesc","hisc")] = "stem_cell"
+    subtypes = paste0(
+        subtypes,
+        "_similarity"
+    )
 
-    res_coeff = fit[,subtypes]
+    sim_index = grep(colnames(meta_data),pattern = "_similarity$", value = F)
+    colnames(meta_data)[sim_index] = str_replace_all(
+        colnames(meta_data)[sim_index],
+        pattern = "_similarity$",
+        ""
+    )
+    colnames(meta_data)[sim_index] = paste(
+        colnames(meta_data)[sim_index],
+        "similarity",
+        sep ="_"
+    )
+
+    colnames = colnames(fit)
+    rownames = rownames(fit)
+    fit = matrix(
+        as.double(
+            as.character(
+                unlist(fit)
+            )
+        ),
+        nrow = length(rownames),
+        ncol = length(colnames)
+    )
+
+    colnames = str_replace_all(
+        colnames,
+        pattern = "_similarity$",
+        ""
+    )
+    colnames[ colnames %in% c("hesc","hisc") ] = "stem_cell"
+    colnames = paste(
+        colnames,
+        "similarity",
+        sep ="_"
+    )
+
+    colnames(fit) = colnames
+    rownames(fit) = rownames
+
+    res_coeff = data.frame(fit)[,subtypes]
 
     for (subtype in subtypes){
 
-        # take the measurement
-        subtype_sim_scalar          = log( res_coeff[,subtype] + 1 )
+        subtype = str_replace_all(
+            subtype,
+            pattern = "_similarity",
+            ""
+        )
 
-        # create entry in results matrix
-        subtype_label = paste0(c(
-            subtype,"_similarity"), collapse ="")
-        subtype_label_quant         = paste0(c(
-            subtype,"_similarity_percent"), collapse ="")
+        subtype_label = paste0(
+            subtype,
+            "_similarity"
+        )
+
+        subtype_label_quant = paste0(
+            c(
+                subtype,
+                "_similarity_percent"
+            ),
+            collapse =""
+        )
+
+        # take the measurement
+        colnames(res_coeff) = str_replace_all(
+            colnames(res_coeff),
+            pattern = "_similarity",
+            ""
+        )
+        subtype_sim_scalar = log( res_coeff[,subtype] + 1 )
 
         # all quantifications are initialized as empty
         meta_data[,subtype_label] =
             rep("",length(subtype_sim_scalar))
 
-        # obtain measurement from training phase of model
-        parameter                   = parameter_list[[model]]
-        parameter                   = parameter[[1]]
-        parameter                   = as.double(
-            as.character(unlist(parameter[subtype])))
-        sub_fit_max = max(parameter)
-        sub_fit_max = log(sub_fit_max + 1)
-
         # decide on what to use as baseline
-        if (mode == "absolute"){
-            baseline_vec = sub_fit_max # use model training
+        if (baseline == "absolute"){
+
+            # obtain measurement from training phase of model
+            parameter = parameter_list[[model]]
+            parameter = parameter[[1]]
+            names(parameter)[names(parameter) %in% c("hesc","hisc")] = "stem_cell"
+
+            parameter = as.double(
+                as.character(
+                    unlist(
+                        parameter[subtype]
+                    )
+                )
+            )
+            sub_fit_max = max(parameter)
+            sub_fit_max = log(sub_fit_max + 1)
+            sub_fit_max = max(sub_fit_max, max(subtype_sim_scalar))
+
+            similarity_quantified = round(subtype_sim_scalar / sub_fit_max * 100,0)
+
+            significant_index   = which( similarity_quantified <= 100 )
+            traces_index        = which( similarity_quantified <= 25 )
+            none_index          = which( similarity_quantified <= 10 )
+
         } else { # use use-case specific measurements
-            baseline_vec = max( subtype_sim_scalar )
+
+            similarity_quantified = round(
+                subtype_sim_scalar / max( subtype_sim_scalar ) * 100,
+                0
+            )
+
+            quants = quantile(
+                similarity_quantified,
+                seq(0,1, by =.1)
+            )
+
+            significant_index   = which( similarity_quantified <= quants[10] )
+            traces_index        = which( similarity_quantified <= quants[6] )
+            none_index          = which( similarity_quantified <= quants[2] )
         }
 
-        # shape measurements relative to baseline
-        meta_data[,subtype_label_quant]  =
-            round(subtype_sim_scalar / baseline_vec * 100, 0)
+        not_sig_index           = which( rownames(meta_data) %in% not_sig_samples )
 
-        significant_index   = meta_data[ , subtype_label_quant ] <= 50
-        traces_index        = meta_data[ , subtype_label_quant ] <= 25
-        none_index          = meta_data[ , subtype_label_quant ] <= 10
-        not_sig_index       = which(rownames(meta_data) %in% not_sig_samples)
+        # shape measurements relative to baseline
+        meta_data[,subtype_label_quant]  = similarity_quantified
 
         meta_data[ significant_index, subtype_label ] = "significant"
         meta_data[ traces_index     , subtype_label ] = "traces"
         meta_data[ none_index       , subtype_label ] = "none"
         meta_data[ not_sig_index    , subtype_label ] = "not_significant"
-        meta_data[ meta_data[ , subtype_label ] == "" , subtype_label ] = "none"
+        meta_data[
+            (meta_data[ ,
+                subtype_label ] == "") | ( is.na(meta_data[ , subtype_label
+            ]) ),
+            subtype_label
+        ] = "none"
     }
     return(meta_data)
 }
