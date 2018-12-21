@@ -37,15 +37,17 @@ library("artdeco")
 # obtain path to testdata
 path_transcriptome_file = system.file(
     "/Data/Expression_data/PANnen_Test_Data.tsv",
-    package="artdeco")
+    package="artdeco"
+)
 
 # testrun
-deconvolution_results = Determine_differentiation_stage(
-    transcriptome_file_path = path_transcriptome_file
+deconvolution_results_absolute = Determine_differentiation_stage(
+    transcriptome_file_path = path_transcriptome_file,
+    baseline = "absolute"
 )
 
 # show results
-deconvolution_results[1:5,1:5]
+deconvolution_results_absolute[1:2,]
 ```
 The call returns a dataframe that contains the differentiation stage
 similarity predictions. 
@@ -58,7 +60,7 @@ Percent-wise similarities of the testdata samples to all scRNA derived training
 
 ## Explanation percent similarities 
 
-The percent value quantifies to what extend a given transkriptome can be reconstructed utilizing
+The percent value quantifies to what extend a given transcriptome can be reconstructed utilizing
  a given reference cell type e.g. by the insulin producing 'beta' cell type as basis. The nu-SVM 
  regression based similarity determination has the limitation that the returned unit-less scalar 
  is challenging to interpret: It is not clearly decidable when a scaler indicates a high or low
@@ -71,6 +73,18 @@ The percent value quantifies to what extend a given transkriptome can be reconst
  by 5.7 to show how similar they are relative to the self-identification of cell subtypes. The
  'relative' mode divides by the maximal similarity measured for a given set of query data, i.e. 
  the maximally measured similarity is taken as divisor.
+ 
+```{r}
+
+# testrun in relative mode
+deconvolution_results_relative = Determine_differentiation_stage(
+    transcriptome_file_path = path_transcriptome_file,
+    baseline = "relative"
+)
+
+# show results
+deconvolution_results_relative[1:2,]
+```
  
 # 2 Visualization of similarity predictions
 
@@ -88,7 +102,12 @@ visualization_data_path = system.file(
 
 create_heatmap_differentiation_stages(
     visualization_data_path,
-    deconvolution_results
+    deconvolution_results_relative
+)
+
+create_heatmap_differentiation_stages(
+    visualization_data_path,
+    deconvolution_results_absolute
 )
 ```
 

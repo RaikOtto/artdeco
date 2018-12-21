@@ -102,7 +102,12 @@ visualization_data_path = system.file(
 
 create_heatmap_differentiation_stages(
     visualization_data_path,
-    deconvolution_results
+    deconvolution_results_relative
+)
+
+create_heatmap_differentiation_stages(
+    visualization_data_path,
+    deconvolution_results_absolute
 )
 ```
 
