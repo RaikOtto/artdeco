@@ -9,6 +9,7 @@ prepare_result_matrix(
     parameter_list,
     p_value,
     meta_data,
+    baseline,
     models
 )
 }
@@ -20,6 +21,8 @@ prepare_result_matrix(
 \item{p_value}{P-value significance threshold}
 
 \item{meta_data}{Contains the deconvolution results as dataframe}
+
+\item{baseline}{Specifying the baseline mode}
 
 \item{models}{List of training models}
 }

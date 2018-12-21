@@ -9,6 +9,7 @@ Determine_differentiation_stage(
     models,
     nr_permutations,
     p_value,
+    baseline,
     meta_data,
     output_file
 )
@@ -29,6 +30,14 @@ precise p-value estimates}
 \item{p_value}{P-value that determines when a deconvolution
 is to be considered significant. Lower p-values lead to loss
 of sensitivity but increase in specificity.}
+
+\item{baseline}{Required for the interpretation of the results.
+Defines the level of expected similarity i.e. what degree of
+similarity in terms of percent is deemed as e.g. 'high' or
+'low'. You can select the 'absolute' mode that sets the highest
+measured similarity of the training data as baseline or 'relative'
+which defines the highest measured similarity of the test samples
+as baseline}
 
 \item{meta_data}{Dataframe that stores the meta information
 of the transcriptomes. Can be build by the function itself or

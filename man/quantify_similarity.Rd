@@ -10,7 +10,7 @@ quantify_similarity(
     model,
     fit,
     parameter_list,
-    mode = "absolute",
+    baseline,
     not_sig_samples
 )
 }
@@ -25,12 +25,12 @@ quantify_similarity(
 
 \item{parameter_list}{List of parameters of the models}
 
-\item{mode}{Absolut or relative mode}
+\item{baseline}{Absolut or relative mode}
 
 \item{not_sig_samples}{list of not significantly deconvolable samples}
 }
 \value{
-dataframe containig baseline adjusted similarities
+dataframe containing baseline adjusted similarities
 }
 \description{
 \code{quantify_similarity} custom function that allows to
