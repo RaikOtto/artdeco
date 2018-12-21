@@ -9,7 +9,6 @@ Description: This packages determines the similarity cancer sample
 Imports:
     stringr,
     ggplot2,
-    bsseq,
     limma,
     msir,
     stats,
