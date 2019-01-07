@@ -4,14 +4,11 @@
 \alias{estimateParameters}
 \title{Estimate parameters for negative binomial distribution}
 \usage{
-estimateParameters(countData, simMarkers = TRUE)
+estimateParameters(countData)
 }
 \arguments{
 \item{countData}{Matrix with the expression values of the reference
 cell-types. Parameters are estimated based on this count data.}
-
-\item{simMarkers}{Logical, indicating whether genes to be simulated are
-markers or not}
 }
 \value{
 Returns a list with the estimated parameters.

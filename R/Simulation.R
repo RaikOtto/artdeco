@@ -68,14 +68,12 @@ simulateCellTypes = function(
     # Estimate parameters for marker genes and other genes separately
     if(verbose){message("Estimating parameters ...")}
 
-        paramMarkers = estimateParameters(
-            markerCounts,
-            simMarkers = TRUE
-        )
-        paramOthers = estimateParameters(
-            otherCounts,
-            simMarkers = FALSE
-        )
+    paramMarkers = estimateParameters(
+        markerCounts
+    )
+    paramOthers = estimateParameters(
+        otherCounts
+    )
 
     # Simulate counts
     if(verbose){message("Simulating counts ...")}
@@ -119,12 +117,9 @@ simulateCellTypes = function(
 #'
 #' @param countData Matrix with the expression values of the reference
 #'  cell-types. Parameters are estimated based on this count data.
-#' @param simMarkers Logical, indicating whether genes to be simulated are
-#'  markers or not
 #' @return Returns a list with the estimated parameters.
 estimateParameters = function(
-    countData,
-    simMarkers = TRUE
+    countData
 ){
     # Set parameters
     sigma = 1.96
