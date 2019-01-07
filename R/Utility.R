@@ -274,7 +274,11 @@ quantify_similarity = function(
         "_similarity"
     )
 
-    sim_index = grep(colnames(meta_data),pattern = "_similarity$", value = F)
+    sim_index = grep(
+        colnames(meta_data),
+        pattern = "_similarity$",
+        value = FALSE
+    )
     colnames(meta_data)[sim_index] = str_replace_all(
         colnames(meta_data)[sim_index],
         pattern = "_similarity$",
