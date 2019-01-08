@@ -15,7 +15,7 @@
 #' @param Graphics_parameters Pheatmap visualization paramters.
 #' You can customize visualization colors.
 #' Read the vignette for more information.
-#' @param baseline_mode Which measurement represents the baseline
+#' @param baseline Which measurement represents the baseline
 #' of the differentiation similarity: 'absolute' = maximal
 #' similarity of the training sample to its subtype e.g.
 #' alpha cell similarity to alpha cell =
@@ -25,7 +25,7 @@
 #'     deconvolution_results,
 #'     annotation_columns,
 #'     Graphics_parameters,
-#'     baseline_mode
+#'     baseline
 #' )
 #' @examples
 #' meta_data_path = system.file(
@@ -52,7 +52,7 @@
 #'         "Differentiatedness"
 #'      ),
 #'      Graphics_parameters = "",
-#'      baseline_mode = "absolute"
+#'      baseline = "relative"
 #' )
 #' @import stringr ggplot2 ggbiplot pheatmap
 #' @return Plots
@@ -66,7 +66,7 @@ create_PCA_differentiation_stages = function(
         "Differentiatedness"
     ),
     Graphics_parameters = "",
-    baseline_mode = "absolute"
+    baseline = "relative"
 ){
 
     # check for input data availability
@@ -189,7 +189,7 @@ create_PCA_differentiation_stages = function(
 #' @param Graphics_parameters Pheatmap visualization paramters.
 #' You can customize visualization colors.
 #' Read the vignette for more information.
-#' @param baseline_mode Which measurement represents the baseline
+#' @param baseline Which measurement represents the baseline
 #' of the differentiation similarity: 'absolute' = maximal
 #' similarity of the training sample to its subtype e.g.
 #' alpha cell similarity to alpha cell =
@@ -199,7 +199,7 @@ create_PCA_differentiation_stages = function(
 #'     deconvolution_results,
 #'     annotation_columns,
 #'     Graphics_parameters,
-#'     baseline_mode
+#'     baseline
 #' )
 #' @examples
 #' meta_data_path = system.file(
@@ -226,7 +226,7 @@ create_PCA_differentiation_stages = function(
 #'         "Differentiatedness"
 #'      ),
 #'      Graphics_parameters = "",
-#'      baseline_mode = "absolute"
+#'      baseline = "absolute"
 #' )
 #' @import stringr ggplot2 ggbiplot pheatmap
 #' @return Plots
@@ -316,7 +316,7 @@ create_heatmap_differentiation_stages = function(
         annotation_data$Differentiation_Stages_Subtypes %in% c("hesc","hisc")
     ] = "stem_cell"
 
-    if (baseline_mode == "relative"){
+    if (baseline == "relative"){
 
         # procure subtype information
 
@@ -369,7 +369,7 @@ create_heatmap_differentiation_stages = function(
                 model = model,
                 fit = fit,
                 parameter_list,
-                mode = mode,
+                baseline = baseline,
                 not_sig_samples = not_sig_samples
             )
         }

@@ -9,7 +9,7 @@ create_PCA_differentiation_stages(
     deconvolution_results,
     annotation_columns,
     Graphics_parameters,
-    baseline_mode
+    baseline
 )
 }
 \arguments{
@@ -27,7 +27,7 @@ ontop of the correlation matrix}
 You can customize visualization colors.
 Read the vignette for more information.}
 
-\item{baseline_mode}{Which measurement represents the baseline
+\item{baseline}{Which measurement represents the baseline
 of the differentiation similarity: 'absolute' = maximal
 similarity of the training sample to its subtype e.g.
 alpha cell similarity to alpha cell =}
@@ -66,6 +66,6 @@ create_PCA_differentiation_stages(
         "Differentiatedness"
      ),
      Graphics_parameters = "",
-     baseline_mode = "absolute"
+     baseline = "relative"
 )
 }
