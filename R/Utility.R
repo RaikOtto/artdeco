@@ -132,6 +132,7 @@ prepare_result_matrix = function(
             meta_data = meta_data,
             subtypes  = subtypes,
             fit       = fit,
+            model     =  model,
             parameter_list = parameter_list,
             baseline  = baseline,
             not_sig_samples   = not_sig_samples
