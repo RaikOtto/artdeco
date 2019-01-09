@@ -240,7 +240,7 @@ create_heatmap_differentiation_stages = function(
         "Differentiatedness"
     ),
     Graphics_parameters = "",
-    baseline_mode = "absolute"
+    baseline = "absolute"
 ){
 
     # check for input data availability
