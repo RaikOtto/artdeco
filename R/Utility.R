@@ -203,8 +203,9 @@ prepare_result_matrix = function(
 
                 dedifferentiatedness = sum(meta_data[i,de_differentiated_index])
                 differentiatedness = round(
-                    differentiatedness / de_differentiated_index
-                , 0 )
+                    differentiatedness / de_differentiated_index,
+                    0
+                )
                 meta_data[i,"Differentiatedness"] = differentiatedness # update
 
                 if(dedifferentiatedness > 50) {
@@ -226,6 +227,7 @@ prepare_result_matrix = function(
             }
         }
     }
+    meta_data$Differentiatedness = as.double(meta_data$Differentiatedness)
     return(meta_data)
 }
 
@@ -351,7 +353,7 @@ quantify_similarity = function(
 
         # all quantifications are initialized as empty
         meta_data[,subtype_label] =
-            rep("",length(subtype_sim_scalar))
+            rep("",length(meta_data$Sample))
 
         # decide on what to use as baseline
         if (baseline == "absolute"){
@@ -395,6 +397,7 @@ quantify_similarity = function(
             none_index          = which( similarity_quantified <= quants[2] )
         }
 
+        meta_data[,subtype_label] = as.double(similarity_quantified)
         not_sig_index           = which( rownames(meta_data) %in% not_sig_samples )
 
         # shape measurements relative to baseline

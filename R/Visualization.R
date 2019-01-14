@@ -267,7 +267,9 @@ create_heatmap_differentiation_stages = function(
     pcr = prcomp(t(correlation_matrix))
 
     # ensure correct ordering of expression and annotation data
-    rownames(deconvolution_results) = deconvolution_results$Sample
+    rownames(deconvolution_results) = as.character(
+            deconvolution_results$Sample
+    )
     deconvolution_results = deconvolution_results[
         colnames(correlation_matrix),
     ]
@@ -341,7 +343,10 @@ create_heatmap_differentiation_stages = function(
 
         models = as.character(
             unlist(
-                str_split(meta_data$model[1],pattern = "\\|")
+                str_split(
+                    deconvolution_results$model[1],
+                    pattern = "\\|"
+                )
             )
         )
         # readjust similarity predictions
@@ -361,7 +366,7 @@ create_heatmap_differentiation_stages = function(
             fit = model_and_parameter[1]
             fit = fit[[1]]
             parameter_list = model_and_parameter[2]
-            model_parameter = model_parameter[[1]]
+            #model_parameter = model_parameter[[1]]
             not_sig_samples = rownames(fit)[fit["P-value"] >= 0.05]
 
             annotation_data = quantify_similarity(
@@ -384,7 +389,7 @@ create_heatmap_differentiation_stages = function(
         annotation_legend = TRUE,
         treeheight_col = 0,
         treeheight_row = 0,
-        show_colnames = TRUE,
+        show_colnames = FALSE,
         show_rownames = FALSE
     )
 
@@ -412,7 +417,7 @@ configure_graphics = function(){
         acinar_similarity     = c(not_significant = "gray", none = "white", traces = "yellow", significant = "Brown"),
         progenitor_simimilarity = c(not_significant = "gray", none = "white", traces = "yellow", significant = "orange"),
         stem_cell_similaritry   = c(none = "white", traces = "yellow", significant = "darkred",not_significant = "gray"),
-        Differentiatedness      = c(none = "white", traces = "yellow", significant = "darkgreen"),
+        Differentiatedness      = c(low = "white", medium = "yellow", high = "darkgreen"),
         Differentiation_Stages_Aggregated = c(
             differentiated   = "darkgreen",
             dedifferentiated = "darkred",
