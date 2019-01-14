@@ -411,8 +411,8 @@ configure_graphics = function(){
         ductal_similarity     = c(not_significant = "gray", none = "white", traces = "yellow", significant = "Black"),
         acinar_similarity     = c(not_significant = "gray", none = "white", traces = "yellow", significant = "Brown"),
         progenitor_simimilarity = c(not_significant = "gray", none = "white", traces = "yellow", significant = "orange"),
-        stem_cell_similaritry   = c(low = "white", medium = "yellow", high = "darkred",not_sig = "gray"),
-        Differentiatedness      = c(low = "white", medium = "yellow", high = "darkgreen"),
+        stem_cell_similaritry   = c(none = "white", traces = "yellow", significant = "darkred",not_significant = "gray"),
+        Differentiatedness      = c(none = "white", traces = "yellow", significant = "darkgreen"),
         Differentiation_Stages_Aggregated = c(
             differentiated   = "darkgreen",
             dedifferentiated = "darkred",
