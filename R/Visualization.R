@@ -32,12 +32,12 @@
 #'     "Data/Meta_information/Meta_information.tsv",
 #'     package = "artdeco"
 #' )
-#' meta_data      = read.table(
+#' deconvolution_results      = read.table(
 #'     meta_data_path, sep ="\t",
 #'     header = TRUE,
 #'     stringsAsFactors = FALSE
 #' )
-#' rownames(meta_data) = meta_data$Sample
+#' rownames(deconvolution_results) = deconvolution_results$Sample
 #'
 #' transcriptome_file_path = system.file(
 #'     "/Data/Expression_data/Visualization_PANnen.tsv",
@@ -45,7 +45,7 @@
 #' )
 #' create_PCA_differentiation_stages(
 #'     transcriptome_file_path = transcriptome_file_path,
-#'     deconvolution_results = meta_data,
+#'     deconvolution_results = deconvolution_results,
 #'     annotation_columns = c(
 #'         "Differentiation_Stages_Subtypes",
 #'         "Differentiation_Stages_Aggregated",
@@ -54,7 +54,7 @@
 #'      Graphics_parameters = "",
 #'      baseline = "relative"
 #' )
-#' @import stringr ggplot2 ggbiplot pheatmap
+#' @import stringr ggplot2 pheatmap ggfortify
 #' @return Plots
 #' @export
 create_PCA_differentiation_stages = function(
@@ -137,15 +137,15 @@ create_PCA_differentiation_stages = function(
                 annotation_data$Differentiatedness
             )
         )
-
-    p = ggbiplot::ggbiplot(
+    #    obs.scale = .75,
+    #    groups = annotation_data[,"Differentiation_Stages_Aggregated"],
+    #    ellipse = TRUE,
+    #    circle = TRUE,
+    #    var.axes = FALSE
+    #    #,labels = meta_data$Name
+    #
+    p = autoplot(
         pcr,
-        obs.scale = .75,
-        groups = annotation_data[,"Differentiation_Stages_Aggregated"],
-        ellipse = TRUE,
-        circle = TRUE,
-        var.axes = FALSE
-        #,labels = meta_data$Name
     )
     p = p + geom_point(
         aes(
@@ -191,8 +191,9 @@ create_PCA_differentiation_stages = function(
 #' Read the vignette for more information.
 #' @param baseline Which measurement represents the baseline
 #' of the differentiation similarity: 'absolute' = maximal
-#' similarity of the training sample to its subtype e.g.
-#' alpha cell similarity to alpha cell =
+#' similarity of the training sample to its subtype. 'relative' 
+#' sets the baseline to maximal similarity of the test samples
+#' currently analysed
 #' @usage
 #' create_heatmap_differentiation_stages(
 #'     transcriptome_file_path,
@@ -228,7 +229,7 @@ create_PCA_differentiation_stages = function(
 #'      Graphics_parameters = "",
 #'      baseline = "absolute"
 #' )
-#' @import stringr ggplot2 ggbiplot pheatmap
+#' @import stringr ggplot2 pheatmap ggfortify
 #' @return Plots
 #' @export
 create_heatmap_differentiation_stages = function(
@@ -409,8 +410,8 @@ configure_graphics = function(){
         delta_similarity        = c(not_significant = "gray", none = "white", traces = "yellow", significant = "Purple"),
         ductal_similarity     = c(not_significant = "gray", none = "white", traces = "yellow", significant = "Black"),
         acinar_similarity     = c(not_significant = "gray", none = "white", traces = "yellow", significant = "Brown"),
-        progenitor_similarity = c(not_significant = "gray", none = "white", traces = "yellow", significant = "orange"),
-        stem_cell_similarity   = c(low = "white", medium = "yellow", high = "darkred",not_sig = "gray"),
+        progenitor_simimilarity = c(not_significant = "gray", none = "white", traces = "yellow", significant = "orange"),
+        stem_cell_similaritry   = c(low = "white", medium = "yellow", high = "darkred",not_sig = "gray"),
         Differentiatedness      = c(low = "white", medium = "yellow", high = "darkgreen"),
         Differentiation_Stages_Aggregated = c(
             differentiated   = "darkgreen",
