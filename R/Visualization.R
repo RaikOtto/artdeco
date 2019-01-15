@@ -184,8 +184,12 @@ create_PCA_differentiation_stages = function(
 #' that the first row has to contain the HGNC identifier
 #' @param deconvolution_results The dataframe returned
 #' by the deconvolution analysis
-#' @param annotation_columns Column names that are to be visualized
-#' ontop of the correlation matrix
+#' @param aggregate_differentiated_stages Show the differentiation stage similarities
+#' aggregated over all differentiated stages - alpha, beta, gamma, delta
+#' accinar and ductal - or specific for each differentiation stage.
+#' Default value FALSE, alternative value TRUE
+#' @param p_value Threshold above which deconvolutions are deemed unsuccessful
+#' and corresponding results being masked on the the plots
 #' @param Graphics_parameters Pheatmap visualization paramters.
 #' You can customize visualization colors.
 #' Read the vignette for more information.
@@ -198,7 +202,8 @@ create_PCA_differentiation_stages = function(
 #' create_heatmap_differentiation_stages(
 #'     transcriptome_file_path,
 #'     deconvolution_results,
-#'     annotation_columns,
+#'     aggregate_differentiated_stages,
+#'     p_value,
 #'     Graphics_parameters,
 #'     baseline
 #' )
@@ -221,13 +226,10 @@ create_PCA_differentiation_stages = function(
 #' create_heatmap_differentiation_stages(
 #'     transcriptome_file_path = transcriptome_file_path,
 #'     deconvolution_results = meta_data,
-#'     annotation_columns = c(
-#'         "Differentiation_Stages_Subtypes",
-#'         "Differentiation_Stages_Aggregated",
-#'         "Differentiatedness"
-#'      ),
-#'      Graphics_parameters = "",
-#'      baseline = "absolute"
+#'     aggregate_differentiated_stages = FALSE,
+#'     Graphics_parameters = "",
+#'     p_value = 0.05,
+#'     baseline = "relative"
 #' )
 #' @import stringr ggplot2 pheatmap ggfortify
 #' @return Plots
@@ -235,13 +237,10 @@ create_PCA_differentiation_stages = function(
 create_heatmap_differentiation_stages = function(
     transcriptome_file_path,
     deconvolution_results,
-    annotation_columns = c(
-        "Differentiation_Stages_Subtypes",
-        "Differentiation_Stages_Aggregated",
-        "Differentiatedness"
-    ),
+    aggregate_differentiated_stages = FALSE,
+    p_value = 0.05,
     Graphics_parameters = "",
-    baseline = "absolute"
+    baseline = "relative"
 ){
 
     # check for input data availability
@@ -262,14 +261,22 @@ create_heatmap_differentiation_stages = function(
         pattern = "^X",
         ""
     )
+    
+    not_sig_samples = rownames(deconvolution_results)[
+        deconvolution_results$P_value >= p_value]
+    for( sample_name in not_sig_samples)
+        deconvolution_results[
+            sample_name,
+            grep(
+                colnames(deconvolution_results),
+                pattern = 'percent|Sig_score|log_odds|P_value|model',
+                invert = T
+            )
+        ] = "Not_significant"
 
     correlation_matrix = cor(transcriptome_mat_vis)
     pcr = prcomp(t(correlation_matrix))
 
-    # ensure correct ordering of expression and annotation data
-    rownames(deconvolution_results) = as.character(
-            deconvolution_results$Sample
-    )
     deconvolution_results = deconvolution_results[
         colnames(correlation_matrix),
     ]
@@ -279,108 +286,65 @@ create_heatmap_differentiation_stages = function(
         Graphics_parameters = configure_graphics()
 
     # extract similarity measurements
-    sim_index = grep(
-        x = colnames(deconvolution_results),
-        pattern = paste0( c(
-            "(_similarity$)",
-            "(Differentiation_Stage)",
-            "Differentiatedness"
-        ), collapse = "|")
-    )
-    annotation_data = deconvolution_results[, sim_index]
-
-    # case the results data frame does not have a column
-    for (annotation in annotation_columns){
-        if (!( annotation %in% colnames(deconvolution_results))){
-            print(paste0(c(
-                "Did not find ",
-                annotation,
-                " column in the deconvolution matrix. No Visualization will occur."
-            )))
-        } else {
-            annotation_data[,annotation] = rep("",nrow(annotation_data))
-            annotation_data[rownames(deconvolution_results),annotation] =
-                deconvolution_results[,annotation]
-        }
-    }
-
-    # assert uniqueness of results
-    annotation_data = annotation_data[,unique(colnames(annotation_data))]
-
-    # ensure correct type cast
-    if(length(annotation_data$Differentiatedness) > 0)
-        annotation_data$Differentiatedness = as.double(
-            as.character(
-                annotation_data$Differentiatedness
-            )
-        )
-
-    annotation_data$Differentiation_Stages_Subtypes[
-        annotation_data$Differentiation_Stages_Subtypes %in% c("hesc","hisc")
-    ] = "stem_cell"
-
-    if (baseline == "relative"){
-
-        # procure subtype information
-
-        sub_index = grep(
+    
+    if (aggregate_differentiated_stages == FALSE){
+    
+        sim_index <<- grep(
             x = colnames(deconvolution_results),
             pattern = paste0( c(
-                "(_similarity$)"),
-                collapse = "|"
-            )
+                "similarity",
+                "NEC_NET"
+            ), collapse = "|")
         )
-        subtypes = colnames(deconvolution_results)[ sub_index]
-        subtypes[
-            str_replace_all(
-                subtypes,
-                "_similarity$",
-                ""
-            )  %in% c("hesc","hisc")
-        ] = "stem_cell_similarity"
-
-        # load the model information
-
-        models = as.character(
-            unlist(
-                str_split(
-                    deconvolution_results$model[1],
-                    pattern = "\\|"
-                )
-            )
+    } else {
+        sim_index <<- grep(
+            x = colnames(deconvolution_results),
+            pattern = paste0( c(
+                "(Differentiation_Stage)",
+                "Differentiatedness",
+                "(Differentiation_Stages_Subtypes)",
+                "NEC_NET"
+            ), collapse = "|")
         )
-        # readjust similarity predictions
-
-        for ( model in models){
-
-            model_path = paste0(c(
-                system.file(
-                    "Models/",
-                    package="artdeco"),
-                "/",
-                model,".RDS"
-            ),
-            collapse = ""
-            )
-            model_and_parameter = readRDS(model_path)
-            fit = model_and_parameter[1]
-            fit = fit[[1]]
-            parameter_list = model_and_parameter[2]
-            #model_parameter = model_parameter[[1]]
-            not_sig_samples = rownames(fit)[fit["P-value"] >= 0.05]
-
-            annotation_data = quantify_similarity(
-                meta_data = deconvolution_results,
-                subtypes = subtypes,
-                model = model,
-                fit = fit,
-                parameter_list,
-                baseline = baseline,
-                not_sig_samples = not_sig_samples
-            )
-        }
     }
-
+    
+    annotation_data = deconvolution_results[, sim_index]
+    
+    if (baseline == "relative"){
+        
+        sim_index <<- grep(
+            x = colnames(annotation_data),
+            pattern = "absolute",
+            invert = TRUE
+        )
+        colnames(annotation_data) = str_replace_all(
+            colnames(annotation_data),
+            pattern = "_relative",
+            ""
+        )
+    } else {
+        sim_index <<- grep(
+            x = colnames(annotation_data),
+            pattern = "absolute",
+            invert = FALSE
+        )
+        colnames(annotation_data) = str_replace_all(
+            colnames(annotation_data),
+            pattern = "_absolute",
+            ""
+        )
+    }
+    
+    annotation_data = annotation_data[,sim_index]
+    annotation_data = annotation_data[,! (colnames(annotation_data) %in% c("Sample","model"))]
+    annotation_data = annotation_data[,
+        grep(
+            colnames(annotation_data),
+            pattern = "_percent",
+            invert = TRUE
+        )
+    ]
+    
     # correlation heatmap
     pheatmap::pheatmap(
         correlation_matrix,
@@ -392,7 +356,6 @@ create_heatmap_differentiation_stages = function(
         show_colnames = FALSE,
         show_rownames = FALSE
     )
-
 }
 
 
@@ -415,15 +378,11 @@ configure_graphics = function(){
         delta_similarity        = c(not_significant = "gray", none = "white", traces = "yellow", significant = "Purple"),
         ductal_similarity     = c(not_significant = "gray", none = "white", traces = "yellow", significant = "Black"),
         acinar_similarity     = c(not_significant = "gray", none = "white", traces = "yellow", significant = "Brown"),
-        progenitor_simimilarity = c(not_significant = "gray", none = "white", traces = "yellow", significant = "orange"),
-        stem_cell_similaritry   = c(none = "white", traces = "yellow", significant = "darkred",not_significant = "gray"),
-        Differentiatedness      = c(low = "white", medium = "yellow", high = "darkgreen"),
-        Differentiation_Stages_Aggregated = c(
-            differentiated   = "darkgreen",
-            dedifferentiated = "darkred",
-            not_significant  = "gray"
-        ),
-        Differentiation_Stages_Subtypes = c(
+        progenitor_similarity = c(not_significant = "gray", none = "white", traces = "yellow", significant = "orange"),
+        stem_cell_similarity   = c(none = "white", traces = "yellow", significant = "darkred",not_significant = "gray"),
+        Differentiatedness_log_odds = c(low = "darkred", medium = "white", high = "darkgreen"),
+        Differentiatedness = c(Not_differentiated = "black", Unclear = "white", Differentiated = "darkgreen"),
+        Differentiation_Stage = c(
             alpha = "blue",
             beta = "green",
             gamma = "brown",

@@ -13,16 +13,6 @@
 #' @param nr_permutations Utilized to calculate p-value
 #' Higher amount of permutations generally lead to more
 #' precise p-value estimates
-#' @param p_value P-value that determines when a deconvolution
-#' is to be considered significant. Lower p-values lead to loss
-#' of sensitivity but increase in specificity.
-#' @param baseline Required for the interpretation of the results.
-#' Defines the level of expected similarity i.e. what degree of
-#' similarity in terms of percent is deemed as e.g. 'high' or
-#' 'low'. You can select the 'absolute' mode that sets the highest
-#' measured similarity of the training data as baseline or 'relative'
-#' which defines the highest measured similarity of the test samples
-#' as baseline
 #' @param meta_data Dataframe that stores the meta information
 #' of the transcriptomes. Can be build by the function itself or
 #' handed over
@@ -34,8 +24,6 @@
 #'     transcriptome_file_path,
 #'     models,
 #'     nr_permutations,
-#'     p_value,
-#'     baseline,
 #'     meta_data,
 #'     output_file
 #' )
@@ -44,26 +32,21 @@
 #' "/Data/Expression_data/PANnen_Test_Data.tsv", package = "artdeco")
 #' Determine_differentiation_stage(
 #'     transcriptome_file_path = transcriptome_file_path,
-#'     models = "Alpha_Beta_Gamma_Delta_Lawlor"
+#'     models = "Alpha_Beta_Gamma_Delta_Segerstolpe_Progenitor_Stanescu_HISC_Haber"
 #' )
 #' @return Similarity measurements of differentiation
 #' stages
 #' @export
 Determine_differentiation_stage = function(
     transcriptome_file_path,
-    models = "Alpha_Beta_Gamma_Delta_Lawlor",
+    models = "Alpha_Beta_Gamma_Delta_Segerstolpe_Progenitor_Stanescu_HISC_Haber",
     nr_permutations = 100,
-    p_value = 0.05,
-    baseline = "relative",
     meta_data = data.frame(),
     output_file = ""
 ){
     # check whether model is available
     if (length(models) == 0)
         stop("Require at least one models")
-
-    if (!(baseline %in% c("absolute","relative") ) )
-        stop("You must set the 'baseline' variable to either 'absolute' or 'relative'")
 
     # check for input data availability
     if (!file.exists(transcriptome_file_path)){
@@ -149,9 +132,7 @@ Determine_differentiation_stage = function(
     meta_data = prepare_result_matrix(
         prediction_stats_list = prediction_stats_list,
         parameter_list = parameter_list,
-        p_value = p_value,
         meta_data = meta_data,
-        baseline = baseline,
         models = models
     )
 
@@ -163,6 +144,7 @@ Determine_differentiation_stage = function(
             row.names = FALSE,
             quote = FALSE
     )
-
+    
+    meta_data = meta_data[,colnames(meta_data) != "Sample"]
     return(meta_data)
 }

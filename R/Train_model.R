@@ -141,11 +141,11 @@ add_deconvolution_training_model = function(
         "ExpressionSet",
         exprs = as.matrix(expression_training_mat)
     );
-
+    expression_training_mat[1:5,1:5]
     fit = bseqsc_proportions(
         test_mat,
         Basis,
-        verbose = FALSE,
+        verbose = TRUE,
         absolute = TRUE,
         perm = training_nr_permutations
     )

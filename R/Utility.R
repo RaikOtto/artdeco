@@ -80,15 +80,12 @@ show_models = function(
 #' Prepares the deconvolution results
 #' @param prediction_stats_list list containing the fitting results
 #' @param parameter_list List containing the model parameters
-#' @param p_value P-value significance threshold
 #' @param meta_data Contains the deconvolution results as dataframe
-#' @param baseline Specifying the baseline mode
 #' @param models List of training models
 #' @usage
 #' prepare_result_matrix(
 #'     prediction_stats_list,
 #'     parameter_list,
-#'     p_value,
 #'     meta_data,
 #'     baseline,
 #'     models
@@ -98,9 +95,7 @@ show_models = function(
 prepare_result_matrix = function(
     prediction_stats_list,
     parameter_list,
-    p_value,
     meta_data,
-    baseline,
     models
 ){
 
@@ -124,110 +119,103 @@ prepare_result_matrix = function(
         res_coeff[ is.na(res_coeff) ] = 0.0
         res_cor[ is.na(res_cor) ]     = 0.0
 
-        not_sig_samples = rownames(res_cor)[
-            which(res_cor[,"P-value"] > p_value)]
-        not_sig_samples
-
         meta_data = quantify_similarity(
             meta_data = meta_data,
             subtypes  = subtypes,
             fit       = fit,
             model     =  model,
-            parameter_list = parameter_list,
-            baseline  = baseline,
-            not_sig_samples   = not_sig_samples
+            parameter_list = parameter_list
         )
 
         # Calculate aggregated proportions
     }
 
-    # find highest similarity
-
-    max_mat  = meta_data[,grep(colnames(meta_data),pattern = "_similarity_percent")]
-    subtypes = str_replace_all(
-        grep(colnames(meta_data), pattern = "_similarity$",value = TRUE),
-        pattern = "_similarity",
-        ""
+    # calculate differentiatedness
+    
+    meta_data[,"Differentiatedness_absolute_log_odds"] = rep(0,nrow(meta_data))
+    meta_data[,"Differentiatedness_relative_log_odds"] = rep(0,nrow(meta_data))
+    meta_data[,"Differentiatedness_absolute"] = rep("",nrow(meta_data))
+    meta_data[,"Differentiatedness_relative"] = rep("",nrow(meta_data))
+    
+    differentiatedness_relative =
+    rowSums(
+        meta_data[,
+            grep( colnames(meta_data), pattern = 
+                "(alpha_similarity_relative_percent)|(beta_similarity_relative_percent)|(gamma_similarity_relative_percent)|(delta_similarity_relative_percent)|(accinar_similarity_relative_percent)|(ductal_similarity_relative_percent)",
+                value = T
+            )
+        ]
     )
-    maxi = apply(  max_mat, FUN = which.max, MARGIN = 1 )
-    meta_data$Differentiation_Stages_Subtypes = subtypes[maxi]
-
-    for (i in 1:nrow(meta_data)){
-
-        signess = (meta_data[i,
-            paste(meta_data$Differentiation_Stages_Subtypes[i],"similarity", sep ="_")
-        ])
-
-        if( signess %in% c("not_significant","none","traces") )
-            meta_data[i,"Differentiation_Stages_Subtypes"] = "not_significant"
-    }
-
-    # add differentiation information
-
-    differentiated_index = grep(
-        pattern = paste0(c(
-            "(alpha_similarity_percent)",
-            "(beta_similarity_percent)",
-            "(gamma_similarity_percent)",
-            "(delta_similarity_percent)",
-            "(accinar_similarity_percent)",
-            "(ductal_similarity_percent)"),
-            collapse = "|"),
-        colnames(meta_data),
-        value = FALSE
+    differentiatedness_absolute =
+    rowSums(
+        meta_data[,
+                  grep( colnames(meta_data), pattern = 
+                        "(alpha_similarity_absolute_percent)|(beta_similarity_absolute_percent)|(gamma_similarity_absolute_percent)|(delta_similarity_absolute_percent)|(accinar_similarity_absolute_percent)|(ductal_similarity_absolute_percent)",
+                        value = T
+                  )
+                  ]
     )
-    de_differentiated_index = grep(
-        pattern = paste0(c(
-            "(progenitor_similarity_percent)",
-            "(hsc_similarity_percent)"),
-            collapse = "|"),
-        colnames(meta_data),
-        value = FALSE
-    )
-
-    meta_data[,"Differentiatedness"] = rep("",nrow(meta_data))
-    meta_data[,"Differentiation_Stages_Aggregated"] = rep("",nrow(meta_data))
-
-    # quantify differentiation stages
-
-    if (length(differentiated_index) > 0 ){ # if we have subtypes that quantify diff.
-
-        for (i in 1:nrow(meta_data)){ # for all samples
-
-            differentiatedness = round(sum(meta_data[i,differentiated_index]),0)
-            meta_data[i,"Differentiatedness"] = differentiatedness
-
-            # branch we have at least one dedifferentiated subtype
-
-            if( length(de_differentiated_index) > 0 ){
-
-                dedifferentiatedness = sum(meta_data[i,de_differentiated_index])
-                differentiatedness = round(
-                    differentiatedness / de_differentiated_index,
-                    0
+    
+    de_differentiatedness_relative =
+        rowSums(
+            meta_data[,
+                grep( colnames(meta_data), pattern = 
+                        "(progenitor_similarity_relative_percent)|(stem_cell_similarity_relative_percent)",
+                    value = T
                 )
-                meta_data[i,"Differentiatedness"] = differentiatedness # update
+            ]
+        )
+    de_differentiatedness_absolute =
+        rowSums(
+            meta_data[,
+                grep( colnames(meta_data), pattern = 
+                        "(progenitor_similarity_relative_percent)|(stem_cell_similarity_relative_percent)",
+                    value = T
+                )
+            ]
+        )
+    
+    meta_data[,"Differentiatedness_absolute_log_odds"] = log( 
+        (differentiatedness_absolute + 1) / ( de_differentiatedness_absolute + 1)
+    )
+    meta_data[,"Differentiatedness_relative_log_odds"] = log(
+        (differentiatedness_relative + 1) / ( de_differentiatedness_relative + 1)
+    )
+    
+    meta_data$Differentiatedness_absolute = "Not_differentiated"
+    meta_data$Differentiatedness_absolute[ 
+        (-1 >= meta_data$Differentiatedness_absolute_log_odds) &
+        (      meta_data$Differentiatedness_absolute_log_odds <= 1)
+    ] = "Unclear"
+    meta_data$Differentiatedness_absolute[
+        meta_data[,"Differentiatedness_absolute_log_odds"] > 1] = "Differentiated"
+    
+    meta_data$Differentiatedness_relative = "Not_differentiated"
+    meta_data$Differentiatedness_relative[ 
+        (-1 >= meta_data$Differentiatedness_relative_log_odds) &
+            (      meta_data$Differentiatedness_relative_log_odds <= 1)
+        ] = "Unclear"
+    meta_data$Differentiatedness_relative[
+        meta_data[,"Differentiatedness_relative_log_odds"] > 1] = "Differentiated"
 
-                if(dedifferentiatedness > 50) {
-
-                    meta_data[i,"Differentiation_Stages_Aggregated"] = "dedifferentiated"
-
-                } else if (differentiatedness <= 50){
-
-                    meta_data[i,"Differentiation_Stages_Aggregated"] = "not_significant"
-                }
-
-            } else { # branch we do not have any dedifferentiation information
-
-                if (differentiatedness > 50) {
-                    meta_data[i,"Differentiation_Stages_Aggregated"] = "differentiated"
-                } else {
-                    meta_data[i,"Differentiation_Stages_Aggregated"] = "not_significant"
-                }
-            }
-        }
-    }
-    meta_data$Differentiatedness = as.double(meta_data$Differentiatedness)
+    # find highest similarity
+    
+    max_mat_relative  = meta_data[,grep(colnames(meta_data),pattern = "_similarity_relative_percent")]
+    max_mat_absolute  = meta_data[,grep(colnames(meta_data),pattern = "_similarity_absolute_percent")]
+    
+    subtypes = unique(str_replace_all(
+        grep(colnames(meta_data), pattern = "_similarity_absolute$",value = TRUE),
+        pattern = "_similarity_absolute",
+        ""
+    ))
+    maxi_relative = as.integer(apply(  max_mat_relative, FUN = which.max, MARGIN = 1 ))
+    maxi_absolute = as.integer(apply(  max_mat_absolute, FUN = which.max, MARGIN = 1 ))
+    meta_data$Differentiation_Stage_relative = subtypes[maxi_relative]
+    meta_data$Differentiation_Stage_absolute = subtypes[maxi_absolute]
+    
+    meta_data[,"P_value"] = res_cor[,"P-value"]
+    meta_data[,"Sig_score"] = res_cor[,ncol(res_cor)]
+ 
     return(meta_data)
 }
 
@@ -241,8 +229,6 @@ prepare_result_matrix = function(
 #'@param model Deconvolution model
 #'@param fit Deconvolution fit
 #'@param parameter_list List of parameters of the models
-#'@param baseline Absolut or relative mode
-#'@param not_sig_samples list of not significantly deconvolable samples
 #'@usage
 #' quantify_similarity(
 #'     meta_data,
@@ -250,8 +236,6 @@ prepare_result_matrix = function(
 #'     model,
 #'     fit,
 #'     parameter_list,
-#'     baseline,
-#'     not_sig_samples
 #' )
 #'@import stringr
 #'@export
@@ -261,9 +245,7 @@ quantify_similarity = function(
     subtypes,
     model,
     fit,
-    parameter_list,
-    baseline,
-    not_sig_samples
+    parameter_list
 ){
 
     subtypes = str_replace_all(
@@ -324,21 +306,33 @@ quantify_similarity = function(
 
     for (subtype in subtypes){
 
+        # initiate labels for absolute and relative case
         subtype = str_replace_all(
             subtype,
             pattern = "_similarity",
             ""
         )
 
-        subtype_label = paste0(
+        subtype_label_absolute = paste0(
             subtype,
-            "_similarity"
+            "_similarity_absolute"
+        )
+        subtype_label_relative = paste0(
+            subtype,
+            "_similarity_relative"
         )
 
-        subtype_label_quant = paste0(
+        subtype_label_quant_absolute = paste0(
             c(
                 subtype,
-                "_similarity_percent"
+                "_similarity_absolute_percent"
+            ),
+            collapse =""
+        )
+        subtype_label_quant_relative = paste0(
+            c(
+                subtype,
+                "_similarity_relative_percent"
             ),
             collapse =""
         )
@@ -349,14 +343,15 @@ quantify_similarity = function(
             pattern = "_similarity",
             ""
         )
-        subtype_sim_scalar = log( res_coeff[,subtype] + 1 )
+        subtype_sim_scalar = res_coeff[,subtype]
 
         # all quantifications are initialized as empty
-        meta_data[,subtype_label] =
+        meta_data[,subtype_label_absolute] =
+            rep("",length(meta_data$Sample))
+        meta_data[,subtype_label_relative] =
             rep("",length(meta_data$Sample))
 
-        # decide on what to use as baseline
-        if (baseline == "absolute"){
+        # case baseline is absolute
 
             # obtain measurement from training phase of model
             parameter = parameter_list[[model]]
@@ -370,49 +365,72 @@ quantify_similarity = function(
                     )
                 )
             )
-            sub_fit_max = max(parameter)
-            sub_fit_max = log(sub_fit_max + 1)
-            sub_fit_max = max(sub_fit_max, max(subtype_sim_scalar))
+            maximum = max(parameter)
+            #sub_fit_max = log(sub_fit_max + 1)
+            #maximum_val = max(maximum, max(subtype_sim_scalar))
 
-            similarity_quantified = round(subtype_sim_scalar / sub_fit_max * 100,0)
+            similarity_quantified_absolute = round(
+                exp( subtype_sim_scalar )  /
+                    maximum * 100,
+                1
+            )
+            similarity_quantified_absolute = similarity_quantified_absolute /
+                max(similarity_quantified_absolute) * 100
+            
+            # load data
 
-            significant_index   = which( similarity_quantified <= 100 )
-            traces_index        = which( similarity_quantified <= 25 )
-            none_index          = which( similarity_quantified <= 10 )
+            none_index_absolute          = which( similarity_quantified_absolute >= 0.0 )
+            traces_index_absolute        = which( similarity_quantified_absolute >= 10.0 )
+            significant_index_absolute   = which( similarity_quantified_absolute >= 20.0 )
+            
+            meta_data[,subtype_label_quant_absolute] = as.double(similarity_quantified_absolute)
+            meta_data[,subtype_label_absolute] = rep("",nrow(meta_data))
+            
+            meta_data[ none_index_absolute       , subtype_label_absolute ] = "none"
+            meta_data[ traces_index_absolute     , subtype_label_absolute ] = "traces"
+            meta_data[ significant_index_absolute, subtype_label_absolute ] = "present"
+            
+            meta_data[
+                (meta_data[ ,
+                            subtype_label_absolute ] == "") | ( is.na(meta_data[ , subtype_label_absolute
+                                                                                 ]) ),
+                subtype_label_absolute
+            ] = "none"
 
-        } else { # use use-case specific measurements
+        #case baseline relative
 
-            similarity_quantified = round(
+            similarity_quantified_relative = round(
                 subtype_sim_scalar / max( subtype_sim_scalar ) * 100,
                 0
             )
+            #similarity_quantified_relative = log(similarity_quantified_relative+1)
 
             quants = quantile(
-                similarity_quantified,
-                seq(0,1, by =.1)
+                similarity_quantified_relative,
+                seq(0,1, by =.01)
             )
 
-            significant_index   = which( similarity_quantified <= quants[10] )
-            traces_index        = which( similarity_quantified <= quants[6] )
-            none_index          = which( similarity_quantified <= quants[2] )
-        }
+            # load data
+            
+            none_index_relative          = which( similarity_quantified_relative >= 0 )
+            traces_index_relative        = which( similarity_quantified_relative >= quants[33]  )
+            significant_index_relative   = which( similarity_quantified_relative >= quants[67] )
 
-        meta_data[,subtype_label] = as.double(similarity_quantified)
-        not_sig_index           = which( rownames(meta_data) %in% not_sig_samples )
+            meta_data[,subtype_label_quant_relative] = as.double(similarity_quantified_relative)
+            meta_data[,subtype_label_relative] = rep("",nrow(meta_data))
+            
+            meta_data[ none_index_relative       , subtype_label_relative ] = "none"
+            meta_data[ traces_index_relative     , subtype_label_relative ] = "traces"
+            meta_data[ significant_index_relative, subtype_label_relative ] = "present"
+            
+            meta_data[
+                (meta_data[ ,
+                            subtype_label_relative ] == "") | ( is.na(meta_data[ , subtype_label_relative
+                                                                                 ]) ),
+                subtype_label_relative
+            ] = "none"
 
-        # shape measurements relative to baseline
-        meta_data[,subtype_label_quant]  = similarity_quantified
-
-        meta_data[ significant_index, subtype_label ] = "significant"
-        meta_data[ traces_index     , subtype_label ] = "traces"
-        meta_data[ none_index       , subtype_label ] = "none"
-        meta_data[ not_sig_index    , subtype_label ] = "not_significant"
-        meta_data[
-            (meta_data[ ,
-                subtype_label ] == "") | ( is.na(meta_data[ , subtype_label
-            ]) ),
-            subtype_label
-        ] = "none"
     }
+
     return(meta_data)
 }
