@@ -83,10 +83,10 @@ add_deconvolution_training_model = function(
 
     if (length(subtype_vector) == 0)
         stop(paste0("You have to provide the sample subtypes labels for model training"))
-    subtype_vector = str_to_lower(subtype_vector)
+    #subtype_vector = str_to_lower(subtype_vector)
 
     print("Loading training data")
-
+    
     expression_training_mat = read.table(
         transcriptome_data_path,
         sep ="\t",
@@ -101,15 +101,15 @@ add_deconvolution_training_model = function(
     expression_training_mat = expression_training_mat[row_var != 0,]
     expression_training_mat = expression_training_mat[rowSums(expression_training_mat) >= 1,]
 
-    if (length(marker_gene_list) == 0){
+    if (length(marker_gene_list) <= 1){
 
-        Marker_Gene_List = marker_gene_list
+        Marker_Gene_List <<- list()
         for( subtype in unique(subtype_vector) ){
             Marker_Gene_List[[subtype]] = identify_marker_genes(
-                expression_training_mat,
-                subtype_vector,
-                subtype,
-                training_nr_marker_genes
+                expression_training_mat = expression_training_mat,
+                subtype_vector = subtype_vector,
+                subtype = subtype,
+                nr_marker_genes = training_nr_marker_genes
             )
         }
         print("Finished extracting marker genes for subtypes")
@@ -122,8 +122,10 @@ add_deconvolution_training_model = function(
         "ExpressionSet",
         exprs = as.matrix(expression_training_mat)
     )
-    fData(training_mat_bseq) = data.frame( subtype_vector )
-    pData(training_mat_bseq) = data.frame( subtype_vector )
+    fData(training_mat_bseq) = data.frame( as.character(subtype_vector) )
+    colnames(fData(training_mat_bseq)) = "subtype_vector"
+    pData(training_mat_bseq) = data.frame( as.character(subtype_vector) )
+    colnames(pData(training_mat_bseq)) = "subtype_vector"
 
     Basis = suppressMessages(
         bseqsc_basis(
@@ -141,13 +143,19 @@ add_deconvolution_training_model = function(
         "ExpressionSet",
         exprs = as.matrix(expression_training_mat)
     );
+    fData(test_mat) = data.frame( as.character(subtype_vector) )
+    colnames(fData(test_mat)) = "subtype_vector"
+    pData(test_mat) = data.frame( as.character(subtype_vector) )
+    colnames(pData(test_mat)) = "subtype_vector"
+    
     expression_training_mat[1:5,1:5]
     fit = bseqsc_proportions(
         test_mat,
         Basis,
         verbose = TRUE,
         absolute = TRUE,
-        perm = training_nr_permutations
+        perm = training_nr_permutations,
+        
     )
 
     print("Finished threshold determination")

@@ -7,46 +7,54 @@
 #' @param transcriptome_file_path Path to the file which contains
 #' the transcriptome data. Notice the HGNC row convention:
 #' Rownames have to include the unique HGNC identifier, see vignette.
+#' @param deconvolve_exokrine_tissue If TRUE, will deconvolve as well
+#' into ductal and accinar tissue percentages
 #' @param models List of models to be used. Use show_models()
 #' to view available models or add new model via
 #' add_deconvolution_training_model()
 #' @param nr_permutations Utilized to calculate p-value
 #' Higher amount of permutations generally lead to more
 #' precise p-value estimates
-#' @param meta_data Dataframe that stores the meta information
-#' of the transcriptomes. Can be build by the function itself or
-#' handed over
 #' @param output_file Path of output file. If not specified,
 #' no hard-disk written output will occur.
 #' @import bseqsc
 #' @usage
 #' Determine_differentiation_stage(
 #'     transcriptome_file_path,
+#'     deconvolve_exokrine_tissue
 #'     models,
 #'     nr_permutations,
-#'     meta_data,
 #'     output_file
 #' )
 #' @examples
 #' transcriptome_file_path = system.file(
 #' "/Data/Expression_data/PANnen_Test_Data.tsv", package = "artdeco")
 #' Determine_differentiation_stage(
-#'     transcriptome_file_path = transcriptome_file_path,
-#'     models = "Alpha_Beta_Gamma_Delta_Segerstolpe_Progenitor_Stanescu_HISC_Haber"
+#'     transcriptome_file_path = transcriptome_file_path
 #' )
 #' @return Similarity measurements of differentiation
 #' stages
 #' @export
 Determine_differentiation_stage = function(
     transcriptome_file_path,
-    models = "Alpha_Beta_Gamma_Delta_Segerstolpe_Progenitor_Stanescu_HISC_Haber",
+    deconvolve_exokrine_tissue = FALSE,
+    models = c(),
     nr_permutations = 100,
-    meta_data = data.frame(),
     output_file = ""
 ){
     # check whether model is available
-    if (length(models) == 0)
-        stop("Require at least one models")
+    if (length(models) > 0){
+        message("Will utilize specified models")
+    } else {
+        models = c(
+            "Alpha_Beta_Gamma_Delta_Lawlor",
+            "Progenitor_Stanescu_HESC_Yan"
+        )
+        message(paste(
+            "Will utilize the following models for deconvolution: ",
+            paste(collapse = ", ",models, sep =",")
+        ))
+    }
 
     # check for input data availability
     if (!file.exists(transcriptome_file_path)){
@@ -74,19 +82,10 @@ Determine_differentiation_stage = function(
 
     # check if meta data is available
 
-    if (nrow(meta_data) == 0){
-
-        print(paste0(c(
-            "No meta data sheet provided, ",
-            "creating meta data sheet from transcriptome file."
-        ), sep ="", collapse = "" ))
-        meta_data = data.frame(
-            row.names = colnames(deconvolution_data),
-            "Sample" = colnames(deconvolution_data)
-        )
-        meta_data$model = rep("",nrow(meta_data))
-        meta_data$model = paste0(c(models),collapse="|")
-    }
+    meta_data = data.frame(
+        row.names = colnames(deconvolution_data),
+        "Model" = rep( paste0(c(models),collapse="|"), ncol(deconvolution_data))
+    )
 
     models_list = list()
     parameter_list = list()
@@ -143,7 +142,7 @@ Determine_differentiation_stage = function(
             sep ="\t",
             row.names = FALSE,
             quote = FALSE
-    )
+        )
     
     meta_data = meta_data[,colnames(meta_data) != "Sample"]
     return(meta_data)

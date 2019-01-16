@@ -193,9 +193,9 @@ create_PCA_differentiation_stages = function(
 #' @param Graphics_parameters Pheatmap visualization paramters.
 #' You can customize visualization colors.
 #' Read the vignette for more information.
-#' @param baseline Which measurement represents the baseline
+#' @param relative_baseline Which measurement represents the baseline
 #' of the differentiation similarity: 'absolute' = maximal
-#' similarity of the training sample to its subtype. 'relative' 
+#' similarity of the training sample to its subtype. TRUE
 #' sets the baseline to maximal similarity of the test samples
 #' currently analysed
 #' @usage
@@ -205,7 +205,7 @@ create_PCA_differentiation_stages = function(
 #'     aggregate_differentiated_stages,
 #'     p_value,
 #'     Graphics_parameters,
-#'     baseline
+#'     relative_baseline
 #' )
 #' @examples
 #' meta_data_path = system.file(
@@ -219,38 +219,38 @@ create_PCA_differentiation_stages = function(
 #' )
 #' rownames(meta_data) = meta_data$Sample
 #'
-#' transcriptome_file_path = system.file(
+#' visualization_data_path = system.file(
 #'     "/Data/Expression_data/Visualization_PANnen.tsv",
 #'      package = "artdeco"
 #' )
 #' create_heatmap_differentiation_stages(
-#'     transcriptome_file_path = transcriptome_file_path,
+#'     visualization_data_path = visualization_data_path,
 #'     deconvolution_results = meta_data,
 #'     aggregate_differentiated_stages = FALSE,
 #'     Graphics_parameters = "",
 #'     p_value = 0.05,
-#'     baseline = "relative"
+#'     relative_baseline = TRUE
 #' )
 #' @import stringr ggplot2 pheatmap ggfortify
 #' @return Plots
 #' @export
 create_heatmap_differentiation_stages = function(
-    transcriptome_file_path,
+    visualization_data_path,
     deconvolution_results,
     aggregate_differentiated_stages = FALSE,
     p_value = 0.05,
     Graphics_parameters = "",
-    baseline = "relative"
+    relative_baseline = TRUE
 ){
 
     # check for input data availability
-    if (!file.exists(transcriptome_file_path)){
-        stop(paste0("Could not find file ",transcriptome_file_path))
+    if (!file.exists(visualization_data_path)){
+        stop(paste0("Could not find file ",visualization_data_path))
     }
 
     # load transcriptome data
     transcriptome_mat_vis = read.table(
-        transcriptome_file_path,
+        visualization_data_path,
         sep="\t",
         header = TRUE,
         stringsAsFactors = FALSE,
@@ -270,7 +270,7 @@ create_heatmap_differentiation_stages = function(
             grep(
                 colnames(deconvolution_results),
                 pattern = 'percent|Sig_score|log_odds|P_value|model',
-                invert = T
+                invert = TRUE
             )
         ] = "Not_significant"
 
@@ -310,7 +310,7 @@ create_heatmap_differentiation_stages = function(
     
     annotation_data = deconvolution_results[, sim_index]
     
-    if (baseline == "relative"){
+    if (relative_baseline){
         
         sim_index <<- grep(
             x = colnames(annotation_data),
@@ -372,16 +372,16 @@ configure_graphics = function(){
 
     Graphics_parameters         = list(
         NEC_NET                 = c(NEC= "red", NET = "blue"),
-        alpha_similarity        = c(not_significant = "gray", none = "white", traces = "yellow", significant = "blue"),
-        beta_similarity         = c(not_significant = "gray", none = "white", traces = "yellow", significant = "darkgreen"),
-        gamma_similarity        = c(not_significant = "gray", none = "white", traces = "yellow", significant = "brown"),
-        delta_similarity        = c(not_significant = "gray", none = "white", traces = "yellow", significant = "Purple"),
-        ductal_similarity     = c(not_significant = "gray", none = "white", traces = "yellow", significant = "Black"),
-        acinar_similarity     = c(not_significant = "gray", none = "white", traces = "yellow", significant = "Brown"),
-        progenitor_similarity = c(not_significant = "gray", none = "white", traces = "yellow", significant = "orange"),
-        stem_cell_similarity   = c(none = "white", traces = "yellow", significant = "darkred",not_significant = "gray"),
+        alpha_similarity        = c(Not_significant = "gray", low = "white", high = "blue"),
+        beta_similarity         = c(Not_significant = "gray", low = "white", high = "darkgreen"),
+        gamma_similarity        = c(Not_significant = "gray", low = "white", high = "brown"),
+        delta_similarity        = c(Not_significant = "gray", low = "white", high = "Purple"),
+        ductal_similarity     = c(Not_significant = "gray", low = "white", high = "Black"),
+        acinar_similarity     = c(Not_significant = "gray", low = "white", high = "Brown"),
+        progenitor_similarity = c(Not_significant = "gray", low = "white", high = "orange"),
+        stem_cell_similarity   = c(Not_significant = "gray",low = "white", high = "darkred"),
         Differentiatedness_log_odds = c(low = "darkred", medium = "white", high = "darkgreen"),
-        Differentiatedness = c(Not_differentiated = "black", Unclear = "white", Differentiated = "darkgreen"),
+        Differentiatedness = c(Not_significant = "gray",low = "black", high = "darkgreen"),
         Differentiation_Stage = c(
             alpha = "blue",
             beta = "green",
@@ -391,7 +391,7 @@ configure_graphics = function(){
             ductal = "red",
             stem_cell      = "black",
             progenitor     = "orange",
-            not_significant= "gray"
+            Not_significant= "gray"
         ),
         Grading          = c( G1 = "Green",G2 = "Yellow", G3 = "Red", G0 = "white")
     )

@@ -9,7 +9,7 @@ identify_marker_genes = function(
     expression_training_mat,
     subtype_vector,
     subtype,
-    nr_marker_genes = 100
+    nr_marker_genes
 ){
 
     print(paste("Calculating marker genes for subtype: ",subtype, sep =""))
