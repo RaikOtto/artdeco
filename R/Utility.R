@@ -184,6 +184,15 @@ prepare_result_matrix = function(
     meta_data[,"Differentiatedness_relative_percent"] =
         round((differentiatedness_relative + 1) / max((differentiatedness_relative + 1))*100,0)
     
+    meta_data[,"Differentiatedness_relative"] = rep("low",nrow(meta_data))
+    meta_data[,"Differentiatedness_absolute"] = rep("low",nrow(meta_data))
+    
+    meta_data[
+        meta_data[,"Differentiatedness_relative_percent"] >
+            quantile(meta_data[,"Differentiatedness_relative_percent"], seq(0,1,.01)[67]),
+        "Differentiatedness_relative"
+    ] = "high"
+
     # find highest similarity non aggregated
     
     max_mat_relative  = meta_data[,grep(colnames(meta_data),pattern = "_similarity_relative_percent")]
@@ -208,7 +217,29 @@ prepare_result_matrix = function(
         pattern = "(stem_cell_similarity_relative_percent)|(progenitor_similarity_relative_percent)|(Differentiatedness_relative_percent)")]
     max_mat_aggregated_absolute  = meta_data[,grep(colnames(meta_data),
         pattern = "(stem_cell_similarity_absolute_percent)|(progenitor_similarity_absolute_percent)|(Differentiatedness_absolute_percent)")]
+    
+    max_vec_agg_rel = apply( max_mat_aggregated_relative, MARGIN = 1, FUN = which.max )
+    max_vec_agg_abs = apply( max_mat_aggregated_relative, MARGIN = 1, FUN = which.max )
  
+    meta_data[,"Differentiation_Stage_Aggregated_relative"] = rep("",nrow(meta_data))
+    meta_data[,"Differentiation_Stage_Aggregated_absolute"] = rep("",nrow(meta_data))
+    
+    rel_labels = str_replace_all( 
+        colnames(max_mat_aggregated_relative),
+        pattern = "_similarity_relative_percent|_relative_percent",
+        "" 
+    )
+    rel_labels[rel_labels == "Differentiatedness"] = "differentiated"
+    meta_data[,"Differentiation_Stage_Aggregated_relative"] = rel_labels[max_vec_agg_rel]
+    
+    abs_labels = str_replace_all(
+        colnames(max_mat_aggregated_absolute),
+        pattern = "_similarity_absolute_percent|_absolute_percent",
+        "" 
+    )
+    abs_labels[abs_labels == "Differentiatedness"] = "differentiated"
+    meta_data[,"Differentiation_Stage_Aggregated_absolute"] = abs_labels[max_vec_agg_abs]
+    
     return(meta_data)
 }
 

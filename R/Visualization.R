@@ -393,6 +393,12 @@ configure_graphics = function(){
             progenitor     = "orange",
             Not_significant= "gray"
         ),
+        Differentiation_Stage_Aggregated = c(
+            differentiated = "darkgreen",
+            stem_cell = "red",
+            progenitor     = "orange",
+            Not_significant= "gray"
+        ),
         Grading          = c( G1 = "Green",G2 = "Yellow", G3 = "Red", G0 = "white")
     )
     return(Graphics_parameters)

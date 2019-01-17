@@ -148,12 +148,12 @@ add_deconvolution_training_model = function(
     pData(test_mat) = data.frame( as.character(subtype_vector) )
     colnames(pData(test_mat)) = "subtype_vector"
     
-    expression_training_mat[1:5,1:5]
     fit = bseqsc_proportions(
         test_mat,
         Basis,
         verbose = TRUE,
         absolute = TRUE,
+        log = F,
         perm = training_nr_permutations,
         
     )
