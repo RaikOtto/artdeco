@@ -31,8 +31,6 @@ prepare_result_matrix = function(
             if ("alpha" %in% rownames(res_coeff))
                 res_coeff = t(res_coeff)
             
-            result_matrix$Differentation_score = rep(0,nrow(result_matrix))
-
             training_baseline = parameter_list[[nr_fit]]
             training_baseline = training_baseline[[1]]
             names(training_baseline) = str_to_lower(names(training_baseline))
@@ -43,10 +41,8 @@ prepare_result_matrix = function(
                 
                 if (scale_values) {
                     result_matrix[ , subtype] = exp( res_coeff[,subtype] )
-                    result_matrix$Differentation_score = exp(res_cor[,4])
                 } else {
                     result_matrix[ , subtype] = res_coeff[,subtype]
-                    result_matrix$Differentation_score = res_cor[,4]
                 }
                 
                 subtype_label = paste(subtype,"similarity",sep  ="_")
@@ -62,7 +58,7 @@ prepare_result_matrix = function(
                     result_matrix[result_matrix[ , subtype] > 100,subtype] = 100
                     
                     result_matrix[
-                        result_matrix[,subtype] > 25,
+                        result_matrix[,subtype] > 20,
                         subtype_label] = "high"    
                 } else {
                     
@@ -77,16 +73,13 @@ prepare_result_matrix = function(
 
             cands = c("alpha","beta","gamma","delta","acinar","ductal")
             cands = cands[cands %in% colnames(result_matrix)]
-            Differentiated_sim_scalar = 
-                rowSums(result_matrix[,cands])
-            result_matrix$Differentiated_similarity = rep("low",nrow(result_matrix))
-            Differentiated_sim_scalar = exp(Differentiated_sim_scalar)
-            result_matrix$Differentiated_similarity[
-                Differentiated_sim_scalar > quantile(
-                    Differentiated_sim_scalar,
-                    seq(0,1,.01)[50]
-                )
+            differentiatedness = rowSums(result_matrix[,cands])
+            result_matrix[,"Differentiatedness"] = rep("low",nrow(result_matrix))
+            result_matrix[
+                differentiatedness > mean(differentiatedness)
+                ,"Differentiatedness"
             ] = "high"
+            result_matrix$Differentiation_score = res_cor[,4]
             
             # set p-values
             
@@ -107,7 +100,6 @@ prepare_result_matrix = function(
                         "ductal_similarity"
                     )
             ]
-            
             result_matrix[no_sig_index,index] = "not_sig"
             }
         ## end fit 1
@@ -118,55 +110,62 @@ prepare_result_matrix = function(
             res_cor   = prediction_stats_list[[nr_fit]]
             colnames(res_coeff) = str_replace_all(colnames(res_coeff) ,"^X","")
             rownames(res_cor) = str_replace_all(rownames(res_cor) ,"^X","")
-            colnames(res_coeff) = str_to_lower(colnames(res_coeff))
             
             res_coeff[ is.na(res_coeff) ] = 0.0
             res_cor[ is.na(res_cor) ] = 0.0
             
-            if (relative != TRUE){
+            res_coeff = t(res_coeff)
+            colnames(res_coeff) = str_to_lower(colnames(res_coeff))
+            
+            if ("progenitor" %in% rownames(res_coeff))
+                res_coeff = t(res_coeff)
+            
+            training_baseline = parameter_list[[nr_fit]]
+            training_baseline = training_baseline[[1]]
+            names(training_baseline) = str_to_lower(names(training_baseline))
+            
+            for (subtype in c("progenitor","hisc","hesc")){
                 
-                training_baseline = parameter_list[[nr_fit]]
-                training_baseline = training_baseline[[1]]
-                names(training_baseline) = str_to_lower(names(training_baseline))
+                if (!(subtype %in% colnames(res_coeff)) ) next
                 
-                for (subtype in c("progenitor","hesc","hisc")){
-                    
-                    if ( !( subtype %in% colnames(res_coeff) ) )
-                        next
+                if (scale_values) {
+                    result_matrix[ , subtype] = exp( res_coeff[,subtype] )
+                } else {
+                    result_matrix[ , subtype] = res_coeff[,subtype]
+                }
+                
+                subtype_label = paste(subtype,"similarity",sep  ="_")
+                result_matrix[,subtype_label] = rep("low",nrow(result_matrix))
+                
+                if (relative != TRUE){
                     
                     baseline = as.double(as.character(unlist(
                         training_baseline[subtype])))
-                    res_coeff[,subtype] = round(
-                        (res_coeff[,subtype]/
-                        quantile(baseline)[1])*100,0)
-                    res_coeff[res_coeff[,subtype] > 100,subtype] = 100
-                }
-            }
-            
-            result_matrix$De_differentation_score = rep(0, nrow(result_matrix))
-            result_matrix$De_differentation_score = res_cor[,4]
-
-            for ( label in colnames(res_coeff) ) {
-            
-                similarity_label = paste(label,"similarity",sep="_")
-                
-                if(scale_values){
-                    sim_scalar = exp( res_coeff[,label] )
-                    result_matrix$De_differentation_score = exp(result_matrix$De_differentation_score)
+                    result_matrix[ , subtype] = round(
+                        (as.double(result_matrix[ , subtype])/
+                             quantile(baseline)[2])*100,0)
+                    result_matrix[result_matrix[ , subtype] > 100,subtype] = 100
+                    
+                    result_matrix[
+                        result_matrix[,subtype] > 20,
+                        subtype_label] = "high"    
                 } else {
-                    sim_scalar = res_coeff[,label]
+                    
+                    result_matrix[
+                        result_matrix[,subtype] >
+                            quantile(result_matrix[,subtype],seq(0,1,.01)[67]),
+                        subtype_label
+                        ] = "high"    
                 }
                 
-                result_matrix[,label] = rep("low",nrow(result_matrix))
-                result_matrix[,label] = as.double(sim_scalar)
-                result_matrix[,similarity_label]   = rep("low",nrow(result_matrix))
-                result_matrix[
-                    sim_scalar > quantile(
-                        sim_scalar,
-                        seq(0,1,.01)[80]
-                    ),similarity_label
-                ] = "high"
             }
+            
+            cands = c("progenitor","hisc","hesc")
+            cands = cands[cands %in% colnames(result_matrix)]
+            
+            result_matrix[,"De_differentiation_score"] = res_cor[,4]
+            
+            # set p-values
             
             p_values = res_cor[,1]
             p_values[is.na(p_values)]  = 1
@@ -177,30 +176,17 @@ prepare_result_matrix = function(
             index = colnames(result_matrix)[
                 str_to_lower(colnames(result_matrix)) %in%
                     c(
+                        "progenitor_similarity",
                         "hisc_similarity",
-                        "hesc_similarity",
-                        "progenitor_similarity"
+                        "hesc_similarity"
                     )
-            ]
+                ]
+            
             result_matrix[no_sig_index,index] = "not_sig"
         }
         ## end fit 2
     }
 
-    result_matrix$Differentation_score[
-        result_matrix$Differentation_score >= quantile(result_matrix$Differentation_score)[4]
-    ] = quantile(result_matrix$Differentation_score)[4]
-    result_matrix$Differentation_score[
-        result_matrix$Differentation_score <= quantile(result_matrix$Differentation_score)[1]
-        ] = quantile(result_matrix$Differentation_score)[2]
-    
-    result_matrix$De_differentation_score[
-        result_matrix$De_differentation_score >= quantile(result_matrix$De_differentation_score)[4]
-        ] = quantile(result_matrix$De_differentation_score)[4]
-    result_matrix$De_differentation_score[
-        result_matrix$De_differentation_score <= quantile(result_matrix$De_differentation_score)[1]
-        ] = quantile(result_matrix$De_differentation_score)[2]
-    
     colnames(result_matrix)[colnames(result_matrix) == "progenitor_similarity"] = "Progenitor_similarity"
     colnames(result_matrix)[colnames(result_matrix) == "hisc_similarity"] = "HISC_similarity"
     colnames(result_matrix)[colnames(result_matrix) == "hesc_similarity"] = "HESC_similarity"

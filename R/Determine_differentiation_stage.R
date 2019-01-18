@@ -44,7 +44,7 @@
 #' @export
 Determine_differentiation_stage = function(
     transcriptome_file_path,
-    p_value_threshold = 0.05,
+    p_value_threshold = 0.03,
     deconvolve_exokrine_tissue = FALSE,
     HISC_stem_cell_only = FALSE,
     models = c(
@@ -126,7 +126,7 @@ Determine_differentiation_stage = function(
             verbose = TRUE,
             absolute = TRUE,
             log = FALSE,
-            perm = 0
+            perm = nr_permutations
         )
         
         prediction_res_coeff_list[[pred_model]] = fit$coefficients
