@@ -92,7 +92,7 @@ show_models = function(
 #' )
 #' @import stringr
 #' @return list of models
-prepare_result_matrix = function(
+prepare_result_matrix_deprecated = function(
     prediction_stats_list,
     parameter_list,
     meta_data,

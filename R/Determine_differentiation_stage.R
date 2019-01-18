@@ -7,8 +7,13 @@
 #' @param transcriptome_file_path Path to the file which contains
 #' the transcriptome data. Notice the HGNC row convention:
 #' Rownames have to include the unique HGNC identifier, see vignette.
+#' @param p_value_threshold P value that deconvolutions may maximally
+#' have in order to be deemed significant
 #' @param deconvolve_exokrine_tissue If TRUE, will deconvolve as well
 #' into ductal and accinar tissue percentages
+#' @param HISC_stem_cell_only TRUE limits the stemm cell similarity
+#' to human intestinal stem cells as opposed to HISC and human embryonal
+#' stem cells, HESC
 #' @param models List of models to be used. Use show_models()
 #' to view available models or add new model via
 #' add_deconvolution_training_model()
@@ -21,7 +26,9 @@
 #' @usage
 #' Determine_differentiation_stage(
 #'     transcriptome_file_path,
+#'     p_value_threshold,
 #'     deconvolve_exokrine_tissue
+#'     HISC_stem_cell_only,
 #'     models,
 #'     nr_permutations,
 #'     output_file
@@ -37,25 +44,28 @@
 #' @export
 Determine_differentiation_stage = function(
     transcriptome_file_path,
+    p_value_threshold = 0.05,
     deconvolve_exokrine_tissue = FALSE,
-    models = c(),
-    nr_permutations = 100,
+    HISC_stem_cell_only = FALSE,
+    models = c(
+        "Alpha_Beta_Gamma_Delta_Segerstolpe",
+        "Progenitor_Stanescu_HISC_Haber"
+    ),
+    nr_permutations = 200,
     output_file = ""
 ){
-    # check whether model is available
-    if (length(models) > 0){
-        message("Will utilize specified models")
-    } else {
-        models = c(
-            "Alpha_Beta_Gamma_Delta_Lawlor",
-            "Progenitor_Stanescu_HESC_Yan"
-        )
-        message(paste(
-            "Will utilize the following models for deconvolution: ",
-            paste(collapse = ", ",models, sep =",")
-        ))
-    }
-
+    
+    # adjust models
+    if(deconvolve_exokrine_tissue)
+        models[
+            grep(models,pattern = "Alpha_Beta_Gamma_Delta_Segerstolpe")
+        ]  = "Alpha_Beta_Gamma_Delta_Acinar_Ductal_Segerstolpe"
+    
+    if(HISC_stem_cell_only)
+        models[
+            grep(models,pattern = "Progenitor_Stanescu_HESC_Yan_HISC_Haber")
+            ]  = "Progenitor_Stanescu_HISC_Haber"
+    
     # check for input data availability
     if (!file.exists(transcriptome_file_path)){
         stop(paste0("Could not find file ",transcriptome_file_path))
@@ -80,13 +90,6 @@ Determine_differentiation_stage = function(
     rownames(transcriptome_file) = str_to_upper(rownames(transcriptome_file) )
     deconvolution_data = new("ExpressionSet", exprs=as.matrix(transcriptome_file));
 
-    # check if meta data is available
-
-    meta_data = data.frame(
-        row.names = colnames(deconvolution_data),
-        "Model" = rep( paste0(c(models),collapse="|"), ncol(deconvolution_data))
-    )
-
     models_list = list()
     parameter_list = list()
 
@@ -108,31 +111,48 @@ Determine_differentiation_stage = function(
     }
     print("Model(s) loaded")
 
+    prediction_res_coeff_list = list()
     prediction_stats_list = list()
 
     for (pred_model in models){
 
         print(paste0("Deconvolving with model: ",pred_model))
-        model_basis = models_list[pred_model]
+        model_basis = models_list[[pred_model]]
+        model_basis = model_basis[[1]]
 
-        fit = suppressMessages(
-            bseqsc_proportions(
+        fit = bseqsc_proportions(
             deconvolution_data,
             model_basis,
-            verbose = FALSE,
+            verbose = TRUE,
             absolute = TRUE,
             log = FALSE,
-            perm = nr_permutations
-        ))
+            perm = 0
+        )
+        
+        prediction_res_coeff_list[[pred_model]] = fit$coefficients
         prediction_stats_list[[pred_model]] = fit$stats
     }
 
     # create results matrix called meta_data
-    meta_data = prepare_result_matrix(
+    deconvolution_result_relative = prepare_result_matrix(
+        prediction_res_coeff_list = prediction_res_coeff_list,
         prediction_stats_list = prediction_stats_list,
         parameter_list = parameter_list,
-        meta_data = meta_data,
-        models = models
+        models_list = models_list,
+        p_value_threshold = p_value_threshold,
+        relative = TRUE,
+        scale_values = TRUE,
+        deconvolution_data = deconvolution_data
+    )
+    
+    deconvolution_result_absolute = prepare_result_matrix(
+        prediction_res_coeff_list = prediction_res_coeff_list,
+        prediction_stats_list = prediction_stats_list,
+        parameter_list = parameter_list,
+        p_value_threshold = p_value_threshold,
+        scale_values = FALSE,
+        relative = FALSE,
+        deconvolution_data = deconvolution_data
     )
 
     if ( output_file != "" )
