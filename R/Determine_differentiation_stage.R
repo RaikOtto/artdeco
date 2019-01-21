@@ -154,6 +154,6 @@ Determine_differentiation_stage = function(
             quote = FALSE
         )
     }
-        
-    return(meta_data)
+    message("Finished")
+    return(deconvolution_result)
 }
