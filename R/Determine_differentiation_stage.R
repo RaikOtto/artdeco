@@ -51,7 +51,7 @@ Determine_differentiation_stage = function(
         "Alpha_Beta_Gamma_Delta_Segerstolpe",
         "Progenitor_Stanescu_HISC_Haber"
     ),
-    nr_permutations = 200,
+    nr_permutations = 100,
     output_file = ""
 ){
     
@@ -134,36 +134,26 @@ Determine_differentiation_stage = function(
     }
 
     # create results matrix called meta_data
-    deconvolution_result_relative = prepare_result_matrix(
-        prediction_res_coeff_list = prediction_res_coeff_list,
-        prediction_stats_list = prediction_stats_list,
-        parameter_list = parameter_list,
-        models_list = models_list,
-        p_value_threshold = p_value_threshold,
-        relative = TRUE,
-        scale_values = TRUE,
-        deconvolution_data = deconvolution_data
-    )
-    
-    deconvolution_result_absolute = prepare_result_matrix(
+
+    deconvolution_result = prepare_result_matrix(
         prediction_res_coeff_list = prediction_res_coeff_list,
         prediction_stats_list = prediction_stats_list,
         parameter_list = parameter_list,
         p_value_threshold = p_value_threshold,
         scale_values = FALSE,
-        relative = FALSE,
         deconvolution_data = deconvolution_data
     )
 
-    if ( output_file != "" )
+    if ( output_file != "" ){
+        message(paste("Writing output to file: ",output_file, sep =""))
         write.table(
-            meta_data,
+            deconvolution_result,
             output_file,
             sep ="\t",
             row.names = FALSE,
             quote = FALSE
         )
-    
-    meta_data = meta_data[,colnames(meta_data) != "Sample"]
+    }
+        
     return(meta_data)
 }

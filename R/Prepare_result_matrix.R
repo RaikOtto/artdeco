@@ -6,7 +6,6 @@ prepare_result_matrix = function(
     models_list,
     p_value_threshold,
     scale_values = TRUE,
-    relative,
     deconvolution_data
 ){
     result_matrix = data.frame(
@@ -48,27 +47,17 @@ prepare_result_matrix = function(
                 subtype_label = paste(subtype,"similarity",sep  ="_")
                 result_matrix[,subtype_label] = rep("low",nrow(result_matrix))
             
-                if (relative != TRUE){
+                baseline = as.double(as.character(unlist(
+                    training_baseline[subtype])))
+                result_matrix[ , subtype] = round(
+                    (as.double(result_matrix[ , subtype])/
+                         quantile(baseline)[2])*100,0)
+                result_matrix[result_matrix[ , subtype] > 100,subtype] = 100
                 
-                    baseline = as.double(as.character(unlist(
-                        training_baseline[subtype])))
-                    result_matrix[ , subtype] = round(
-                        (as.double(result_matrix[ , subtype])/
-                             quantile(baseline)[2])*100,0)
-                    result_matrix[result_matrix[ , subtype] > 100,subtype] = 100
-                    
-                    result_matrix[
-                        result_matrix[,subtype] > 20,
-                        subtype_label] = "high"    
-                } else {
-                    
-                    result_matrix[
-                        result_matrix[,subtype] >
-                        quantile(result_matrix[,subtype],seq(0,1,.01)[67]),
-                        subtype_label
-                    ] = "high"    
-                }
-                
+                result_matrix[
+                    result_matrix[,subtype] > 20,
+                    subtype_label] = "high"    
+
             }
 
             cands = c("alpha","beta","gamma","delta","acinar","ductal")
@@ -83,11 +72,16 @@ prepare_result_matrix = function(
             
             # set p-values
             
+            result_matrix[,"P_value_differentiated"] = rep(0,nrow(result_matrix))
             p_values = res_cor[,1]
             p_values[is.na(p_values)]  = 1
             p_values[p_values == 9999] = 0
             no_sig_index = 
                 p_values >= p_value_threshold
+            result_matrix[,"P_value_differentiated"] = p_values
+            
+            result_matrix[,"Correlation_differentiated"] = rep(0,nrow(result_matrix))
+            result_matrix[,"Correlation_differentiated"] = res_cor[,2]
             
             index = colnames(result_matrix)[
                 str_to_lower(colnames(result_matrix)) %in%
@@ -137,27 +131,17 @@ prepare_result_matrix = function(
                 subtype_label = paste(subtype,"similarity",sep  ="_")
                 result_matrix[,subtype_label] = rep("low",nrow(result_matrix))
                 
-                if (relative != TRUE){
-                    
-                    baseline = as.double(as.character(unlist(
-                        training_baseline[subtype])))
-                    result_matrix[ , subtype] = round(
-                        (as.double(result_matrix[ , subtype])/
-                             quantile(baseline)[2])*100,0)
-                    result_matrix[result_matrix[ , subtype] > 100,subtype] = 100
-                    
-                    result_matrix[
-                        result_matrix[,subtype] > 20,
-                        subtype_label] = "high"    
-                } else {
-                    
-                    result_matrix[
-                        result_matrix[,subtype] >
-                            quantile(result_matrix[,subtype],seq(0,1,.01)[67]),
-                        subtype_label
-                        ] = "high"    
-                }
+                baseline = as.double(as.character(unlist(
+                    training_baseline[subtype])))
+                result_matrix[ , subtype] = round(
+                    (as.double(result_matrix[ , subtype])/
+                         median(baseline))*100,1)
+                result_matrix[result_matrix[ , subtype] > 100,subtype] = 100
                 
+                result_matrix[
+                    result_matrix[,subtype] >= 8.25,
+                    subtype_label] = "high"    
+
             }
             
             cands = c("progenitor","hisc","hesc")
@@ -167,11 +151,16 @@ prepare_result_matrix = function(
             
             # set p-values
             
+            result_matrix[,"P_value_de_differentiated"] = rep(0,nrow(result_matrix))
             p_values = res_cor[,1]
             p_values[is.na(p_values)]  = 1
             p_values[p_values == 9999] = 0
             no_sig_index = 
                 p_values >= p_value_threshold
+            result_matrix[,"P_value_de_differentiated"] = p_values
+            
+            result_matrix[,"Correlation_de_differentiated"] = rep(0,nrow(result_matrix))
+            result_matrix[,"Correlation_de_differentiated"] = res_cor[,2]
             
             index = colnames(result_matrix)[
                 str_to_lower(colnames(result_matrix)) %in%
