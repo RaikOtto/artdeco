@@ -1,5 +1,5 @@
 
-prepare_result_matrix = function(
+prepare_sample_result_matrix = function(
     prediction_res_coeff_list,
     prediction_stats_list,
     parameter_list,
@@ -27,7 +27,7 @@ prepare_result_matrix = function(
             
             res_coeff[ is.na(res_coeff) ] = 0.0
             res_cor[ is.na(res_cor) ] = 0.0
-
+            
             res_coeff = t(res_coeff)
             colnames(res_coeff) = str_to_lower(colnames(res_coeff))
             
@@ -37,7 +37,7 @@ prepare_result_matrix = function(
             training_baseline = parameter_list[[nr_fit]]
             training_baseline = training_baseline[[1]]
             names(training_baseline) = str_to_lower(names(training_baseline))
-
+            
             for (subtype in c("alpha","beta","gamma","delta","acinar","ductal","progenitor")){
                 
                 if (!(subtype %in% colnames(res_coeff)) ) next
@@ -50,22 +50,22 @@ prepare_result_matrix = function(
                 
                 subtype_label = paste(subtype,"similarity",sep  ="_")
                 result_matrix[,subtype_label] = rep("low",nrow(result_matrix))
-            
+                
                 baseline = as.double(as.character(unlist(
                     training_baseline[subtype])))
                 result_matrix[,subtype] = round(
                     (as.double(result_matrix[ , subtype])/
                          #quantile(baseline)[2])*100,1)
-                    max(baseline))*100,1)
+                         max(baseline))*100,1)
                 result_matrix[result_matrix[ , subtype] > 100,subtype] = 100
                 
                 result_matrix[
                     result_matrix[,subtype] > high_threshold_diff,
                     subtype_label
-                ] = "high"    
-
+                    ] = "high"    
+                
             }
-
+            
             cands = c("alpha","beta","gamma","delta","acinar","ductal","progenitor")
             cands = cands[cands %in% colnames(result_matrix)]
             differentiatedness = rowSums(result_matrix[,cands])
@@ -73,7 +73,7 @@ prepare_result_matrix = function(
             result_matrix[
                 differentiatedness > mean(differentiatedness)
                 ,"Differentiatedness"
-            ] = "high"
+                ] = "high"
             result_matrix$Differentiation_score = res_cor[,4]
             
             # set p-values
@@ -82,7 +82,7 @@ prepare_result_matrix = function(
             p_values = res_cor[,1]
             p_values[is.na(p_values)]  = 1
             p_values[p_values == 9999] = 0
-
+            
             result_matrix[,"P_value_differentiated"] = p_values
             
             result_matrix[,"Correlation_differentiated"] = rep(0,nrow(result_matrix))
@@ -98,9 +98,9 @@ prepare_result_matrix = function(
                         "acinar_similarity",
                         "ductal_similarity"
                     )
-            ]
-
-            }
+                ]
+            
+        }
         ## end fit 1
         
         if ( nr_fit == 2 ){
@@ -147,7 +147,7 @@ prepare_result_matrix = function(
                 result_matrix[
                     result_matrix[,subtype] >= high_threshold_de_diff,
                     subtype_label] = "high"    
-
+                
             }
             
             cands = c("progenitor","hisc","hesc")
@@ -161,7 +161,7 @@ prepare_result_matrix = function(
             p_values = res_cor[,1]
             p_values[is.na(p_values)]  = 1
             p_values[p_values == 9999] = 0
-
+            
             result_matrix[,"P_value_de_differentiated"] = p_values
             
             result_matrix[,"Correlation_de_differentiated"] = rep(0,nrow(result_matrix))
@@ -179,7 +179,7 @@ prepare_result_matrix = function(
         }
         ## end fit 2
     }
-
+    
     colnames(result_matrix)[colnames(result_matrix) == "progenitor_similarity"] = "Progenitor_similarity"
     colnames(result_matrix)[colnames(result_matrix) == "hisc_similarity"] = "HISC_similarity"
     colnames(result_matrix)[colnames(result_matrix) == "hesc_similarity"] = "HESC_similarity"
@@ -208,8 +208,8 @@ prepare_result_matrix = function(
     
     maxi = apply( 
         result_matrix[,
-                  cand_label_indices
-                  ],
+                      cand_label_indices
+                      ],
         FUN = which.max,
         MARGIN = 1
         
@@ -228,6 +228,6 @@ prepare_result_matrix = function(
                 "Differentiated_similarity"
             )
         ]
-
+    
     return(result_matrix)
 }

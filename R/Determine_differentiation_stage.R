@@ -7,8 +7,6 @@
 #' @param transcriptome_file_path Path to the file which contains
 #' the transcriptome data. Notice the HGNC row convention:
 #' Rownames have to include the unique HGNC identifier, see vignette.
-#' @param p_value_threshold P value that deconvolutions may maximally
-#' have in order to be deemed significant
 #' @param deconvolve_exokrine_tissue If TRUE, will deconvolve as well
 #' into ductal and accinar tissue percentages
 #' @param HISC_stem_cell_only TRUE limits the stemm cell similarity
@@ -26,7 +24,6 @@
 #' @usage
 #' Determine_differentiation_stage(
 #'     transcriptome_file_path,
-#'     p_value_threshold,
 #'     deconvolve_exokrine_tissue
 #'     HISC_stem_cell_only,
 #'     models,
@@ -44,7 +41,6 @@
 #' @export
 Determine_differentiation_stage = function(
     transcriptome_file_path,
-    p_value_threshold = 0.03,
     deconvolve_exokrine_tissue = FALSE,
     HISC_stem_cell_only = FALSE,
     models = c(
@@ -123,7 +119,7 @@ Determine_differentiation_stage = function(
         fit = bseqsc_proportions(
             deconvolution_data,
             model_basis,
-            verbose = TRUE,
+            verbose = FALSE,
             absolute = TRUE,
             log = FALSE,
             perm = nr_permutations
@@ -135,19 +131,19 @@ Determine_differentiation_stage = function(
 
     # create results matrix called meta_data
 
-    deconvolution_result = prepare_result_matrix(
+    deconvolution_results = prepare_result_matrix(
         prediction_res_coeff_list = prediction_res_coeff_list,
         prediction_stats_list = prediction_stats_list,
         parameter_list = parameter_list,
-        p_value_threshold = p_value_threshold,
         scale_values = FALSE,
-        deconvolution_data = deconvolution_data
+        deconvolution_data = deconvolution_data,
+        models = models
     )
 
     if ( output_file != "" ){
         message(paste("Writing output to file: ",output_file, sep =""))
         write.table(
-            deconvolution_result,
+            deconvolution_results,
             output_file,
             sep ="\t",
             row.names = FALSE,
@@ -155,5 +151,5 @@ Determine_differentiation_stage = function(
         )
     }
     message("Finished")
-    return(deconvolution_result)
+    return(deconvolution_results)
 }
