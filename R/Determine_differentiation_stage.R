@@ -44,7 +44,7 @@ Determine_differentiation_stage = function(
     deconvolve_exokrine_tissue = FALSE,
     HISC_stem_cell_only = FALSE,
     models = c(
-        "Alpha_Beta_Gamma_Delta_Segerstolpe",
+        "Alpha_Beta_Gamma_Delta_Baron",
         "Progenitor_Stanescu_HISC_Haber"
     ),
     nr_permutations = 100,
@@ -60,7 +60,7 @@ Determine_differentiation_stage = function(
     if(HISC_stem_cell_only)
         models[
             grep(models,pattern = "Progenitor_Stanescu_HESC_Yan_HISC_Haber")
-            ]  = "Progenitor_Stanescu_HISC_Haber"
+        ]  = "Progenitor_Stanescu_HISC_Haber"
     
     # check for input data availability
     if (!file.exists(transcriptome_file_path)){
@@ -133,11 +133,15 @@ Determine_differentiation_stage = function(
 
     deconvolution_results = prepare_result_matrix(
         prediction_res_coeff_list = prediction_res_coeff_list,
-        prediction_stats_list = prediction_stats_list,
-        parameter_list = parameter_list,
-        scale_values = FALSE,
-        deconvolution_data = deconvolution_data,
         models = models
+    )
+    colnames(deconvolution_results) = str_to_lower(colnames(deconvolution_results))
+    
+    deconvolution_results = prepare_sample_result_matrix(
+        deconvolution_results = deconvolution_results,
+        prediction_stats_list = prediction_stats_list,
+        models_list = models_list,
+        transcriptome_file = transcriptome_file
     )
 
     if ( output_file != "" ){

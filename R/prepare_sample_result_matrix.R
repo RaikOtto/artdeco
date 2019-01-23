@@ -1,233 +1,113 @@
 
 prepare_sample_result_matrix = function(
-    prediction_res_coeff_list,
+    deconvolution_results,
     prediction_stats_list,
-    parameter_list,
     models_list,
-    scale_values = TRUE,
-    deconvolution_data,
-    models,
-    high_threshold_diff,
-    high_threshold_de_diff
+    transcriptome_file
 ){
     
-    result_matrix = data.frame(
-        row.names = colnames(deconvolution_data),
-        "Model" = rep( paste0(c(models),collapse="|"), ncol(deconvolution_data))
-    )
+    models = as.character(unlist(str_split(deconvolution_results$Model[1],pattern = "\\|")))
+    deconvolution_results[,"P_value_subtype"] = rep("",nrow(deconvolution_results))
+    deconvolution_results[,"Strength_subtype"] = rep("",nrow(deconvolution_results))
+    deconvolution_results[,"Subtype"] = rep("",nrow(deconvolution_results))
+
+    ###
     
-    for (nr_fit in 1:2){
+    res_cor = prediction_stats_list[[1]]
+    rownames(res_cor) = str_replace_all(rownames(res_cor) ,"^X","")
+    res_cor[ is.na(res_cor) ] = 0.0
+    training_mat_dif = as.data.frame(models_list[[1]][[1]])
+
+    transcriptome_file = transcriptome_file[rownames(training_mat_dif),]
+    training_mat_dif = training_mat_dif[!is.na(transcriptome_file[,1]),]
+    transcriptome_file = transcriptome_file[!is.na(transcriptome_file[,1]),]
+    
+    cands_dif = c("alpha","beta","gamma","delta","acinar","ductal")
+    cands_dif = cands_dif[cands_dif %in% colnames(deconvolution_results)]
+    
+    for( j in 1:ncol(transcriptome_file)){
         
-        if (nr_fit == 1){
+        dif_p_values = c()
+        for (subtype in cands_dif){
             
-            res_coeff = prediction_res_coeff_list[[nr_fit]]
-            res_cor   = prediction_stats_list[[nr_fit]]
-            colnames(res_coeff) = str_replace_all(colnames(res_coeff) ,"^X","")
-            rownames(res_cor) = str_replace_all(rownames(res_cor) ,"^X","")
-            
-            res_coeff[ is.na(res_coeff) ] = 0.0
-            res_cor[ is.na(res_cor) ] = 0.0
-            
-            res_coeff = t(res_coeff)
-            colnames(res_coeff) = str_to_lower(colnames(res_coeff))
-            
-            if ("alpha" %in% str_to_lower(rownames(res_coeff)))
-                res_coeff = t(res_coeff)
-            
-            training_baseline = parameter_list[[nr_fit]]
-            training_baseline = training_baseline[[1]]
-            names(training_baseline) = str_to_lower(names(training_baseline))
-            
-            for (subtype in c("alpha","beta","gamma","delta","acinar","ductal","progenitor")){
-                
-                if (!(subtype %in% colnames(res_coeff)) ) next
-                
-                if (scale_values) {
-                    result_matrix[ , subtype] = exp( res_coeff[,subtype] )
-                } else {
-                    result_matrix[ , subtype] = res_coeff[,subtype]
-                }
-                
-                subtype_label = paste(subtype,"similarity",sep  ="_")
-                result_matrix[,subtype_label] = rep("low",nrow(result_matrix))
-                
-                baseline = as.double(as.character(unlist(
-                    training_baseline[subtype])))
-                result_matrix[,subtype] = round(
-                    (as.double(result_matrix[ , subtype])/
-                         #quantile(baseline)[2])*100,1)
-                         max(baseline))*100,1)
-                result_matrix[result_matrix[ , subtype] > 100,subtype] = 100
-                
-                result_matrix[
-                    result_matrix[,subtype] > high_threshold_diff,
-                    subtype_label
-                    ] = "high"    
-                
-            }
-            
-            cands = c("alpha","beta","gamma","delta","acinar","ductal","progenitor")
-            cands = cands[cands %in% colnames(result_matrix)]
-            differentiatedness = rowSums(result_matrix[,cands])
-            result_matrix[,"Differentiatedness"] = rep("low",nrow(result_matrix))
-            result_matrix[
-                differentiatedness > mean(differentiatedness)
-                ,"Differentiatedness"
-                ] = "high"
-            result_matrix$Differentiation_score = res_cor[,4]
-            
-            # set p-values
-            
-            result_matrix[,"P_value_differentiated"] = rep(0,nrow(result_matrix))
-            p_values = res_cor[,1]
-            p_values[is.na(p_values)]  = 1
-            p_values[p_values == 9999] = 0
-            
-            result_matrix[,"P_value_differentiated"] = p_values
-            
-            result_matrix[,"Correlation_differentiated"] = rep(0,nrow(result_matrix))
-            result_matrix[,"Correlation_differentiated"] = res_cor[,2]
-            
-            index = colnames(result_matrix)[
-                str_to_lower(colnames(result_matrix)) %in%
-                    c(
-                        "alpha_similarity",
-                        "beta_similarity",
-                        "gamma_similarity",
-                        "delta_similarity",
-                        "acinar_similarity",
-                        "ductal_similarity"
-                    )
-                ]
-            
+            dif_p_values = c(
+                cor.test(
+                    transcriptome_file[,j],
+                    training_mat_dif[,subtype]
+                )$p.value,
+                dif_p_values
+            )
         }
-        ## end fit 1
         
-        if ( nr_fit == 2 ){
-            
-            res_coeff = prediction_res_coeff_list[[nr_fit]]
-            res_cor   = prediction_stats_list[[nr_fit]]
-            colnames(res_coeff) = str_replace_all(colnames(res_coeff) ,"^X","")
-            rownames(res_cor) = str_replace_all(rownames(res_cor) ,"^X","")
-            
-            res_coeff[ is.na(res_coeff) ] = 0.0
-            res_cor[ is.na(res_cor) ] = 0.0
-            
-            res_coeff = t(res_coeff)
-            colnames(res_coeff) = str_to_lower(colnames(res_coeff))
-            
-            if ("progenitor" %in% rownames(res_coeff))
-                res_coeff = t(res_coeff)
-            
-            training_baseline = parameter_list[[nr_fit]]
-            training_baseline = training_baseline[[1]]
-            names(training_baseline) = str_to_lower(names(training_baseline))
-            
-            for (subtype in c("progenitor","hisc","hesc")){
-                
-                if (!(subtype %in% colnames(res_coeff)) ) next
-                
-                if (scale_values) {
-                    result_matrix[ , subtype] = exp( res_coeff[,subtype] )
-                } else {
-                    result_matrix[ , subtype] = res_coeff[,subtype]
-                }
-                
-                subtype_label = paste(subtype,"similarity",sep  ="_")
-                result_matrix[,subtype_label] = rep("low",nrow(result_matrix))
-                
-                baseline = as.double(as.character(unlist(
-                    training_baseline[subtype])))
-                result_matrix[ , subtype] = round(
-                    (as.double(result_matrix[ , subtype])/
-                         #quantile(baseline)[2])*100,1)
-                         median(baseline))*100,1)
-                result_matrix[result_matrix[ , subtype] > 100,subtype] = 100
-                
-                result_matrix[
-                    result_matrix[,subtype] >= high_threshold_de_diff,
-                    subtype_label] = "high"    
-                
-            }
-            
-            cands = c("progenitor","hisc","hesc")
-            cands = cands[cands %in% colnames(result_matrix)]
-            
-            result_matrix[,"De_differentiation_score"] = res_cor[,4]
-            
-            # set p-values
-            
-            result_matrix[,"P_value_de_differentiated"] = rep(0,nrow(result_matrix))
-            p_values = res_cor[,1]
-            p_values[is.na(p_values)]  = 1
-            p_values[p_values == 9999] = 0
-            
-            result_matrix[,"P_value_de_differentiated"] = p_values
-            
-            result_matrix[,"Correlation_de_differentiated"] = rep(0,nrow(result_matrix))
-            result_matrix[,"Correlation_de_differentiated"] = res_cor[,2]
-            
-            index = colnames(result_matrix)[
-                str_to_lower(colnames(result_matrix)) %in%
-                    c(
-                        "progenitor_similarity",
-                        "hisc_similarity",
-                        "hesc_similarity"
-                    )
-                ]
-            
-        }
-        ## end fit 2
+        max_subtype = colnames(deconvolution_results[cands_dif])[
+            which.max(deconvolution_results[j,cands_dif])
+        ]
+        subtype_strength = deconvolution_results[j,max_subtype] /
+            sum(deconvolution_results[j,cands_dif])
+        if (sum(deconvolution_results[j,cands_dif]) == 0)
+            subtype_strength = deconvolution_results[j,max_subtype]
+        subtype_strength = round(subtype_strength * 100,1)
+        
+        deconvolution_results[j,"P_value_subtype"] =
+            dif_p_values[colnames(training_mat_dif) == max_subtype]
+        deconvolution_results[j,"P_value_subtype"] = -1*logb(
+            as.double(deconvolution_results[j,"P_value_subtype"])
+        )
+        deconvolution_results[j,"Strength_subtype"] =
+            subtype_strength
+        
+        if (subtype_strength == 0)
+            max_subtype = "not_significant"
+        
+        deconvolution_results[j,"Subtype"] = max_subtype
     }
     
-    colnames(result_matrix)[colnames(result_matrix) == "progenitor_similarity"] = "Progenitor_similarity"
-    colnames(result_matrix)[colnames(result_matrix) == "hisc_similarity"] = "HISC_similarity"
-    colnames(result_matrix)[colnames(result_matrix) == "hesc_similarity"] = "HESC_similarity"
+    deconvolution_results[,"Differentiation_score"] = rep("",nrow(deconvolution_results))
+    deconvolution_results[,"Differentiation_score"] = res_cor[,4]
     
-    colnames(result_matrix)[colnames(result_matrix) == "progenitor"] = "Progenitor"
-    colnames(result_matrix)[colnames(result_matrix) == "hisc"] = "HISC"
-    colnames(result_matrix)[colnames(result_matrix) == "hesc"] = "HESC"
-    colnames(result_matrix)[colnames(result_matrix) == "alpha"] = "Alpha"
-    colnames(result_matrix)[colnames(result_matrix) == "beta"] = "Beta"
-    colnames(result_matrix)[colnames(result_matrix) == "gamma"] = "Gamma"
-    colnames(result_matrix)[colnames(result_matrix) == "delta"] = "Delta"
-    colnames(result_matrix)[colnames(result_matrix) == "acinar"] = "acinar"
-    colnames(result_matrix)[colnames(result_matrix) == "ductal"] = "Ductal"
-    colnames(result_matrix)[colnames(result_matrix) == "alpha_similarity"] = "Alpha_similarity"
-    colnames(result_matrix)[colnames(result_matrix) == "beta_similarity"] = "Beta_similarity"
-    colnames(result_matrix)[colnames(result_matrix) == "gamma_similarity"] = "Gamma_similarity"
-    colnames(result_matrix)[colnames(result_matrix) == "delta_similarity"] = "Delta_similarity"
-    colnames(result_matrix)[colnames(result_matrix) == "acinar_similarity"] = "acinar_similarity"
-    colnames(result_matrix)[colnames(result_matrix) == "ductal_similarity"] = "Ductal_similarity"
-    colnames(result_matrix)[colnames(result_matrix) == "progenitor_similarity"] = "Progenitor_similarity"
-    colnames(result_matrix)[colnames(result_matrix) == "hisc_similarity"] = "HISC_similarity"
-    colnames(result_matrix)[colnames(result_matrix) == "hesc_similarity"] = "HESC_similarity"
+    ### de dif
     
-    cand_labels = c("alpha","beta","gamma","delta","hisc","hesc","progenitor")
-    cand_label_indices = which( str_to_lower(colnames(result_matrix)) %in% cand_labels)
+    res_cor = prediction_stats_list[[2]]
+    rownames(res_cor) = str_replace_all(rownames(res_cor) ,"^X","")
+    res_cor[ is.na(res_cor) ] = 0.0
+    training_mat_de_dif = as.data.frame(models_list[[2]][[1]])
     
-    maxi = apply( 
-        result_matrix[,
-                      cand_label_indices
-                      ],
-        FUN = which.max,
-        MARGIN = 1
+    transcriptome_file = transcriptome_file[rownames(training_mat_de_dif),]
+    training_mat_de_dif = training_mat_de_dif[!is.na(transcriptome_file[,1]),]
+    transcriptome_file = transcriptome_file[!is.na(transcriptome_file[,1]),]
+    
+    cands_de_dif = c("progenitor","hisc","hesc")
+    deconvolution_results[,"Strength_de_differentiation"] = rep("",nrow(deconvolution_results))
+    cands_de_dif = cands_de_dif[cands_de_dif %in% colnames(deconvolution_results)]
+    
+    for( j in 1:ncol(transcriptome_file)){
         
-    )
-    
-    cand_labels_max = colnames(result_matrix)[cand_label_indices]
-    cand_labels_max = cand_labels_max[maxi]
-    result_matrix$Differentiation_stage = rep("",nrow(result_matrix))
-    result_matrix$Differentiation_stage = cand_labels_max
-    
-    #p_value differentiation stage
-    index = colnames(result_matrix)[
-        str_to_lower(colnames(result_matrix)) %in%
-            c(
-                "Differentiation_stage",
-                "Differentiated_similarity"
+        de_dif_p_values = c()
+        for (subtype in cands_de_dif){
+            
+            de_dif_p_values = c(
+                cor.test(
+                    transcriptome_file[,j],
+                    training_mat_de_dif[,subtype]
+                )$p.value,
+                de_dif_p_values
             )
-        ]
+        }
+        
+        de_strength = logb( sum(deconvolution_results[j,cands_de_dif]) /
+            sum(deconvolution_results[j,cands_dif]) )
+        if (sum(deconvolution_results[j,cands_dif]) == 0)
+            de_strength = 0
+        deconvolution_results[j,"Strength_de_differentiation"] = 
+            as.double(de_strength)
+
+        deconvolution_results[j,"P_value_de_dif"] =
+            de_dif_p_values[ which.min(de_dif_p_values) ]
+        deconvolution_results[j,"P_value_de_dif"] = deconvolution_results[j,"P_value_de_dif"]
+    }
     
-    return(result_matrix)
+    deconvolution_results[,"De_differentiation_score"] = rep("",nrow(deconvolution_results))
+    deconvolution_results[,"De_differentiation_score"] = res_cor[,4]
+
+    return(deconvolution_results)
 }

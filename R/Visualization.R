@@ -250,8 +250,8 @@ create_heatmap_differentiation_stages = function(
     }
     
     # data cleansing
-    deconvolution_results$Differentiation_stage =
-        str_to_lower(deconvolution_results$Differentiation_stage)
+    deconvolution_results$Subtype =
+        str_to_lower(deconvolution_results$Subtype)
     
     # load transcriptome data
     transcriptome_mat_vis = read.table(
@@ -272,21 +272,21 @@ create_heatmap_differentiation_stages = function(
     dif_index = grep(
         colnames(deconvolution_results),
         pattern = paste0( c(
-            "Alpha_similarity",
-            "Beta_similarity",
-            "Gamma_similarity",
-            "Delta_similarity",
-            "Acinar_similarity",
-            "Ductal_similarity"
+            "alpha",
+            "beta",
+            "gamma",
+            "delta",
+            "acinar",
+            "ductal"
         ), collapse = "|")
     )
     
     de_dif_index = grep(
         colnames(deconvolution_results),
         pattern = paste0( c(
-            "Progenitor_similarity",
-            "HISC_similarity",
-            "HESC_similarity"
+            "progenitor",
+            "hisc",
+            "hesc"
         ), collapse = "|")
     )
 
@@ -300,15 +300,13 @@ create_heatmap_differentiation_stages = function(
         Graphics_parameters = configure_graphics()
 
     # extract similarity measurements
-    subtype_index_vis = c(
-        dif_index, grep(
+    subtype_index_vis = c
+    (
+        grep(
             colnames(deconvolution_results),
             pattern = paste0( c(
-                "Progenitor_similarity",
-                "HISC_similarity",
-                "HESC_similarity",
-                "De_differentiation_score",
-                "Differentiation_score",
+                "Cor_differentiated_model",
+                "Cor_de_differentiated_model",
                 "NEC_NET"
             ), collapse = "|")
         )
@@ -317,75 +315,32 @@ create_heatmap_differentiation_stages = function(
     aggregated_index_vis = grep(
         colnames(deconvolution_results),
         pattern = paste0( c(
-            "De_differentiation_score",
-            "Differentiation_score",
-            "Differentiation_stage",
+            "Subtype",
+            "Strength_de_differentiation",
+#            "Differentiation_score",
             "NEC_NET"
         ), collapse = "|")
     )
     
-    # reset parameters
-    
-    for (subtype in c("Alpha","Beta","Gamma","Delta","Acinar","Ductal")){
-        
-        if (! (subtype %in% colnames(deconvolution_results)))
-            next()
-        
-        subtype_label = paste(subtype,"similarity",sep ="_")
-        deconvolution_results[,subtype_label] = "low"
-        higher_index = deconvolution_results[,subtype] >= high_threshold_diff
-        deconvolution_results[higher_index,subtype_label] = "high"
-        
-        deconvolution_results[
-            deconvolution_results$P_value_differentiated >= p_value_threshold,
-            subtype_label ] = "Not_significant"
-    }
-    
-    for (subtype in c("Progenitor","HISC","HESC")){
-        
-        if (! (subtype %in% colnames(deconvolution_results)))
-            next()
-        
-        subtype_label = paste(subtype,"similarity",sep ="_")
-        deconvolution_results[,subtype_label] = "low"
-        higher_index = deconvolution_results[,subtype] >=
-            high_threshold_de_diff
-        deconvolution_results[higher_index,subtype_label] = "high"
-        
-        deconvolution_results[
-            deconvolution_results$P_value_de_differentiated >= p_value_threshold,
-            subtype_label ] = "Not_significant"
-    }
-    
-    #deconvolution_results[
-    #    deconvolution_results$P_value_differentiated >= p_value_threshold,
-    #    "Differentiation_stage" ] = "Not_significant"
-    
-    similarities = deconvolution_results[,c(dif_index-1,de_dif_index-1)]
-    max_vec = apply(similarities, FUN = which.max, MARGIN = 1)
-    deconvolution_results$Differentiation_stage = colnames(similarities)[max_vec]
-    deconvolution_results[
-        deconvolution_results$P_value_differentiated >= p_value_threshold,
-        "Differentiation_stage"
-    ] = "not_significant"
-    deconvolution_results$Differentiation_stage = 
-        str_to_lower(deconvolution_results$Differentiation_stage)
-    
-    #
-    
     if (aggregate_differentiated_stages == FALSE){
-    
-        vis_mat = deconvolution_results[,subtype_index_vis]
-        
+        vis_mat = deconvolution_results[subtype_index_vis]
     } else {
-
-        vis_mat = deconvolution_results[,aggregated_index_vis]
-
+        vis_mat = deconvolution_results[aggregated_index_vis]
     }
+    
+    vis_mat$Subtype[
+        as.double(deconvolution_results$P_value_subtype) <=
+            p_value_threshold
+    ] = "not_significant"
+    vis_mat$Strength_de_differentiation = as.double(vis_mat$Strength_de_differentiation)
     
     # differentiation score scaling
     
+    
     for ( score in c("Differentiation_score","De_differentiation_score")){
+        
+        if (! ( "Differentiation_score" %in% colnames(vis_mat)))
+            next()
         
         vis_mat[,score] = (vis_mat[,score] )
         quantiles = quantile(vis_mat[, score ])
@@ -432,20 +387,17 @@ configure_graphics = function(){
         Progenitor_similarity = c(Not_significant = "gray", low = "white", high = "orange"),
         HISC_similarity   = c(Not_significant = "gray",low = "white", high = "black"),
         HESC_similarity   = c(Not_significant = "gray",low = "white", high = "black"),
-        Differentiatedness_log_odds = c(low = "darkred", medium = "white", high = "darkgreen"),
-        Differentiatedness = c(Not_significant = "gray",low = "black", high = "darkgreen"),
+        Strength_de_differentiation = c(low = "darkgreen", medium = "white", high = "darkred"),
+        Strength_subtype = c(low = "black", high = "darkgreen"),
         De_differentiation_score = c(low = "red", medium = "white", high = "green"),
         Differentiation_score = c(low = "red", medium = "white", high = "green"),
-        Differentiation_stage = c(
+        Subtype = c(
             alpha = "blue",
             beta = "green",
             gamma = "brown",
             delta = "purple",
             acinar = "cyan",
             ductal = "red",
-            hesc      = "black",
-            hisc      = "black",
-            progenitor     = "orange",
             not_significant = "gray"
         ),
         Differentiation_Stage_Aggregated = c(
