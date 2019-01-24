@@ -133,6 +133,7 @@ Determine_differentiation_stage = function(
 
     deconvolution_results = prepare_result_matrix(
         prediction_res_coeff_list = prediction_res_coeff_list,
+        deconvolution_data = deconvolution_data,
         models = models
     )
     colnames(deconvolution_results) = str_to_lower(colnames(deconvolution_results))

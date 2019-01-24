@@ -120,6 +120,7 @@ create_PCA_differentiation_stages = function(
           grep(
               colnames(deconvolution_results),
               pattern = paste0( c(
+                  "Grading",
                   "NEC_NET",
                   "Study"
               ), collapse = "|")
@@ -274,25 +275,35 @@ create_heatmap_differentiation_stages = function(
     
     # get the index for differentiated state
     
+    cands_dif = c(
+        "alpha",
+        "beta",
+        "gamma",
+        "delta",
+        "acinar",
+        "ductal"
+    )
+    
+    cands_de_dif = c(
+        "progenitor",
+        "hisc",
+        "hesc"
+    )
+    
     dif_index = grep(
         colnames(deconvolution_results),
-        pattern = paste0( c(
-            "alpha",
-            "beta",
-            "gamma",
-            "delta",
-            "acinar",
-            "ductal"
-        ), collapse = "|")
+        pattern = paste0(
+            cands_dif,
+            collapse = "|"
+        )
     )
     
     de_dif_index = grep(
         colnames(deconvolution_results),
-        pattern = paste0( c(
-            "progenitor",
-            "hisc",
-            "hesc"
-        ), collapse = "|")
+        pattern = paste0( 
+            cands_de_dif,
+            collapse = "|"
+        )
     )
 
     correlation_matrix = cor(transcriptome_mat_vis)
@@ -309,6 +320,7 @@ create_heatmap_differentiation_stages = function(
         grep(
             colnames(deconvolution_results),
             pattern = paste0( c(
+                "Grading",
                 "NEC_NET",
                 "Study"
             ), collapse = "|")
@@ -318,9 +330,11 @@ create_heatmap_differentiation_stages = function(
     aggregated_index_vis = grep(
         colnames(deconvolution_results),
         pattern = paste0( c(
+            "Grading",
             "Subtype",
             "Strength_de_differentiation",
-            "NEC_NET"
+            "NEC_NET",
+            "Study"
         ), collapse = "|")
     )
     
@@ -328,6 +342,9 @@ create_heatmap_differentiation_stages = function(
         
         vis_mat = deconvolution_results[subtype_index_vis]
         for(subtype in c(cands_de_dif,cands_dif)){
+            
+            if (! (subtype %in% colnames(deconvolution_results)))
+                next()
             vis_mat[
                 deconvolution_results[,subtype] <=
                 quantile(
@@ -387,7 +404,7 @@ create_heatmap_differentiation_stages = function(
         annotation_legend = TRUE,
         treeheight_col = 0,
         treeheight_row = 0,
-        show_colnames = FALSE,
+        show_colnames = TRUE,
         show_rownames = FALSE
     )
 
@@ -413,7 +430,7 @@ configure_graphics = function(){
         gamma        = c(not_significant = "gray", low = "white", high = "brown"),
         delta        = c(not_significant = "gray", low = "white", high = "Purple"),
         ductal     = c(not_significant = "gray", low = "white", high = "Black"),
-        acinar     = c(not_significant = "gray", low = "white", high = "Brown"),
+        acinar     = c(not_significant = "gray", low = "white", high = "red"),
         progenitor = c(not_significant = "gray", low = "white", high = "orange"),
         hisc   = c(not_significant = "gray",low = "white", high = "black"),
         hesc   = c(not_significant = "gray",low = "white", high = "black"),

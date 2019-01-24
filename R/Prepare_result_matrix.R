@@ -1,6 +1,7 @@
 
 prepare_result_matrix = function(
     prediction_res_coeff_list,
+    deconvolution_data,
     models
 ){
     
