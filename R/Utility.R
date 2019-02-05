@@ -49,9 +49,9 @@ remove_model = function(
     print(paste0("Deleted model: ",model_name))
 }
 
-#' show_models
+#' show_models_music
 #'
-#' \code{remove_model} shows which models have been trained
+#' \code{show_models_music} shows which models have been trained
 #'
 #'@usage
 #' show_models()
@@ -60,11 +60,37 @@ remove_model = function(
 #'@import stringr
 #'@export
 #'@return list of models
-show_models = function(
+show_models_music = function(
+){
+    
+    package_path = system.file("", package = "artdeco")
+    model_path = paste(package_path,"Models/music", sep = "/")
+    
+    models = stringr::str_replace_all(
+        list.files(model_path),
+        pattern = ".RDS",
+        ""
+    )
+    
+    return(models)
+}
+
+#' show_models_bseqsc
+#'
+#' \code{show_models_bseqsc} shows which models have been trained
+#'
+#'@usage
+#' show_models()
+#'@examples
+#' show_models()
+#'@import stringr
+#'@export
+#'@return list of models
+show_models_bseqsc = function(
 ){
 
     package_path = system.file("", package = "artdeco")
-    model_path = paste(package_path,"Models", sep = "/")
+    model_path = paste(package_path,"Models/bseqsc", sep = "/")
 
     models = stringr::str_replace_all(
         list.files(model_path),

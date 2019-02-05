@@ -14,7 +14,8 @@ Imports:
     stats,
     bseqsc,
     ggbiplot,
-    pheatmap
+    pheatmap,
+    MuSiC
 Depends: 
     R (>= 3.5)
 License: Artistic-2.0

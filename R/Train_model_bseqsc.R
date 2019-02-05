@@ -1,6 +1,6 @@
-#' add_deconvolution_training_model
+#' add_deconvolution_training_model_bseqsc
 #'
-#' \code{add_deconvolution_training_model} adds a new model
+#' \code{add_deconvolution_training_model_bseqsc} adds a new model
 #'
 #' @param transcriptome_data_path Path to transcriptomic data to be
 #' used for training. Has to contain the cell subtypes to which the
@@ -22,7 +22,7 @@
 #' as list of marker genes
 #' @import stringr bseqsc
 #' @usage
-#' add_deconvolution_training_model(
+#' add_deconvolution_training_model_bseqsc(
 #'     transcriptome_data_path = "",
 #'     model_name = "",
 #'     subtype_vector,
@@ -41,7 +41,7 @@
 #'     stringsAsFactors = FALSE
 #' )
 #' subtype_vector = meta_data$Subtype # extract the training sample subtype labels
-#' add_deconvolution_training_model(
+#' add_deconvolution_training_model_bseqsc(
 #'     transcriptome_data_path = transcriptome_data_path,
 #'     model_name = "Test_model",
 #'     subtype_vector,
@@ -51,7 +51,7 @@
 #' )
 #' @return Stores a new model in the package directory
 #' @export
-add_deconvolution_training_model = function(
+add_deconvolution_training_model_bseqsc = function(
     transcriptome_data_path = "",
     model_name = "",
     subtype_vector,

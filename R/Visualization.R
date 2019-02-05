@@ -109,7 +109,7 @@ create_PCA_differentiation_stages = function(
     de_dif_index = grep(
         colnames(deconvolution_results),
         pattern = paste0( c(
-            "progenitor",
+            #"progenitor",
             "hisc",
             "hesc"
         ), collapse = "|")
@@ -156,14 +156,6 @@ create_PCA_differentiation_stages = function(
             shape = vis_mat[,"Grading"]),
             size = 5
     )
-    #p = p + scale_shape_manual(
-    #    values = c(1,2),
-    #    labels = c("Deconvolveable","Not deconvolveable")
-    #)
-    #p = p + scale_color_manual(
-    #    values = c("darkgreen","darkred"),
-    #    labels = c("Differentiated","Not differentiated")
-    #)
     p = p + guides(
         color=guide_legend(
             title="Differentiation stage",
@@ -185,7 +177,7 @@ create_PCA_differentiation_stages = function(
 #' Please note that the first column of the expression
 #' data matrix has to contain the HGNC identifier
 #'
-#' @param visualization_data_path Path to the transcriptome
+#' @param visualization_data Matrix of the transcriptome data
 #' data that shall be visualized. Notice the convention
 #' that the first row has to contain the HGNC identifier
 #' @param deconvolution_results The dataframe returned
@@ -194,7 +186,8 @@ create_PCA_differentiation_stages = function(
 #' aggregated over all differentiated stages - alpha, beta, gamma, delta
 #' accinar and ductal - or specific for each differentiation stage.
 #' Default value FALSE, alternative value TRUE
-#' @param p_value_threshold Threshold above which deconvolutions are deemed unsuccessful
+#' @param show_colnames Whether to show the sample column names
+#' @param confidence_threshold Threshold above which deconvolutions are deemed unsuccessful
 #' and corresponding results being masked on the the plots
 #' @param Graphics_parameters Pheatmap visualization paramters.
 #' You can customize visualization colors.
@@ -209,15 +202,13 @@ create_PCA_differentiation_stages = function(
 #'     transcriptome_file_path,
 #'     deconvolution_results,
 #'     aggregate_differentiated_stages,
-#'     p_value_threshold,
+#'     show_colnames
+#'     confidence_threshold,
 #'     Graphics_parameters,
 #'     relative_baseline
 #' )
 #' @examples
-#' meta_data_path = system.file(
-#'     "Data/Meta_information/Meta_information.tsv",
-#'     package = "artdeco"
-#' )
+#' visualization_data = data("Vis_data)
 #' meta_data      = read.table(
 #'     meta_data_path, sep ="\t",
 #'     header = TRUE,
@@ -225,54 +216,40 @@ create_PCA_differentiation_stages = function(
 #' )
 #' rownames(meta_data) = meta_data$Sample
 #'
-#' visualization_data_path = system.file(
-#'     "/Data/Expression_data/Visualization_PANnen.tsv",
-#'      package = "artdeco"
-#' )
+#' visualization_data = data("Vis_data")
 #' create_heatmap_differentiation_stages(
-#'     visualization_data_path = visualization_data_path,
+#'     visualization_data = visualization_data,
 #'     deconvolution_results = meta_data,
 #'     aggregate_differentiated_stages = FALSE,
+#'     show_colnames = FALSE,
 #'     Graphics_parameters = "",
-#'     p_value_threshold = 0.05,
+#'     confidence_threshold = 0.05,
 #'     relative_baseline = TRUE
 #' )
 #' @import stringr ggplot2 pheatmap ggfortify
 #' @return Plots
 #' @export
 create_heatmap_differentiation_stages = function(
-    visualization_data_path,
+    visualization_data,
     deconvolution_results,
     aggregate_differentiated_stages = FALSE,
-    p_value_threshold = 0.05,
+    confidence_threshold = 1.1,
+    show_colnames = FALSE,
     Graphics_parameters = "",
-    high_threshold_diff = 20,
-    high_threshold_de_diff = 20
+    high_threshold = 101
 ){
 
-    # check for input data availability
-    if (!file.exists(visualization_data_path)){
-        stop(paste0("Could not find file ",visualization_data_path))
-    }
-    
     # data cleansing
     deconvolution_results$Subtype =
         str_to_lower(deconvolution_results$Subtype)
-    
-    # load transcriptome data
-    transcriptome_mat_vis = read.table(
-        visualization_data_path,
-        sep="\t",
-        header = TRUE,
-        stringsAsFactors = FALSE,
-        row.names = 1
-    )
+
+    transcriptome_mat_vis = visualization_data
     colnames(transcriptome_mat_vis) = str_replace_all(
         colnames(transcriptome_mat_vis),
         pattern = "^X",
         ""
     )
-    
+
     # get the index for differentiated state
     
     cands_dif = c(
@@ -283,12 +260,14 @@ create_heatmap_differentiation_stages = function(
         "acinar",
         "ductal"
     )
+    cands_dif = cands_dif[cands_dif %in% colnames(deconvolution_results)]
     
     cands_de_dif = c(
-        "progenitor",
+        #"progenitor",
         "hisc",
         "hesc"
     )
+    cands_de_dif = cands_de_dif[cands_de_dif %in% colnames(deconvolution_results)]
     
     dif_index = grep(
         colnames(deconvolution_results),
@@ -322,89 +301,203 @@ create_heatmap_differentiation_stages = function(
             pattern = paste0( c(
                 "Grading",
                 "NEC_NET",
-                "Study"
+                "Confidence_score_dif",
+                "Confidence_score_de_dif"
             ), collapse = "|")
         )
     )
+
+    vis_mat = deconvolution_results[subtype_index_vis]
     
-    aggregated_index_vis = grep(
-        colnames(deconvolution_results),
-        pattern = paste0( c(
-            "Grading",
-            "Subtype",
-            "Strength_de_differentiation",
-            "NEC_NET",
-            "Study"
-        ), collapse = "|")
-    )
-    
-    if (aggregate_differentiated_stages == FALSE){
-        
-        vis_mat = deconvolution_results[subtype_index_vis]
-        for(subtype in c(cands_de_dif,cands_dif)){
-            
-            if (! (subtype %in% colnames(deconvolution_results)))
-                next()
-            vis_mat[
-                deconvolution_results[,subtype] <=
-                quantile(
-                    deconvolution_results[,subtype],
-                    probs = seq(0,1,.01)
-                )[50],
-                subtype
-            ] = "low"
-            vis_mat[
-                deconvolution_results[,subtype] >
-                    quantile(
-                        deconvolution_results[,subtype],
-                        probs = seq(0,1,.01)
-                    )[50],
-                subtype
-            ] = "high"
-        }
-        
-        # p_value setting
-        
-        for(subtype in c(cands_dif)){
-            vis_mat[
-                as.double(deconvolution_results$P_value_subtype) <=
-                p_value_threshold,
-                subtype
-            ] = "not_significant"
-        }
-        
-    } else {
-        vis_mat = deconvolution_results[aggregated_index_vis]
-        vis_mat$Strength_de_differentiation = as.double(vis_mat$Strength_de_differentiation)
-        vis_mat$Subtype[
-            as.double(deconvolution_results$P_value_subtype) <=
-                p_value_threshold
-            ] = "not_significant"
-    }
     # differentiation score scaling
-    
-    
-    for ( score in c("Differentiation_score","De_differentiation_score")){
-        
-        if (! ( "Differentiation_score" %in% colnames(vis_mat)))
-            next()
-        
-        vis_mat[,score] = (vis_mat[,score] )
-        quantiles = quantile(vis_mat[, score ])
-        vis_mat[ vis_mat[,score] <=  quantiles[1], score ] = quantiles[1]
-        vis_mat[ vis_mat[,score] >=  quantiles[4], score ] = quantiles[4]
-        
+    for ( score in c("Confidence_score_de_dif","Confidence_score_dif")){
+
+        vis_mat[,score] = vis_mat[,score] - min(vis_mat[,score])
+        vis_mat[,score] = vis_mat[,score] / max(vis_mat[,score])
     }
     
+    if ( confidence_threshold > 1.0 )
+        confidence_threshold = 
+            mean(vis_mat[,"Confidence_score_dif"]) +
+            sd(vis_mat[,"Confidence_score_dif"])
+    
+    for(subtype in c(cands_de_dif,cands_dif)){
+        
+        # log the result
+        deconvolution_results[,subtype] = log(deconvolution_results[,subtype]+1)
+        deconvolution_results[,subtype] = deconvolution_results[,subtype] - min(deconvolution_results[,subtype])
+        deconvolution_results[,subtype] = deconvolution_results[,subtype] / max(deconvolution_results[,subtype])
+        deconvolution_results[,subtype] = round(deconvolution_results[,subtype] * 100,1)
+        
+        if (high_threshold > 100){
+            m = mean(deconvolution_results[,subtype])
+            sd = sd(deconvolution_results[,subtype])*.5
+            high_threshold_subtype = round(m + sd,1)
+            
+            if (
+                ( high_threshold_subtype == 0 ) |
+                ( length(high_threshold_subtype) == 0 )
+            )
+            high_threshold_subtype = 1
+            message(
+                paste0(
+                    c("Setting high threshold for subtype ",subtype," to ",high_threshold_subtype),
+                    collapse = ""
+                )
+            )
+        } else {
+            high_threshold_subtype = high_threshold
+        }
+        
+        if (! (subtype %in% colnames(deconvolution_results)))
+            next()
+        vis_mat[
+            (deconvolution_results[,subtype] <= high_threshold_subtype) |
+            (deconvolution_results[,subtype] <=
+                 mean(deconvolution_results[,subtype])+ sd(deconvolution_results[,subtype]))
+            #quantile(
+            #    deconvolution_results[,subtype],
+            #    probs = seq(0,1,.01)
+            #)[high_threshold_subtype]
+            ,subtype
+        ] = "low"
+        vis_mat[
+            (deconvolution_results[,subtype] > high_threshold_subtype) &
+            (deconvolution_results[,subtype] > 
+                 mean(deconvolution_results[,subtype])+ sd(deconvolution_results[,subtype]))
+                #quantile(
+                #    deconvolution_results[,subtype],
+                #    probs = seq(0,1,.01)
+                #)[high_threshold_subtype]
+            ,
+            subtype
+        ] = "high"
+    }
+    
+    # p_value setting
+    
+    for(subtype in cands_dif){
+        vis_mat[
+            as.double(vis_mat$Confidence_score_dif) >=
+            confidence_threshold,
+            subtype
+        ] = "not_significant"
+    }
+    
+    for(subtype in c(cands_de_dif)){
+        vis_mat[
+            as.double(vis_mat$Confidence_score_de_dif) >=
+                confidence_threshold,
+            subtype
+            ] = "not_significant"
+    }
+
+    # differentiation score scaling
+    for ( score in c("Confidence_score_de_dif","Confidence_score_dif")){
+        
+        lower_index = which( vis_mat[ ,score] <= (mean(vis_mat[ ,score])-sd(vis_mat[ ,score])*.5) )
+        vis_mat[lower_index,score] = mean(vis_mat[ ,score]) - (sd(vis_mat[ ,score])*.5)
+        
+        higher_index = which( vis_mat[ ,score] >= (mean(vis_mat[ ,score])+sd(vis_mat[ ,score])*.5) )
+        vis_mat[higher_index,score] = mean(vis_mat[ ,score]) + (sd(vis_mat[ ,score])*.5)
+    }
+    vis_mat$Ratio = ( 
+        #scale(vis_mat$Confidence_score_de_dif) / ( scale(vis_mat$Confidence_score_dif))
+        scale(vis_mat$Confidence_score_de_dif / vis_mat$Confidence_score_dif)
+    )
+    vis_mat$Ratio_numeric = round(vis_mat$Ratio, 3)
+    
+    ### ratio adjustment
+    
+    #lower_index = which( vis_mat$Ratio <= (mean(vis_mat$Ratio)-sd(vis_mat$Ratio)*.5) )
+    #higher_index = which( vis_mat$Ratio >= (mean(vis_mat$Ratio) + sd(vis_mat$Ratio)*.5) )
+    
+    lower_index = which(vis_mat$Ratio <= -.5)
+    higher_index = which(vis_mat$Ratio >=.5)
+    medium_index = 1:nrow(vis_mat)
+    medium_index = medium_index[!(medium_index %in% c(lower_index,higher_index))]
+    
+    vis_mat$Ratio[lower_index] = "low"
+    vis_mat$Ratio[medium_index] = "medium"
+    vis_mat$Ratio[higher_index] = "high"
+    
+    #vis_mat$Ratio[lower_index] = mean(vis_mat$Ratio) - (sd(vis_mat$Ratio)*.5)
+    #vis_mat$Ratio[higher_index] = mean(vis_mat$Ratio) + (sd(vis_mat$Ratio)*.5)
+    
+    #lower_index = which( vis_mat[,"MKI67"] <= (mean(vis_mat[,"MKI67"])-sd(vis_mat[,"MKI67"])*.5) )
+    #higher_index = which( vis_mat[,"MKI67"] >= (mean(vis_mat[,"MKI67"]) + sd(vis_mat[,"MKI67"])*.5) )
+    
+    #vis_mat$MKI67[lower_index] = mean(vis_mat[,"MKI67"]) - (sd(vis_mat[,"MKI67"])*.5)
+    #vis_mat$MKI67[higher_index] = mean(vis_mat[,"MKI67"]) + (sd(vis_mat[,"MKI67"])*.5)
+    
+    # case aggregated similarity
+    if (aggregate_differentiated_stages){
+        
+        vis_mat[,"aggregated_similarity"] = rep("",nrow(vis_mat))
+        for (i in 1:nrow(vis_mat)){
+            
+            candidate_list_max = vis_mat[i,cands_dif]
+            candidate_list_index = which(candidate_list_max == "high")
+            
+            if (length(candidate_list_index) == 0)
+                vis_mat[i,"aggregated_similarity"] = "not_significant"
+            
+            high_types = colnames(candidate_list_max)[candidate_list_index]
+            
+            if (length(high_types) == 1){
+                
+                max_type = high_types
+            } else {
+                
+                max_index = which.max(deconvolution_results[i,high_types])
+                vis_mat[i,"aggregated_similarity"] = colnames(deconvolution_results[,high_types])[max_index]
+            }
+        }
+        
+        vis_mat[
+            as.double(vis_mat$Confidence_score_dif) >=
+                confidence_threshold,
+            "aggregated_similarity"
+            ] = "not_significant"
+
+        vis_mat = vis_mat[,!(colnames(vis_mat) %in% cands_dif)]
+        
+        # rearrange order
+        
+        aggregated_similarity = vis_mat$aggregated_similarity
+        vis_mat = vis_mat[,colnames(vis_mat) != "aggregated_similarity"]
+        vis_mat = cbind(aggregated_similarity,vis_mat)
+    }
+
+    # add mki67 information
+    if ("MKI67" %in% colnames(deconvolution_results)){
+        
+        vis_mat$MKI67 = rep("",nrow(vis_mat))
+        mki_67 = as.double(deconvolution_results[,"MKI67"])
+        quantiles = quantile(mki_67,probs = seq(0,1,.01))
+        vis_mat[mki_67>=quantiles[67],"MKI67"] = "high"
+        vis_mat[mki_67<quantiles[67],"MKI67"] = "medium"
+        vis_mat[mki_67<=quantiles[34],"MKI67"] = "low"
+    }
+    
+    # remove confidence scores
+    vis_mat_filtered = vis_mat[,
+        !(colnames(vis_mat) %in% c(
+            "Confidence_score_de_dif",
+            "Confidence_score_dif",
+            "Ratio_numeric"
+        ))
+    ]
+
     # correlation heatmap
     pheatmap::pheatmap(
         correlation_matrix,
-        annotation_col = vis_mat,
+        annotation_col = vis_mat_filtered,
         annotation_colors = Graphics_parameters,
         annotation_legend = TRUE,
         treeheight_col = 0,
         treeheight_row = 0,
-        show_colnames = TRUE,
+        show_colnames = show_colnames,
         show_rownames = FALSE
     )
 
@@ -429,32 +522,33 @@ configure_graphics = function(){
         beta         = c(not_significant = "gray", low = "white", high = "green"),
         gamma        = c(not_significant = "gray", low = "white", high = "brown"),
         delta        = c(not_significant = "gray", low = "white", high = "Purple"),
-        ductal     = c(not_significant = "gray", low = "white", high = "Black"),
-        acinar     = c(not_significant = "gray", low = "white", high = "red"),
-        progenitor = c(not_significant = "gray", low = "white", high = "orange"),
+        ductal     = c(not_significant = "gray", low = "white", high = "orange"),
+        acinar     = c(not_significant = "gray", low = "white", high = "cyan"),
+        #progenitor = c(not_significant = "gray", low = "white", high = "orange"),
         hisc   = c(not_significant = "gray",low = "white", high = "black"),
         hesc   = c(not_significant = "gray",low = "white", high = "black"),
-        Strength_de_differentiation = c(low = "darkgreen", medium = "white", high = "darkred"),
-        Strength_subtype = c(low = "black", high = "darkgreen"),
-        De_differentiation_score = c(low = "red", medium = "white", high = "green"),
-        Differentiation_score = c(low = "red", medium = "white", high = "green"),
+        Confidence_score_de_dif = c(low = "green", medium = "white", high = "red"),
+        Ratio = c(low = "darkgreen", medium = "yellow", high = "darkred"),
+        MKI67 = c(low = "green", medium = "yellow", high = "red"),
+        Confidence_score_dif = c(low = "green", medium = "white", high = "red"),
         Study = c(Groetzinger = "darkgreen", Scarpa = "darkred"),
-        Subtype = c(
+        aggregated_similarity = c(
             alpha = "blue",
             beta = "green",
             gamma = "brown",
             delta = "purple",
             acinar = "cyan",
-            ductal = "red",
-            not_significant = "gray"
+            ductal = "orange",
+            not_significant = "gray",
+            undetermined = "white"
         ),
         Differentiation_Stage_Aggregated = c(
             differentiated = "darkgreen",
             hisc = "red",
-            progenitor     = "orange",
+            #progenitor     = "orange",
             Not_significant= "gray"
         ),
-        Grading          = c( G1 = "Green",G2 = "Yellow", G3 = "Red", G0 = "white")
+        Grading          = c( G1 = "darkgreen",G2 = "Yellow", G3 = "darkred", G0 = "white")
     )
     return(Graphics_parameters)
 }

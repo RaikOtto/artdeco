@@ -4,14 +4,11 @@
 #' of one or many query RNA-seq or microarray samples to samples
 #' with known differentiation stage contained in the training models.
 #'
-#' @param transcriptome_file_path Path to the file which contains
+#' @param transcriptome_file File which contains
 #' the transcriptome data. Notice the HGNC row convention:
 #' Rownames have to include the unique HGNC identifier, see vignette.
-#' @param deconvolve_exokrine_tissue If TRUE, will deconvolve as well
-#' into ductal and accinar tissue percentages
-#' @param HISC_stem_cell_only TRUE limits the stemm cell similarity
-#' to human intestinal stem cells as opposed to HISC and human embryonal
-#' stem cells, HESC
+#' @param deconvolution_algorithm Which deconvolution algorithm to choose
+#' from. Options: 'music','bseqsc' (CIBERSORT), 'centroid' 
 #' @param models List of models to be used. Use show_models()
 #' to view available models or add new model via
 #' add_deconvolution_training_model()
@@ -20,61 +17,32 @@
 #' precise p-value estimates
 #' @param output_file Path of output file. If not specified,
 #' no hard-disk written output will occur.
-#' @import bseqsc
+#' @import bseqsc MuSiC
 #' @usage
 #' Determine_differentiation_stage(
-#'     transcriptome_file_path,
-#'     deconvolve_exokrine_tissue
-#'     HISC_stem_cell_only,
+#'     transcriptome_file,
 #'     models,
 #'     nr_permutations,
 #'     output_file
 #' )
 #' @examples
-#' transcriptome_file_path = system.file(
-#' "/Data/Expression_data/PANnen_Test_Data.tsv", package = "artdeco")
+#' transcriptome_file = data("Deco_mat")
 #' Determine_differentiation_stage(
-#'     transcriptome_file_path = transcriptome_file_path
+#'     transcriptome_file = transcriptome_file
 #' )
 #' @return Similarity measurements of differentiation
 #' stages
 #' @export
 Determine_differentiation_stage = function(
-    transcriptome_file_path,
-    deconvolve_exokrine_tissue = FALSE,
-    HISC_stem_cell_only = FALSE,
+    transcriptome_file,
+    deconvolution_algorithm = "music",
     models = c(
-        "Alpha_Beta_Gamma_Delta_Baron",
+        "Alpha_Beta_Gamma_Delta_Segerstolpe",
         "Progenitor_Stanescu_HISC_Haber"
     ),
     nr_permutations = 100,
     output_file = ""
 ){
-    
-    # adjust models
-    if(deconvolve_exokrine_tissue)
-        models[
-            grep(models,pattern = "Alpha_Beta_Gamma_Delta_Segerstolpe")
-        ]  = "Alpha_Beta_Gamma_Delta_Acinar_Ductal_Segerstolpe"
-    
-    if(HISC_stem_cell_only)
-        models[
-            grep(models,pattern = "Progenitor_Stanescu_HESC_Yan_HISC_Haber")
-        ]  = "Progenitor_Stanescu_HISC_Haber"
-    
-    # check for input data availability
-    if (!file.exists(transcriptome_file_path)){
-        stop(paste0("Could not find file ",transcriptome_file_path))
-    }
-
-    # load transcriptome data
-    transcriptome_file = read.table(
-        transcriptome_file_path,
-        sep="\t",
-        header = TRUE,
-        stringsAsFactors = FALSE,
-        row.names= 1
-    )
 
     # data cleansing
     colnames(transcriptome_file) =
@@ -89,10 +57,18 @@ Determine_differentiation_stage = function(
     models_list = list()
     parameter_list = list()
 
+    if (deconvolution_algorithm == "music"){
+        model_indicator = "Models/music"
+    } else if (deconvolution_algorithm == "bseqsc"){
+        model_indicator = "Models/bseqsc"
+    } else {
+        stop("Only bseqsc and music implemented as of now.")
+    }
+    
     for (model in models){
         model_path = paste0(c(
             system.file(
-                "Models/",
+                model_indicator,
                 package="artdeco"),
                 "/",
                 model,".RDS"
@@ -107,43 +83,33 @@ Determine_differentiation_stage = function(
     }
     print("Model(s) loaded")
 
-    prediction_res_coeff_list = list()
-    prediction_stats_list = list()
-
-    for (pred_model in models){
-
-        print(paste0("Deconvolving with model: ",pred_model))
-        model_basis = models_list[[pred_model]]
-        model_basis = model_basis[[1]]
-
-        fit = bseqsc_proportions(
-            deconvolution_data,
-            model_basis,
-            verbose = FALSE,
-            absolute = TRUE,
-            log = FALSE,
-            perm = nr_permutations
+    ### switch algorithms
+    
+    if (deconvolution_algorithm == "music"){
+        
+        deconvolution_results = Deconvolve_music(
+            deconvolution_data = deconvolution_data,
+            models_list = models_list,
+            models = models,
+            nr_permutations = nr_permutations
         )
         
-        prediction_res_coeff_list[[pred_model]] = fit$coefficients
-        prediction_stats_list[[pred_model]] = fit$stats
+    } else if (deconvolution_algorithm == "bseqsc"){
+        
+        deconvolution_results = Deconvolve_bseq_sc(
+            deconvolution_data = deconvolution_data,
+            models_list = models_list,
+            models = models,
+            nr_permutations = nr_permutations
+        )
+        
+    } else if (deconvolution_algorithm == "centroid"){
+        stop("Centroid no implemented as of now")
+    } else {
+        stop("Algorithm type not recognized, aborting.")
     }
-
-    # create results matrix called meta_data
-
-    deconvolution_results = prepare_result_matrix(
-        prediction_res_coeff_list = prediction_res_coeff_list,
-        deconvolution_data = deconvolution_data,
-        models = models
-    )
-    colnames(deconvolution_results) = str_to_lower(colnames(deconvolution_results))
+        
     
-    deconvolution_results = prepare_sample_result_matrix(
-        deconvolution_results = deconvolution_results,
-        prediction_stats_list = prediction_stats_list,
-        models_list = models_list,
-        transcriptome_file = transcriptome_file
-    )
 
     if ( output_file != "" ){
         message(paste("Writing output to file: ",output_file, sep =""))

@@ -7,7 +7,7 @@ prepare_sample_result_matrix = function(
 ){
     
     models = as.character(unlist(str_split(deconvolution_results$Model[1],pattern = "\\|")))
-    deconvolution_results[,"P_value_subtype"] = rep("",nrow(deconvolution_results))
+    deconvolution_results[,"Confidence_score_dif"] = rep("",nrow(deconvolution_results))
     deconvolution_results[,"Strength_subtype"] = rep("",nrow(deconvolution_results))
     deconvolution_results[,"Subtype"] = rep("",nrow(deconvolution_results))
 
@@ -48,10 +48,10 @@ prepare_sample_result_matrix = function(
             subtype_strength = deconvolution_results[j,max_subtype]
         subtype_strength = round(subtype_strength * 100,1)
         
-        deconvolution_results[j,"P_value_subtype"] =
+        deconvolution_results[j,"Confidence_score_dif"] =
             dif_p_values[colnames(training_mat_dif) == max_subtype]
-        deconvolution_results[j,"P_value_subtype"] = -1*logb(
-            as.double(deconvolution_results[j,"P_value_subtype"])
+        deconvolution_results[j,"Confidence_score_dif"] = -1*logb(
+            as.double(deconvolution_results[j,"Confidence_score_dif"])
         )
         deconvolution_results[j,"Strength_subtype"] =
             subtype_strength
@@ -80,6 +80,8 @@ prepare_sample_result_matrix = function(
     deconvolution_results[,"Strength_de_differentiation"] = rep("",nrow(deconvolution_results))
     cands_de_dif = cands_de_dif[cands_de_dif %in% colnames(deconvolution_results)]
     
+    deconvolution_results[,"Confidence_score_de_dif"] = rep(0.0, nrow(deconvolution_results))
+    
     for( j in 1:ncol(transcriptome_file)){
         
         de_dif_p_values = c()
@@ -101,9 +103,9 @@ prepare_sample_result_matrix = function(
         deconvolution_results[j,"Strength_de_differentiation"] = 
             as.double(de_strength)
 
-        deconvolution_results[j,"P_value_de_dif"] =
+        deconvolution_results[j,"Confidence_score_de_dif"] =
             de_dif_p_values[ which.min(de_dif_p_values) ]
-        deconvolution_results[j,"P_value_de_dif"] = deconvolution_results[j,"P_value_de_dif"]
+        deconvolution_results[j,"Confidence_score_de_dif"] = deconvolution_results[j,"Confidence_score_de_dif"]
     }
     
     deconvolution_results[,"De_differentiation_score"] = rep("",nrow(deconvolution_results))
