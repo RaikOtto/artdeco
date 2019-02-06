@@ -324,7 +324,8 @@ create_heatmap_differentiation_stages = function(
     for(subtype in c(cands_de_dif,cands_dif)){
         
         # log the result
-        deconvolution_results[,subtype] = log(deconvolution_results[,subtype]+1)
+        #deconvolution_results[,subtype] = log(deconvolution_results[,subtype]+1)
+        #deconvolution_results[,subtype] = scale(deconvolution_results[,subtype])
         deconvolution_results[,subtype] = deconvolution_results[,subtype] - min(deconvolution_results[,subtype])
         deconvolution_results[,subtype] = deconvolution_results[,subtype] / max(deconvolution_results[,subtype])
         deconvolution_results[,subtype] = round(deconvolution_results[,subtype] * 100,1)
@@ -353,23 +354,22 @@ create_heatmap_differentiation_stages = function(
             next()
         vis_mat[
             (deconvolution_results[,subtype] <= high_threshold_subtype) |
-            (deconvolution_results[,subtype] <=
-                 mean(deconvolution_results[,subtype])+ sd(deconvolution_results[,subtype]))
-            #quantile(
-            #    deconvolution_results[,subtype],
-            #    probs = seq(0,1,.01)
-            #)[high_threshold_subtype]
-            ,subtype
+            (deconvolution_results[,subtype] <= #mean(deconvolution_results[,subtype]))
+            #(mean(deconvolution_results[,subtype])+ sd(deconvolution_results[,subtype]))
+            quantile(
+                deconvolution_results[,subtype],
+                probs = seq(0,1,.01)
+            )[high_threshold_subtype]),
+            subtype
         ] = "low"
         vis_mat[
             (deconvolution_results[,subtype] > high_threshold_subtype) &
-            (deconvolution_results[,subtype] > 
-                 mean(deconvolution_results[,subtype])+ sd(deconvolution_results[,subtype]))
-                #quantile(
-                #    deconvolution_results[,subtype],
-                #    probs = seq(0,1,.01)
-                #)[high_threshold_subtype]
-            ,
+            (deconvolution_results[,subtype] > #mean(deconvolution_results[,subtype]))
+            #(mean(deconvolution_results[,subtype])+ sd(deconvolution_results[,subtype]))
+            quantile(
+                deconvolution_results[,subtype],
+                probs = seq(0,1,.01)
+            )[high_threshold_subtype]),
             subtype
         ] = "high"
     }
@@ -435,12 +435,14 @@ create_heatmap_differentiation_stages = function(
         
         vis_mat[,"aggregated_similarity"] = rep("",nrow(vis_mat))
         for (i in 1:nrow(vis_mat)){
-            
+
             candidate_list_max = vis_mat[i,cands_dif]
-            candidate_list_index = which(candidate_list_max == "high")
+            candidate_list_index = which(candidate_list_max %in% c("low","high"))
             
-            if (length(candidate_list_index) == 0)
-                vis_mat[i,"aggregated_similarity"] = "not_significant"
+            if (length(candidate_list_index) == 0){
+                vis_mat[i,"aggregated_similarity"] = "undetermined"
+                next()
+            }
             
             high_types = colnames(candidate_list_max)[candidate_list_index]
             
@@ -458,7 +460,7 @@ create_heatmap_differentiation_stages = function(
             as.double(vis_mat$Confidence_score_dif) >=
                 confidence_threshold,
             "aggregated_similarity"
-            ] = "not_significant"
+        ] = "not_significant"
 
         vis_mat = vis_mat[,!(colnames(vis_mat) %in% cands_dif)]
         
@@ -467,6 +469,8 @@ create_heatmap_differentiation_stages = function(
         aggregated_similarity = vis_mat$aggregated_similarity
         vis_mat = vis_mat[,colnames(vis_mat) != "aggregated_similarity"]
         vis_mat = cbind(aggregated_similarity,vis_mat)
+        
+        vis_mat[vis_mat[,"aggregated_similarity"] == "","aggregated_similarity"] = "undetermined"
     }
 
     # add mki67 information
