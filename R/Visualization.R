@@ -312,6 +312,8 @@ create_heatmap_differentiation_stages = function(
     # differentiation score scaling
     for ( score in c("Confidence_score_de_dif","Confidence_score_dif")){
 
+        vis_mat[,score] = as.double(vis_mat[,score])
+        vis_mat[vis_mat[,score] == 0.0,score] = 10^-5
         vis_mat[,score] = vis_mat[,score] - min(vis_mat[,score])
         vis_mat[,score] = vis_mat[,score] / max(vis_mat[,score])
     }
@@ -327,7 +329,10 @@ create_heatmap_differentiation_stages = function(
         #deconvolution_results[,subtype] = log(deconvolution_results[,subtype]+1)
         #deconvolution_results[,subtype] = scale(deconvolution_results[,subtype])
         deconvolution_results[,subtype] = deconvolution_results[,subtype] - min(deconvolution_results[,subtype])
-        deconvolution_results[,subtype] = deconvolution_results[,subtype] / max(deconvolution_results[,subtype])
+        if ( max( deconvolution_results[,subtype]) > 0 )
+            deconvolution_results[,subtype] = 
+                deconvolution_results[,subtype] /
+                max(deconvolution_results[,subtype])
         deconvolution_results[,subtype] = round(deconvolution_results[,subtype] * 100,1)
         
         if (high_threshold > 100){
@@ -401,8 +406,10 @@ create_heatmap_differentiation_stages = function(
         higher_index = which( vis_mat[ ,score] >= (mean(vis_mat[ ,score])+sd(vis_mat[ ,score])*.5) )
         vis_mat[higher_index,score] = mean(vis_mat[ ,score]) + (sd(vis_mat[ ,score])*.5)
     }
+    vis_mat$Confidence_score_dif[vis_mat$Confidence_score_dif == 0] = 1*10^-5
+    vis_mat$Confidence_score_de_dif[vis_mat$Confidence_score_de_dif == 0] = 1*10^-5
     vis_mat$Ratio = ( 
-        #scale(vis_mat$Confidence_score_de_dif) / ( scale(vis_mat$Confidence_score_dif))
+        #scale(vis_mat$Confidence_score_de_dif) / scale(vis_mat$Confidence_score_dif)
         scale(vis_mat$Confidence_score_de_dif / vis_mat$Confidence_score_dif)
     )
     vis_mat$Ratio_numeric = round(vis_mat$Ratio, 3)

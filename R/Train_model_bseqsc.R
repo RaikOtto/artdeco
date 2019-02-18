@@ -64,7 +64,7 @@ add_deconvolution_training_model_bseqsc = function(
     if( model_name == "")
         stop("Require model name, aborting")
     model_path = paste(
-        c(system.file("Models/", package="artdeco"),"/",model_name,".RDS"),
+        c(system.file("Models/bseqsc", package="artdeco"),"/",model_name,".RDS"),
         collapse = ""
     )
 

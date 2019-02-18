@@ -37,10 +37,10 @@ Determine_differentiation_stage = function(
     transcriptome_file,
     deconvolution_algorithm = "music",
     models = c(
-        "Alpha_Beta_Gamma_Delta_Segerstolpe",
-        "Progenitor_Stanescu_HISC_Haber"
+        "Alpha_Beta_Gamma_Delta_Acinar_Ductal_Baron",
+        "Alpha_Beta_Gamma_Delta_Acinar_Ductal_Baron_progenitor_stanescu_hisc_haber"
     ),
-    nr_permutations = 100,
+    nr_permutations = 1000,
     output_file = ""
 ){
 
