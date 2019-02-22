@@ -28,23 +28,10 @@
 #'     baseline
 #' )
 #' @examples
-#' meta_data_path = system.file(
-#'     "Data/Meta_information/Meta_information.tsv",
-#'     package = "artdeco"
-#' )
-#' deconvolution_results      = read.table(
-#'     meta_data_path, sep ="\t",
-#'     header = TRUE,
-#'     stringsAsFactors = FALSE
-#' )
-#' rownames(deconvolution_results) = deconvolution_results$Sample
-#'
-#' visualization_data_path = system.file(
-#'     "/Data/Expression_data/Visualization_PANnen.tsv",
-#'      package = "artdeco"
-#' )
+#' data(deconvolution_results)
+#' data(visualization_data)
 #' create_PCA_differentiation_stages(
-#'     visualization_data_path = visualization_data_path,
+#'     visualization_data = visualization_data,
 #'     deconvolution_results = deconvolution_results,
 #'     annotation_columns = c(
 #'         "Differentiation_Stages_Subtypes",
@@ -58,7 +45,7 @@
 #' @return Plots
 #' @export
 create_PCA_differentiation_stages = function(
-    visualization_data_path,
+    visualization_data,
     deconvolution_results,
     Graphics_parameters = ""
 ){
@@ -186,45 +173,38 @@ create_PCA_differentiation_stages = function(
 #' aggregated over all differentiated stages - alpha, beta, gamma, delta
 #' accinar and ductal - or specific for each differentiation stage.
 #' Default value FALSE, alternative value TRUE
-#' @param show_colnames Whether to show the sample column names
 #' @param confidence_threshold Threshold above which deconvolutions are deemed unsuccessful
 #' and corresponding results being masked on the the plots
+#' @param show_colnames Whether to show the sample column names
 #' @param Graphics_parameters Pheatmap visualization paramters.
 #' You can customize visualization colors.
 #' Read the vignette for more information.
-#' @param relative_baseline Which measurement represents the baseline
-#' of the differentiation similarity: 'absolute' = maximal
-#' similarity of the training sample to its subtype. TRUE
-#' sets the baseline to maximal similarity of the test samples
-#' currently analysed
+#' @param high_threshold Threshold depending on which a deconvolution result
+#' is interpreted as 'high'. If not set, a statistical estimation will approximately
+#' identify a signficance threshold for a high similarity.
 #' @usage
 #' create_heatmap_differentiation_stages(
-#'     transcriptome_file_path,
+#'     visualization_data,
 #'     deconvolution_results,
 #'     aggregate_differentiated_stages,
-#'     show_colnames
 #'     confidence_threshold,
+#'     show_colnames,
 #'     Graphics_parameters,
-#'     relative_baseline
+#'     high_threshold
 #' )
 #' @examples
-#' visualization_data = data("Vis_data)
-#' meta_data      = read.table(
-#'     meta_data_path, sep ="\t",
-#'     header = TRUE,
-#'     stringsAsFactors = FALSE
-#' )
-#' rownames(meta_data) = meta_data$Sample
+#' data(visualization_data)
+#' data(deconvolution_results)
+#' data(meta_data)
 #'
-#' visualization_data = data("Vis_data")
 #' create_heatmap_differentiation_stages(
 #'     visualization_data = visualization_data,
-#'     deconvolution_results = meta_data,
+#'     deconvolution_results = deconvolution_results,
 #'     aggregate_differentiated_stages = FALSE,
+#'     confidence_threshold = 1.1,
 #'     show_colnames = FALSE,
 #'     Graphics_parameters = "",
-#'     confidence_threshold = 0.05,
-#'     relative_baseline = TRUE
+#'     high_threshold = 101
 #' )
 #' @import stringr ggplot2 pheatmap ggfortify
 #' @return Plots
@@ -336,6 +316,7 @@ create_heatmap_differentiation_stages = function(
         deconvolution_results[,subtype] = round(deconvolution_results[,subtype] * 100,1)
         
         if (high_threshold > 100){
+            
             m = mean(deconvolution_results[,subtype])
             sd = sd(deconvolution_results[,subtype])*.5
             high_threshold_subtype = round(m + sd,1)
@@ -357,26 +338,59 @@ create_heatmap_differentiation_stages = function(
         
         if (! (subtype %in% colnames(deconvolution_results)))
             next()
+        
+        quantile_threshold = quantile(
+            deconvolution_results[,subtype],
+            probs = seq(0,1,.01)
+        )[high_threshold_subtype]
+        
         vis_mat[
             (deconvolution_results[,subtype] <= high_threshold_subtype) |
-            (deconvolution_results[,subtype] <= #mean(deconvolution_results[,subtype]))
-            #(mean(deconvolution_results[,subtype])+ sd(deconvolution_results[,subtype]))
-            quantile(
-                deconvolution_results[,subtype],
-                probs = seq(0,1,.01)
-            )[high_threshold_subtype]),
+            (deconvolution_results[,subtype] <= quantile_threshold ),
             subtype
         ] = "low"
+        
         vis_mat[
             (deconvolution_results[,subtype] > high_threshold_subtype) &
-            (deconvolution_results[,subtype] > #mean(deconvolution_results[,subtype]))
-            #(mean(deconvolution_results[,subtype])+ sd(deconvolution_results[,subtype]))
-            quantile(
-                deconvolution_results[,subtype],
-                probs = seq(0,1,.01)
-            )[high_threshold_subtype]),
+                (deconvolution_results[,subtype] > quantile_threshold),
             subtype
         ] = "high"
+        
+        cands_dif_endocrine = c("alpha","beta","gamma","delta")
+        cands_dif_endocrine = cands_dif_endocrine[
+            cands_dif_endocrine %in% colnames(deconvolution_results)
+        ]
+        cands_dif_exokrine = c("ductal","acinar")
+        cands_dif_exokrine = cands_dif_exokrine[cands_dif_exokrine %in% colnames(deconvolution_results)]
+        
+        if( subtype %in% cands_dif_endocrine){
+            
+            max_indeces = as.integer(apply( 
+                deconvolution_results[,cands_dif_endocrine],
+                MARGIN = 1,
+                FUN = which.max
+            ))
+            max_subtypes = colnames(deconvolution_results[,cands_dif_endocrine])[max_indeces]
+            highest_percentage = max_subtypes == subtype 
+
+        } else if ( subtype %in% cands_dif_exokrine){
+            
+            max_indeces = as.integer(apply( 
+                deconvolution_results[,cands_dif_exokrine],
+                MARGIN = 1,
+                FUN = which.max
+            ))
+            max_subtypes = colnames(deconvolution_results[,cands_dif_exokrine])[max_indeces]
+            highest_percentage = max_subtypes == subtype 
+            
+        } else {
+            highest_percentage = rep(TRUE,nrow(deconvolution_results))
+        }
+        
+        vis_mat[
+            ! highest_percentage,
+            subtype
+        ] = "low"
     }
     
     # p_value setting
@@ -416,9 +430,6 @@ create_heatmap_differentiation_stages = function(
     
     ### ratio adjustment
     
-    #lower_index = which( vis_mat$Ratio <= (mean(vis_mat$Ratio)-sd(vis_mat$Ratio)*.5) )
-    #higher_index = which( vis_mat$Ratio >= (mean(vis_mat$Ratio) + sd(vis_mat$Ratio)*.5) )
-    
     lower_index = which(vis_mat$Ratio <= -.5)
     higher_index = which(vis_mat$Ratio >=.5)
     medium_index = 1:nrow(vis_mat)
@@ -427,15 +438,6 @@ create_heatmap_differentiation_stages = function(
     vis_mat$Ratio[lower_index] = "low"
     vis_mat$Ratio[medium_index] = "medium"
     vis_mat$Ratio[higher_index] = "high"
-    
-    #vis_mat$Ratio[lower_index] = mean(vis_mat$Ratio) - (sd(vis_mat$Ratio)*.5)
-    #vis_mat$Ratio[higher_index] = mean(vis_mat$Ratio) + (sd(vis_mat$Ratio)*.5)
-    
-    #lower_index = which( vis_mat[,"MKI67"] <= (mean(vis_mat[,"MKI67"])-sd(vis_mat[,"MKI67"])*.5) )
-    #higher_index = which( vis_mat[,"MKI67"] >= (mean(vis_mat[,"MKI67"]) + sd(vis_mat[,"MKI67"])*.5) )
-    
-    #vis_mat$MKI67[lower_index] = mean(vis_mat[,"MKI67"]) - (sd(vis_mat[,"MKI67"])*.5)
-    #vis_mat$MKI67[higher_index] = mean(vis_mat[,"MKI67"]) + (sd(vis_mat[,"MKI67"])*.5)
     
     # case aggregated similarity
     if (aggregate_differentiated_stages){

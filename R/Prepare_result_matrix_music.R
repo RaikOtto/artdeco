@@ -50,7 +50,8 @@ prepare_result_matrix_music = function(
                 
                 if (!(subtype %in% colnames(res_coeff)) ) next
                 
-                result_matrix[ , subtype] = round(res_coeff[,subtype] * 100,1)
+                #result_matrix[ , subtype] = round(res_coeff[,subtype] * 100,1)
+                result_matrix[ , subtype] = res_coeff[,subtype] * 100
                 result_matrix[result_matrix[ , subtype] > 100,subtype] = 100
             }
         }

@@ -1,5 +1,5 @@
 Deconvolve_bseq_sc = function(
-    deconvolution_data = deconvolution_data,
+    deconvolution_data,
     models_list,
     models,
     nr_permutations
