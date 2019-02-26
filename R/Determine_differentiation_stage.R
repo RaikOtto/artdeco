@@ -4,9 +4,8 @@
 #' of one or many query RNA-seq or microarray samples to samples
 #' with known differentiation stage contained in the training models.
 #'
-#' @param transcriptome_file File which contains
-#' the transcriptome data. Notice the HGNC row convention:
-#' Rownames have to include the unique HGNC identifier, see vignette.
+#' @param transcriptome_data A data frame that contains the gene expression data.
+#' Rows are expected to be HGNC symbols and columns are expected to contain the samples.
 #' @param deconvolution_algorithm Which deconvolution algorithm to choose
 #' from. Options: 'music','bseqsc' (CIBERSORT), 'centroid' 
 #' @param models List of models to be used. Use show_models()
@@ -20,21 +19,21 @@
 #' @import bseqsc MuSiC
 #' @usage
 #' Determine_differentiation_stage(
-#'     transcriptome_file,
+#'     transcriptome_data,
 #'     models,
 #'     nr_permutations,
 #'     output_file
 #' )
 #' @examples
-#' transcriptome_file = data("Deco_mat")
+#' data("transcriptome_data")
 #' Determine_differentiation_stage(
-#'     transcriptome_file = transcriptome_file
+#'     transcriptome_data = transcriptome
 #' )
 #' @return Similarity measurements of differentiation
 #' stages
 #' @export
 Determine_differentiation_stage = function(
-    transcriptome_file,
+    transcriptome_data,
     deconvolution_algorithm = "music",
     models = c(
         "Alpha_Beta_Gamma_Delta_Acinar_Ductal_Baron",
@@ -45,24 +44,32 @@ Determine_differentiation_stage = function(
 ){
 
     # data cleansing
-    colnames(transcriptome_file) =
+    colnames(transcriptome_data) =
         stringr::str_replace_all(
-            colnames(transcriptome_file),
+            colnames(transcriptome_data),
             pattern = "^X",
             ""
     )
-    rownames(transcriptome_file) = str_to_upper(rownames(transcriptome_file) )
-    deconvolution_data = new("ExpressionSet", exprs=as.matrix(transcriptome_file));
+    rownames(transcriptome_data) = str_to_upper(rownames(transcriptome_data) )
+    deconvolution_data = new("ExpressionSet", exprs=as.matrix(transcriptome_data));
 
     models_list = list()
     parameter_list = list()
+    
+    deconvolution_algorithm = str_to_lower(deconvolution_algorithm)
 
     if (deconvolution_algorithm == "music"){
+        
         model_indicator = "Models/music"
     } else if (deconvolution_algorithm == "bseqsc"){
+        
         model_indicator = "Models/bseqsc"
+        
+    } else if (deconvolution_algorithm == "deconrnaseq"){
+        
+        model_indicator = "Models/deconrnaseq"
     } else {
-        stop("Only bseqsc and music implemented as of now.")
+        stop("Only bseqsc, DeconRNASeq and MuSiC implemented as of now.")
     }
     
     for (model in models){
@@ -85,7 +92,7 @@ Determine_differentiation_stage = function(
 
     ### switch algorithms
     
-    if (deconvolution_algorithm == "music"){
+    if ( str_to_lower(deconvolution_algorithm) == "music"){
         
         deconvolution_results = Deconvolve_music(
             deconvolution_data = deconvolution_data,
@@ -94,7 +101,7 @@ Determine_differentiation_stage = function(
             nr_permutations = nr_permutations
         )
         
-    } else if (deconvolution_algorithm == "bseqsc"){
+    } else if ( str_to_lower(deconvolution_algorithm) == "bseqsc"){
         
         deconvolution_results = Deconvolve_bseq_sc(
             deconvolution_data = deconvolution_data,
@@ -103,10 +110,17 @@ Determine_differentiation_stage = function(
             nr_permutations = nr_permutations
         )
         
-    } else if (deconvolution_algorithm == "centroid"){
-        stop("Centroid no implemented as of now")
+    } else if (str_to_lower(deconvolution_algorithm) == "deconrnaseq"){
+        
+        deconvolution_results = Deconvolve_DeconRNASeq(
+            deconvolution_data = deconvolution_data,
+            models_list = models_list,
+            models = models,
+            nr_permutations = nr_permutations
+        )
+        
     } else {
-        stop("Algorithm type not recognized, aborting.")
+        stop("Algorithm type not recognized. Options are music, bseqsc and DeconRNASeq, aborting.")
     }
         
     

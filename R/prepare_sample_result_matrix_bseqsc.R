@@ -1,5 +1,5 @@
 
-prepare_sample_result_matrix = function(
+prepare_sample_result_matrix_bseqsc = function(
     deconvolution_results,
     prediction_stats_list,
     models_list,
@@ -18,6 +18,7 @@ prepare_sample_result_matrix = function(
     res_cor[ is.na(res_cor) ] = 0.0
     training_mat_dif = as.data.frame(models_list[[1]][[1]])
 
+    transcriptome_file = as.data.frame(transcriptome_file)
     transcriptome_file = transcriptome_file[rownames(training_mat_dif),]
     training_mat_dif = training_mat_dif[!is.na(transcriptome_file[,1]),]
     transcriptome_file = transcriptome_file[!is.na(transcriptome_file[,1]),]
@@ -96,7 +97,7 @@ prepare_sample_result_matrix = function(
             )
         }
         
-        de_strength = logb( sum(deconvolution_results[j,cands_de_dif]) /
+        de_strength = log( sum(deconvolution_results[j,cands_de_dif]) /
             sum(deconvolution_results[j,cands_dif]) )
         if (sum(deconvolution_results[j,cands_dif]) == 0)
             de_strength = 0
