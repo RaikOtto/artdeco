@@ -1,9 +1,8 @@
-
 prepare_sample_result_matrix_bseqsc = function(
     deconvolution_results,
     prediction_stats_list,
     models_list,
-    transcriptome_file
+    deconvolution_data
 ){
     
     models = as.character(unlist(str_split(deconvolution_results$Model[1],pattern = "\\|")))
@@ -18,22 +17,22 @@ prepare_sample_result_matrix_bseqsc = function(
     res_cor[ is.na(res_cor) ] = 0.0
     training_mat_dif = as.data.frame(models_list[[1]][[1]])
 
-    transcriptome_file = as.data.frame(transcriptome_file)
-    transcriptome_file = transcriptome_file[rownames(training_mat_dif),]
-    training_mat_dif = training_mat_dif[!is.na(transcriptome_file[,1]),]
-    transcriptome_file = transcriptome_file[!is.na(transcriptome_file[,1]),]
+    deconvolution_data = as.data.frame(deconvolution_data)
+    deconvolution_data = deconvolution_data[rownames(training_mat_dif),]
+    training_mat_dif = training_mat_dif[!is.na(deconvolution_data[,1]),]
+    deconvolution_data = deconvolution_data[!is.na(deconvolution_data[,1]),]
     
     cands_dif = c("alpha","beta","gamma","delta","acinar","ductal")
     cands_dif = cands_dif[cands_dif %in% colnames(deconvolution_results)]
     
-    for( j in 1:ncol(transcriptome_file)){
+    for( j in 1:ncol(deconvolution_data)){
         
         dif_p_values = c()
         for (subtype in cands_dif){
             
             dif_p_values = c(
                 cor.test(
-                    transcriptome_file[,j],
+                    deconvolution_data[,j],
                     training_mat_dif[,subtype]
                 )$p.value,
                 dif_p_values
@@ -73,9 +72,9 @@ prepare_sample_result_matrix_bseqsc = function(
     res_cor[ is.na(res_cor) ] = 0.0
     training_mat_de_dif = as.data.frame(models_list[[2]][[1]])
     
-    transcriptome_file = transcriptome_file[rownames(training_mat_de_dif),]
-    training_mat_de_dif = training_mat_de_dif[!is.na(transcriptome_file[,1]),]
-    transcriptome_file = transcriptome_file[!is.na(transcriptome_file[,1]),]
+    deconvolution_data = deconvolution_data[rownames(training_mat_de_dif),]
+    training_mat_de_dif = training_mat_de_dif[!is.na(deconvolution_data[,1]),]
+    deconvolution_data = deconvolution_data[!is.na(deconvolution_data[,1]),]
     
     cands_de_dif = c("progenitor","hisc","hesc")
     deconvolution_results[,"Strength_de_differentiation"] = rep("",nrow(deconvolution_results))
@@ -83,14 +82,14 @@ prepare_sample_result_matrix_bseqsc = function(
     
     deconvolution_results[,"Confidence_score_de_dif"] = rep(0.0, nrow(deconvolution_results))
     
-    for( j in 1:ncol(transcriptome_file)){
+    for( j in 1:ncol(deconvolution_data)){
         
         de_dif_p_values = c()
         for (subtype in cands_de_dif){
             
             de_dif_p_values = c(
                 cor.test(
-                    transcriptome_file[,j],
+                    deconvolution_data[,j],
                     training_mat_de_dif[,subtype]
                 )$p.value,
                 de_dif_p_values

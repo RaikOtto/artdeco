@@ -2,7 +2,7 @@
 #'
 #' \code{add_deconvolution_training_model_bseqsc} adds a new model
 #'
-#' @param transcriptome_data_path Path to transcriptomic data to be
+#' @param transcriptome_data Path to transcriptomic data to be
 #' used for training. Has to contain the cell subtypes to which the
 #' similarity has to be calculated. Note that the first column has
 #' to contain the HGNC symbols and the header not! not the first
@@ -23,17 +23,16 @@
 #' @import stringr bseqsc
 #' @usage
 #' add_deconvolution_training_model_bseqsc(
-#'     transcriptome_data_path = "",
-#'     model_name = "",
+#'     transcriptome_data,
+#'     model_name,
 #'     subtype_vector,
-#'     marker_gene_list = list(),
-#'     training_p_value_threshold = 0.05,
-#'     training_nr_permutations = 100,
-#'     training_nr_marker_genes = 100
+#'     marker_gene_list,
+#'     training_p_value_threshold,
+#'     training_nr_permutations,
+#'     training_nr_marker_genes
 #' )
 #' @examples
-#' transcriptome_data_path = system.file(
-#' "Data/Expression_data/PANnen_Test_Data.tsv",package ="artdeco")
+#' data("test_data")
 #' meta_data_path = system.file("Data/Meta_information/Meta_information.tsv", package = "artdeco")
 #' meta_data      = read.table(
 #'     meta_data_path, sep = "\t",
@@ -42,7 +41,7 @@
 #' )
 #' subtype_vector = meta_data$Subtype # extract the training sample subtype labels
 #' add_deconvolution_training_model_bseqsc(
-#'     transcriptome_data_path = transcriptome_data_path,
+#'     transcriptome_data = test_data,
 #'     model_name = "Test_model",
 #'     subtype_vector,
 #'     training_p_value_threshold = 0.05,
@@ -52,8 +51,8 @@
 #' @return Stores a new model in the package directory
 #' @export
 add_deconvolution_training_model_bseqsc = function(
-    transcriptome_data_path = "",
-    model_name = "",
+    transcriptome_data,
+    model_name,
     subtype_vector,
     marker_gene_list = list(),
     training_p_value_threshold = 0.05,
@@ -74,26 +73,11 @@ add_deconvolution_training_model_bseqsc = function(
                        " already exists, please choose different name or delete existing model"))
         )
 
-    if( ! file.exists(transcriptome_data_path)){
-        stop(paste(
-            c("Could not find file ",transcriptome_data_path,", aborting"),
-            collapse = ""
-        ))
-    }
-
     if (length(subtype_vector) == 0)
         stop(paste0("You have to provide the sample subtypes labels for model training"))
     #subtype_vector = str_to_lower(subtype_vector)
 
-    print("Loading training data")
-    
-    expression_training_mat = read.table(
-        transcriptome_data_path,
-        sep ="\t",
-        header = TRUE,
-        stringsAsFactors = FALSE,
-        row.names = 1
-    )
+    expression_training_mat = transcriptome_data
 
     ### Data cleansing
 

@@ -232,38 +232,33 @@ create_heatmap_differentiation_stages = function(
 
     # get the index for differentiated state
     
-    cands_dif = c(
-        "alpha",
-        "beta",
-        "gamma",
-        "delta",
-        "acinar",
-        "ductal"
-    )
-    cands_dif = cands_dif[cands_dif %in% colnames(deconvolution_results)]
+    subtype_cands = c("alpha","beta","gamma","delta","acinar","ductal","progenitor","hisc")
+    model_1 = head(unlist(str_split(as.character(deconvolution_results$model),pattern = "\\|")),1)
+    model_2 = head(unlist(str_split(as.character(deconvolution_results$model),pattern = "\\|")),2)[2]
+    subtypes_1 = str_to_lower(as.character(unlist(str_split(model_1,pattern="_"))))
+    subtypes_2 = str_to_lower(as.character(unlist(str_split(model_2,pattern="_"))))
+    subtypes_1 = subtypes_1[str_to_lower(subtypes_1) %in% subtype_cands]
+    subtypes_2 = subtypes_2[str_to_lower(subtypes_2) %in% subtype_cands]
+    cands_dif_2 = subtypes_2[!(subtypes_2 %in% subtypes_1)]
+    cands_dif_1 = subtypes_1[!(subtypes_1 %in% cands_dif_2)]
     
-    cands_de_dif = c(
-        #"progenitor",
-        "hisc",
-        "hesc"
-    )
-    cands_de_dif = cands_de_dif[cands_de_dif %in% colnames(deconvolution_results)]
-    
-    dif_index = grep(
+    cands_1_index = grep(
         colnames(deconvolution_results),
         pattern = paste0(
-            cands_dif,
+            str_to_lower(cands_dif_1),
             collapse = "|"
         )
     )
     
-    de_dif_index = grep(
+    cands_2_index = grep(
         colnames(deconvolution_results),
         pattern = paste0( 
-            cands_de_dif,
+            str_to_lower(cands_dif_2),
             collapse = "|"
         )
     )
+    colnames(deconvolution_results)[c(cands_1_index,cands_2_index)] =
+        str_to_lower(colnames(deconvolution_results)[c(cands_1_index,cands_2_index)])
 
     correlation_matrix = cor(transcriptome_mat_vis)
     deconvolution_results = deconvolution_results[
@@ -275,7 +270,7 @@ create_heatmap_differentiation_stages = function(
         Graphics_parameters = configure_graphics()
 
     # extract similarity measurements
-    subtype_index_vis = c(dif_index,de_dif_index,
+    subtype_index_vis = c(cands_1_index,cands_2_index,
         grep(
             colnames(deconvolution_results),
             pattern = paste0( c(
@@ -303,11 +298,9 @@ create_heatmap_differentiation_stages = function(
             mean(vis_mat[,"Confidence_score_dif"]) +
             sd(vis_mat[,"Confidence_score_dif"])
     
-    for(subtype in c(cands_de_dif,cands_dif)){
+    for(subtype in c(cands_dif_2,cands_dif_1)){
         
-        # log the result
-        #deconvolution_results[,subtype] = log(deconvolution_results[,subtype]+1)
-        #deconvolution_results[,subtype] = scale(deconvolution_results[,subtype])
+        subtype = str_to_lower(subtype)
         deconvolution_results[,subtype] = deconvolution_results[,subtype] - min(deconvolution_results[,subtype])
         if ( max( deconvolution_results[,subtype]) > 0 )
             deconvolution_results[,subtype] = 
@@ -395,7 +388,8 @@ create_heatmap_differentiation_stages = function(
     
     # p_value setting
     
-    for(subtype in cands_dif){
+    for(subtype in cands_dif_1){
+        subtype = str_to_lower(subtype)
         vis_mat[
             as.double(vis_mat$Confidence_score_dif) >=
             confidence_threshold,
@@ -403,7 +397,7 @@ create_heatmap_differentiation_stages = function(
         ] = "not_significant"
     }
     
-    for(subtype in c(cands_de_dif)){
+    for(subtype in c(cands_dif_2)){
         vis_mat[
             as.double(vis_mat$Confidence_score_de_dif) >=
                 confidence_threshold,

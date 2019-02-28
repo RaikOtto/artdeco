@@ -1,6 +1,6 @@
-#' add_deconvolution_training_model
+#' add_deconvolution_training_model_NMF
 #'
-#' \code{add_deconvolution_training_model} adds a new model
+#' \code{add_deconvolution_training_model_NMF} adds a new model
 #'
 #' @param transcriptome_data Path to transcriptomic data to be
 #' used for training. Has to contain the cell subtypes to which the
@@ -12,7 +12,7 @@
 #' labels of the training data samples
 #' @import stringr
 #' @usage
-#' add_deconvolution_training_model_music(
+#' add_deconvolution_training_model_NMF(
 #'     transcriptome_data,
 #'     model_name,
 #'     subtype_vector
@@ -31,18 +31,20 @@
 #'     model_name = "Test_model",
 #'     subtype_vector
 #' )
+#' @import NMF
 #' @return Stores a new model in the package directory
 #' @export
-add_deconvolution_training_model_music = function(
+add_deconvolution_training_model_NMF = function(
     transcriptome_data_path = "",
     model_name = "",
-    subtype_vector
+    subtype_vector,
+    training_nr_marker_genes = 100
 ){
 
     if( model_name == "")
         stop("Require model name, aborting")
     model_path = paste(
-        c(system.file("Models/music", package="artdeco"),"/",model_name,".RDS"),
+        c(system.file("Models/NMF", package="artdeco"),"/",model_name,".RDS"),
         collapse = ""
     )
 
@@ -63,6 +65,54 @@ add_deconvolution_training_model_music = function(
     row_var = apply(expression_training_mat, FUN = var, MARGIN = 1)
     expression_training_mat = expression_training_mat[row_var != 0,]
     expression_training_mat = expression_training_mat[rowSums(expression_training_mat) >= 1,]
+    
+    ### dif genes
+    
+    markers <<- c()
+    Marker_Gene_List = list()
+    for( subtype in unique(subtype_vector) ){
+        markers = c(
+            markers,
+            identify_marker_genes(
+                expression_training_mat = expression_training_mat,
+                subtype_vector = subtype_vector,
+                subtype = subtype,
+                nr_marker_genes = training_nr_marker_genes
+            )
+        )
+        Marker_Gene_List[[subtype]] = markers
+    }
+    markers = unique(markers)
+    expression_training_mat_reduced = expression_training_mat[markers,]
+    print("Finished extracting marker genes for subtypes")
+
+    ### NMF training
+    
+    rank_estimate = length(unique(subtype_vector))
+    library("NMF")
+
+    res = nmf(
+        expression_training_mat_reduced,
+        rank = rank_estimate,
+        method = 'brunet',
+        .opt = 'tp3',
+        nrun = 10,
+        maxIter = 100,
+        seed = "random"
+    )
+    summary(res, class = subtype_vector)
+    plot(res)
+    H=res@fit@H
+    W=res@fit@W
+    aprx = W %*% H
+    residual = expression_training_mat_reduced - aprx
+    residual[1:5,1:5]
+    dd = NMF::basis(res)
+    round(dd["INS",],0)
+    
+    aggregate(
+        
+    )
 
     eset = new(
         "ExpressionSet",
@@ -82,3 +132,4 @@ add_deconvolution_training_model_music = function(
 
     print(paste0("Finished training model: ", model_name))
 }
+

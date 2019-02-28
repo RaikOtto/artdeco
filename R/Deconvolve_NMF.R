@@ -1,4 +1,4 @@
-Deconvolve_bseq_sc = function(
+Deconvolve_NMF = function(
     deconvolution_data,
     models_list,
     models,
