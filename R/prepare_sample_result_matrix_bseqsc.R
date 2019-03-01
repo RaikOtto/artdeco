@@ -1,58 +1,47 @@
+
 prepare_sample_result_matrix_bseqsc = function(
     deconvolution_results,
     prediction_stats_list,
-    models_list,
-    deconvolution_data
+    deconvolution_data,
+    models_list
 ){
     
-    models = as.character(unlist(str_split(deconvolution_results$Model[1],pattern = "\\|")))
-    deconvolution_results[,"Confidence_score_dif"] = rep("",nrow(deconvolution_results))
+    #models = as.character(unlist(str_split(deconvolution_results$Model[1],pattern = "\\|")))
+    # deconvolution_results[,"R_sqr_dif"] = rep("",nrow(deconvolution_results))
     deconvolution_results[,"Strength_subtype"] = rep("",nrow(deconvolution_results))
     deconvolution_results[,"Subtype"] = rep("",nrow(deconvolution_results))
-
+    
     ###
     
     res_cor = prediction_stats_list[[1]]
-    rownames(res_cor) = str_replace_all(rownames(res_cor) ,"^X","")
     res_cor[ is.na(res_cor) ] = 0.0
-    training_mat_dif = as.data.frame(models_list[[1]][[1]])
-
-    deconvolution_data = as.data.frame(deconvolution_data)
-    deconvolution_data = deconvolution_data[rownames(training_mat_dif),]
-    training_mat_dif = training_mat_dif[!is.na(deconvolution_data[,1]),]
-    deconvolution_data = deconvolution_data[!is.na(deconvolution_data[,1]),]
     
-    cands_dif = c("alpha","beta","gamma","delta","acinar","ductal")
-    cands_dif = cands_dif[cands_dif %in% colnames(deconvolution_results)]
+    cands_dif_1 = c("alpha","beta","gamma","delta","acinar","ductal")
+    if("hisc" %in% colnames(deconvolution_results)){
+        cands_dif_2 = "hisc"
+    } else {
+        cands_dif_2 = c("acinar","ductal")
+    }
+    
+    deconvolution_results[,"Confidence_score_dif"] = rep("",nrow(deconvolution_results))
+    deconvolution_results[,"Confidence_score_dif"] = abs(as.double(res_cor[,"RMSE"]))
+    
+    cands_dif = cands_dif_1[
+        (cands_dif_1 %in% colnames(deconvolution_results)) &
+        !(cands_dif_1 %in% cands_dif_2)
+    ]
     
     for( j in 1:ncol(deconvolution_data)){
         
-        dif_p_values = c()
-        for (subtype in cands_dif){
-            
-            dif_p_values = c(
-                cor.test(
-                    deconvolution_data[,j],
-                    training_mat_dif[,subtype]
-                )$p.value,
-                dif_p_values
-            )
-        }
-        
         max_subtype = colnames(deconvolution_results[cands_dif])[
             which.max(deconvolution_results[j,cands_dif])
-        ]
+            ]
         subtype_strength = deconvolution_results[j,max_subtype] /
             sum(deconvolution_results[j,cands_dif])
         if (sum(deconvolution_results[j,cands_dif]) == 0)
             subtype_strength = deconvolution_results[j,max_subtype]
         subtype_strength = round(subtype_strength * 100,1)
         
-        deconvolution_results[j,"Confidence_score_dif"] =
-            dif_p_values[colnames(training_mat_dif) == max_subtype]
-        deconvolution_results[j,"Confidence_score_dif"] = -1*logb(
-            as.double(deconvolution_results[j,"Confidence_score_dif"])
-        )
         deconvolution_results[j,"Strength_subtype"] =
             subtype_strength
         
@@ -63,53 +52,27 @@ prepare_sample_result_matrix_bseqsc = function(
     }
     
     deconvolution_results[,"Differentiation_score"] = rep("",nrow(deconvolution_results))
-    deconvolution_results[,"Differentiation_score"] = res_cor[,4]
+    deconvolution_results[,"Differentiation_score"] = res_cor
     
     ### de dif
     
     res_cor = prediction_stats_list[[2]]
-    rownames(res_cor) = str_replace_all(rownames(res_cor) ,"^X","")
     res_cor[ is.na(res_cor) ] = 0.0
-    training_mat_de_dif = as.data.frame(models_list[[2]][[1]])
     
-    deconvolution_data = deconvolution_data[rownames(training_mat_de_dif),]
-    training_mat_de_dif = training_mat_de_dif[!is.na(deconvolution_data[,1]),]
-    deconvolution_data = deconvolution_data[!is.na(deconvolution_data[,1]),]
-    
-    cands_de_dif = c("progenitor","hisc","hesc")
     deconvolution_results[,"Strength_de_differentiation"] = rep("",nrow(deconvolution_results))
-    cands_de_dif = cands_de_dif[cands_de_dif %in% colnames(deconvolution_results)]
-    
-    deconvolution_results[,"Confidence_score_de_dif"] = rep(0.0, nrow(deconvolution_results))
+    deconvolution_results[,"Confidence_score_de_dif"] = rep("",nrow(deconvolution_results))
+    deconvolution_results[,"Confidence_score_de_dif"] = abs( as.double(res_cor[,"RMSE"]) )
     
     for( j in 1:ncol(deconvolution_data)){
         
-        de_dif_p_values = c()
-        for (subtype in cands_de_dif){
-            
-            de_dif_p_values = c(
-                cor.test(
-                    deconvolution_data[,j],
-                    training_mat_de_dif[,subtype]
-                )$p.value,
-                de_dif_p_values
-            )
-        }
-        
-        de_strength = log( sum(deconvolution_results[j,cands_de_dif]) /
-            sum(deconvolution_results[j,cands_dif]) )
-        if (sum(deconvolution_results[j,cands_dif]) == 0)
+        de_strength = log( sum(deconvolution_results[j,cands_dif_2]) /
+                               sum(deconvolution_results[j,cands_dif_2]) +1 )
+        if (sum(deconvolution_results[j,cands_dif_2]) == 0)
             de_strength = 0
         deconvolution_results[j,"Strength_de_differentiation"] = 
             as.double(de_strength)
-
-        deconvolution_results[j,"Confidence_score_de_dif"] =
-            de_dif_p_values[ which.min(de_dif_p_values) ]
-        deconvolution_results[j,"Confidence_score_de_dif"] = deconvolution_results[j,"Confidence_score_de_dif"]
+        
     }
     
-    deconvolution_results[,"De_differentiation_score"] = rep("",nrow(deconvolution_results))
-    deconvolution_results[,"De_differentiation_score"] = res_cor[,4]
-
     return(deconvolution_results)
 }
