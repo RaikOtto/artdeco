@@ -47,10 +47,11 @@ add_deconvolution_training_model_NMF = function(
     transcriptome_data,
     model_name,
     subtype_vector,
-    rank_estimate,
+    rank_estimate = 0,
     exclude_non_interpretable_NMF_components = TRUE,
     training_nr_marker_genes = 100
 ){
+    canonical_subtypes = c("alpha","beta","gamma","delta","acinar","ductal","hisc")
 
     if( model_name == "")
         stop("Require model name, aborting")
@@ -101,11 +102,11 @@ add_deconvolution_training_model_NMF = function(
 
     ### NMF training
     
-    if ( !  exists("rank_estimate") )
+    if ( rank_estimate == 0 )
         rank_estimate = length(unique(subtype_vector))
     library("NMF")
     
-    print("Commencing NMF training")
+    print("Commencing NMF training, this may take some time")
 
     res = nmf(
         expression_training_mat_reduced,
@@ -117,31 +118,37 @@ add_deconvolution_training_model_NMF = function(
         seed = "random"
     )
     
-    print("Finished NMF training")
-    
     summary(res, class = subtype_vector)
     
     W=res@fit@W
     colnames(W) = 1:rank_estimate
-
-    for (subtype in names(Marker_Gene_List)){
+    
+    for (subtype in canonical_subtypes){
         
         marker_genes = as.character(unlist(Marker_Gene_List[subtype]))
         
-        col_var = apply( W[marker_genes,],MARGIN = 2,FUN= var)
-        max_index = as.integer(which.max(col_var))
-        print(paste0(collapse="",c(subtype," subtype found as component ",max_index),sep=""))
-        colnames(W)[max_index] = subtype
+        for (gene in marker_genes){
+        
+            max_col_mean_index = as.integer(which.max(W[gene,]))
+            if( colnames(W)[max_col_mean_index] %in% canonical_subtypes )
+                next()
+            
+            colnames(W)[max_col_mean_index] = subtype
+            print(paste0(collapse="",c(subtype," subtype found as component ",max_col_mean_index),sep=""))
+            break()
+        }
     }
     
     if(exclude_non_interpretable_NMF_components){
+        
         exclusion_index = which(!str_to_lower(
-            colnames(W)) %in% c("alpha","beta","gamma","delta","acinar","ductal","hisc"
-            ))
+            colnames(W)) %in% canonical_subtypes)
         print(paste("Excluding component ",exclusion_index,sep=""))
         W = W[,-exclusion_index]
     }
     res@fit@W = W
+    
+    print("Succesfully finished NMF training")
 
     print(paste0("Storing model: ", model_path))
     saveRDS(res,model_path)
