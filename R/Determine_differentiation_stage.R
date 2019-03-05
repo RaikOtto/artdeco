@@ -65,11 +65,11 @@ Determine_differentiation_stage = function(
         
         model_indicator = "Models/bseqsc"
         
-    } else if (deconvolution_algorithm == "deconrnaseq"){
+    } else if (deconvolution_algorithm == "NMF"){
         
-        model_indicator = "Models/deconrnaseq"
+        model_indicator = "Models/NMF"
     } else {
-        stop("Only bseqsc, DeconRNASeq and MuSiC implemented as of now.")
+        stop("Only bseqsc, NMF and MuSiC implemented as of now.")
     }
     
     for (model in models){
