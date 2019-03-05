@@ -2,14 +2,14 @@
 #' @param expression_training_mat matrix that contains the expression data
 #' @param subtype_vector Vector containing the subtype of the training samples
 #' @param subtype Subtype for which to determine the differentially expressed
-#' @param nr_marker_genes Number of desired marker genes to describe a subtype
+#' @param training_nr_marker_genes Number of desired marker genes to describe a subtype
 #' @import stringr limma
 #' @return Returns marker genes
 identify_marker_genes = function(
     expression_training_mat,
     subtype_vector,
     subtype,
-    nr_marker_genes
+    training_nr_marker_genes
 ){
 
     print(paste("Calculating marker genes for subtype: ",subtype, sep =""))
@@ -20,13 +20,14 @@ identify_marker_genes = function(
     design <- model.matrix(~0 + groups)
     colnames(design) = c("Case","Ctrl")
 
-    vfit <- lmFit(expression_training_mat,design)
+    vfit = lmFit(expression_training_mat,design)
     contr.matrix = makeContrasts(
         contrast = Case - Ctrl,
-        levels = design )
+        levels = design
+    )
 
-    vfit <- contrasts.fit( vfit, contrasts = contr.matrix)
-    efit <- eBayes(vfit)
+    vfit = contrasts.fit( vfit, contrasts = contr.matrix)
+    efit = eBayes(vfit)
 
     result_t = topTable(
         efit,
@@ -52,7 +53,7 @@ identify_marker_genes = function(
     result_t = result_t[order(result_t$Log_FC, decreasing = TRUE),]
     marker_genes = as.character(result_t$HGNC)
     marker_genes = marker_genes[marker_genes %in% rownames(expression_training_mat)]
-    marker_genes = marker_genes[1:nr_marker_genes]
+    marker_genes = marker_genes[1:training_nr_marker_genes]
 
     return(marker_genes)
 }

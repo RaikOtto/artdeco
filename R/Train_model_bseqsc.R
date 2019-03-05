@@ -54,7 +54,7 @@ add_deconvolution_training_model_bseqsc = function(
     transcriptome_data,
     model_name,
     subtype_vector,
-    marker_gene_list = list(),
+    marker_gene_list,
     training_p_value_threshold = 0.05,
     training_nr_permutations = 100,
     training_nr_marker_genes = 100
@@ -85,7 +85,7 @@ add_deconvolution_training_model_bseqsc = function(
     expression_training_mat = expression_training_mat[row_var != 0,]
     expression_training_mat = expression_training_mat[rowSums(expression_training_mat) >= 1,]
 
-    if (length(marker_gene_list) <= 1){
+    if ( ! exists("marker_gene_list") ){
 
         Marker_Gene_List <<- list()
         for( subtype in unique(subtype_vector) ){
@@ -93,7 +93,7 @@ add_deconvolution_training_model_bseqsc = function(
                 expression_training_mat = expression_training_mat,
                 subtype_vector = subtype_vector,
                 subtype = subtype,
-                nr_marker_genes = training_nr_marker_genes
+                training_nr_marker_genes = training_nr_marker_genes
             )
         }
         print("Finished extracting marker genes for subtypes")

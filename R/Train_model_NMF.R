@@ -2,7 +2,7 @@
 #'
 #' \code{add_deconvolution_training_model_NMF} adds a new model
 #'
-#' @param transcriptome_data Path to transcriptomic data to be
+#' @param transcriptome_data Transcriptomic data to be
 #' used for training. Has to contain the cell subtypes to which the
 #' similarity has to be calculated. Note that the first column has
 #' to contain the HGNC symbols and the header not! not the first
@@ -10,12 +10,22 @@
 #' @param model_name Name of the model
 #' @param subtype_vector Character vector containing the subtype
 #' labels of the training data samples
-#' @import stringr
+#' @param rank_estimate Rank of the NMF model. Will be set to amount of 
+#' different subtypes defined in the subtype_vector if not specified manually
+#' @param exclude_non_interpretable_NMF_components Boolean parameter that indicates
+#' whether trained NMF components that cannot clearly be associated with either an endocrine
+#' or acinar & ductal or hisc subtyp shall be excluded
+#' @param training_nr_marker_genes Amount of genes to be utilized as marker genes
+#' for each cell type
+#' @import stringr NMF
 #' @usage
 #' add_deconvolution_training_model_NMF(
-#'     transcriptome_data,
-#'     model_name,
-#'     subtype_vector
+#' transcriptome_data,
+#' model_name,
+#' subtype_vector,
+#' rank_estimate,
+#' exclude_non_interpretable_NMF_components,
+#' training_nr_marker_genes
 #' )
 #' @examples
 #' data("test_data")
@@ -27,17 +37,18 @@
 #' )
 #' subtype_vector = meta_data$Subtype # extract the training sample subtype labels
 #' add_deconvolution_training_model(
-#'     transcriptome_data_path = transcriptome_data_path,
+#'     transcriptome_data = transcriptome_data,
 #'     model_name = "Test_model",
 #'     subtype_vector
 #' )
-#' @import NMF
 #' @return Stores a new model in the package directory
 #' @export
 add_deconvolution_training_model_NMF = function(
-    transcriptome_data_path = "",
-    model_name = "",
+    transcriptome_data,
+    model_name,
     subtype_vector,
+    rank_estimate,
+    exclude_non_interpretable_NMF_components = TRUE,
     training_nr_marker_genes = 100
 ){
 
@@ -71,16 +82,18 @@ add_deconvolution_training_model_NMF = function(
     markers <<- c()
     Marker_Gene_List = list()
     for( subtype in unique(subtype_vector) ){
+        
+        markers_subtype = identify_marker_genes(
+            expression_training_mat = expression_training_mat,
+            subtype_vector = subtype_vector,
+            subtype = subtype,
+            training_nr_marker_genes = training_nr_marker_genes
+        )
         markers = c(
             markers,
-            identify_marker_genes(
-                expression_training_mat = expression_training_mat,
-                subtype_vector = subtype_vector,
-                subtype = subtype,
-                nr_marker_genes = training_nr_marker_genes
-            )
+            markers_subtype
         )
-        Marker_Gene_List[[subtype]] = markers
+        Marker_Gene_List[[subtype]] = markers_subtype
     }
     markers = unique(markers)
     expression_training_mat_reduced = expression_training_mat[markers,]
@@ -88,47 +101,50 @@ add_deconvolution_training_model_NMF = function(
 
     ### NMF training
     
-    rank_estimate = length(unique(subtype_vector))
+    if ( !  exists("rank_estimate") )
+        rank_estimate = length(unique(subtype_vector))
     library("NMF")
+    
+    print("Commencing NMF training")
 
     res = nmf(
         expression_training_mat_reduced,
         rank = rank_estimate,
         method = 'brunet',
-        .opt = 'tp3',
+        .opt = 'tp8',
         nrun = 10,
         maxIter = 100,
         seed = "random"
     )
-    summary(res, class = subtype_vector)
-    plot(res)
-    H=res@fit@H
-    W=res@fit@W
-    aprx = W %*% H
-    residual = expression_training_mat_reduced - aprx
-    residual[1:5,1:5]
-    dd = NMF::basis(res)
-    round(dd["INS",],0)
     
-    aggregate(
+    print("Finished NMF training")
+    
+    summary(res, class = subtype_vector)
+    
+    W=res@fit@W
+    colnames(W) = 1:rank_estimate
+
+    for (subtype in names(Marker_Gene_List)){
         
-    )
-
-    eset = new(
-        "ExpressionSet",
-        exprs = as.matrix(expression_training_mat)
-    );
-    fData(eset) = data.frame( as.character(subtype_vector) )
-    colnames(fData(eset)) = "cellType"
-    pData(eset)$sampleID = colnames(expression_training_mat)
-    pData(eset)$cellType = fData(eset)$cellType
-
-    model = list(
-        eset
-    )
+        marker_genes = as.character(unlist(Marker_Gene_List[subtype]))
+        
+        col_var = apply( W[marker_genes,],MARGIN = 2,FUN= var)
+        max_index = as.integer(which.max(col_var))
+        print(paste0(collapse="",c(subtype," subtype found as component ",max_index),sep=""))
+        colnames(W)[max_index] = subtype
+    }
+    
+    if(exclude_non_interpretable_NMF_components){
+        exclusion_index = which(!str_to_lower(
+            colnames(W)) %in% c("alpha","beta","gamma","delta","acinar","ductal","hisc"
+            ))
+        print(paste("Excluding component ",exclusion_index,sep=""))
+        W = W[,-exclusion_index]
+    }
+    res@fit@W = W
 
     print(paste0("Storing model: ", model_path))
-    saveRDS(model,model_path)
+    saveRDS(res,model_path)
 
     print(paste0("Finished training model: ", model_name))
 }
