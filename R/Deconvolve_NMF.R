@@ -12,19 +12,33 @@ Deconvolve_NMF = function(
         
         print(paste0("Deconvolving with model: ",pred_model))
         model_basis = models_list[[pred_model]]
-        model_basis = model_basis[[1]]
+        W = as.data.frame(model_basis@fit@W)
+    
+        dec_data = as.data.frame(exprs(deconvolution_data))
+        W = W[rownames(W) %in% rownames(dec_data),]
+        dec_data = dec_data[rownames(dec_data) %in% rownames(W),]
+        dec_data = dec_data[rownames(W),]
+
+        proportions = t(W)[,0]
+        residuals   = c()
         
-        fit = bseqsc_proportions(
-            deconvolution_data,
-            model_basis,
-            verbose = FALSE,
-            absolute = TRUE,
-            log = FALSE,
-            perm = nr_permutations
-        )
+        for (i in 1:ncol(dec_data)){
         
-        prediction_res_coeff_list[[pred_model]] = fit$coefficients
-        prediction_stats_list[[pred_model]] = fit$stats
+            H = t(1/W)%*%dec_data[,i]
+            predictions = rowSums(W*(as.matrix(H)))
+            row_residuals = dec_data[,1] - predictions
+            residuals = c(
+                residuals,
+                sum(row_residuals)
+            )
+            percentages = round((H / sum(H))*100,1)
+            proportions = cbind(proportions, percentages)
+        }
+        colnames(proportions) = colnames(dec_data)
+        names(residuals) = colnames(dec_data)
+        
+        prediction_res_coeff_list[[pred_model]] = proportions
+        prediction_stats_list[[pred_model]]     = residuals
     }
     
     # create results matrix called meta_data
@@ -36,7 +50,7 @@ Deconvolve_NMF = function(
     )
     colnames(deconvolution_results) = str_to_lower(colnames(deconvolution_results))
     
-    deconvolution_results = prepare_sample_result_matrix_bseqsc(
+    deconvolution_results = prepare_sample_result_matrix_NMF(
         deconvolution_results = deconvolution_results,
         prediction_stats_list = prediction_stats_list,
         models_list = models_list,

@@ -65,7 +65,7 @@ Determine_differentiation_stage = function(
         
         model_indicator = "Models/bseqsc"
         
-    } else if (deconvolution_algorithm == "NMF"){
+    } else if (deconvolution_algorithm == "nmf"){
         
         model_indicator = "Models/NMF"
     } else {
@@ -73,6 +73,7 @@ Determine_differentiation_stage = function(
     }
     
     for (model in models){
+        
         model_path = paste0(c(
             system.file(
                 model_indicator,
@@ -84,15 +85,23 @@ Determine_differentiation_stage = function(
         )
         if( !file.exists(model_path))
             stop(paste0(c("Could not find models ",model_path,", aborting"), collapse = ""))
+        
         model_and_parameter = readRDS(model_path)
-        models_list[[model]] = model_and_parameter[1]
-        parameter_list[[model]] = model_and_parameter[2]
+        
+        if (deconvolution_algorithm != "nmf"){
+            
+            models_list[[model]] = model_and_parameter[1]
+            parameter_list[[model]] = model_and_parameter[2]
+        } else {
+            models_list[[model]] = model_and_parameter
+            parameter_list[[model]] = model_and_parameter
+        }
     }
-    print("Model(s) loaded")
+    print("Models loaded")
 
     ### switch algorithms
     
-    if ( str_to_lower(deconvolution_algorithm) == "music"){
+    if ( deconvolution_algorithm == "music"){
         
         deconvolution_results = Deconvolve_music(
             deconvolution_data = deconvolution_data,
@@ -101,7 +110,7 @@ Determine_differentiation_stage = function(
             nr_permutations = nr_permutations
         )
         
-    } else if ( str_to_lower(deconvolution_algorithm) == "bseqsc"){
+    } else if ( deconvolution_algorithm == "bseqsc"){
         
         deconvolution_results = Deconvolve_bseq_sc(
             deconvolution_data = deconvolution_data,
@@ -110,9 +119,9 @@ Determine_differentiation_stage = function(
             nr_permutations = nr_permutations
         )
         
-    } else if (str_to_lower(deconvolution_algorithm) == "deconrnaseq"){
+    } else if ( deconvolution_algorithm == "nmf"){
         
-        deconvolution_results = Deconvolve_DeconRNASeq(
+        deconvolution_results = Deconvolve_NMF(
             deconvolution_data = deconvolution_data,
             models_list = models_list,
             models = models,
