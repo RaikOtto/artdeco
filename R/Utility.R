@@ -54,9 +54,9 @@ remove_model = function(
 #' \code{show_models_music} shows which models have been trained
 #'
 #'@usage
-#' show_models()
+#' show_models_music()
 #'@examples
-#' show_models()
+#' show_models_music()
 #'@import stringr
 #'@export
 #'@return list of models
@@ -77,12 +77,12 @@ show_models_music = function(
 
 #' show_models_bseqsc
 #'
-#' \code{show_models_bseqsc} shows which models have been trained
+#' \code{show_models_bseqsc} shows which models have been trained for bseqsc
 #'
 #'@usage
-#' show_models()
+#' show_models_bseqsc()
 #'@examples
-#' show_models()
+#' show_models_bseqsc()
 #'@import stringr
 #'@export
 #'@return list of models
@@ -98,6 +98,32 @@ show_models_bseqsc = function(
         ""
     )
 
+    return(models)
+}
+
+#' show_models_NMF
+#'
+#' \code{show_models_NMF} shows which models have been trained for the NMF method
+#'
+#'@usage
+#' show_models_NMF()
+#'@examples
+#' show_models_NMF()
+#'@import stringr
+#'@export
+#'@return list of models
+show_models_NMF = function(
+){
+    
+    package_path = system.file("", package = "artdeco")
+    model_path = paste(package_path,"Models/NMF", sep = "/")
+    
+    models = stringr::str_replace_all(
+        list.files(model_path),
+        pattern = ".RDS",
+        ""
+    )
+    
     return(models)
 }
 
