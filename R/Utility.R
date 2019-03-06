@@ -1,3 +1,54 @@
+#' remove_model_NMF
+#'
+#' \code{remove_model_NMF} removes a model from the NMF library
+#'
+#' @param model_name Name of the model
+#' @param test_mode Testrun indicator
+#' @usage
+#' remove_model(
+#'     model_name,
+#'     test_mode
+#' )
+#' @examples
+#' model = list.files(system.file("Models/", package = "artdeco"))[1]
+#' remove_model(
+#'     model_name = model,
+#'     test_mode = TRUE
+#' )
+#' @import stringr
+#' @export
+#' @return list of models
+remove_model_NMF = function(
+    model_name,
+    test_mode = FALSE
+){
+
+    # procure path
+    model_name = str_replace_all(
+        model_name,
+        pattern = "(.rds)|(.RDS)",
+        ""
+    )
+    
+    model_path = paste0(
+        c(system.file("Models/NMF", package = "artdeco"),
+          "/", paste0(model_name, ".RDS")
+        ), sep ="", collapse = ""
+    )
+    
+    # check if model exists
+    if (!file.exists(model_path)){
+        stop( paste0(c(
+            "Cannot delete model ", model_name, ", model not found."
+        ),collapse = "" )
+        )
+    }else{
+        if (! test_mode)
+            file.remove(model_path)
+    }
+    print(paste0("Deleted model: ",model_name))
+}
+
 #' remove_model
 #'
 #' \code{remove_model} removes a model

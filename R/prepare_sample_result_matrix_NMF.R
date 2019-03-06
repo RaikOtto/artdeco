@@ -1,5 +1,4 @@
-
-prepare_sample_result_matrix_music = function(
+prepare_sample_result_matrix_NMF = function(
     deconvolution_results,
     prediction_stats_list,
     deconvolution_data,

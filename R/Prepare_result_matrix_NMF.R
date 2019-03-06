@@ -1,4 +1,4 @@
-prepare_result_matrix_music = function(
+prepare_result_matrix_NMF = function(
     prediction_res_coeff_list,
     deconvolution_data,
     models

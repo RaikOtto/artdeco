@@ -31,7 +31,7 @@ Deconvolve_NMF = function(
                 residuals,
                 sum(row_residuals)
             )
-            percentages = round((H / sum(H))*100,1)
+            percentages = (H / sum(H))
             proportions = cbind(proportions, percentages)
         }
         colnames(proportions) = colnames(dec_data)
@@ -43,7 +43,7 @@ Deconvolve_NMF = function(
     
     # create results matrix called meta_data
     
-    deconvolution_results = prepare_result_matrix_bseqsc(
+    deconvolution_results = prepare_result_matrix_NMF(
         prediction_res_coeff_list = prediction_res_coeff_list,
         deconvolution_data = deconvolution_data,
         models = models
