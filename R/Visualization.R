@@ -229,10 +229,15 @@ create_heatmap_differentiation_stages = function(
         pattern = "^X",
         ""
     )
+    
+    # init variables
+    
+    subtype_cands = c("alpha","beta","gamma","delta","acinar","ductal","progenitor","hisc")
+    cands_dif_endocrine = c("alpha","beta","gamma","delta")
+    cands_dif_exokrine = c("ductal","acinar")
 
     # get the index for differentiated state
     
-    subtype_cands = c("alpha","beta","gamma","delta","acinar","ductal","progenitor","hisc")
     model_1 = head(unlist(str_split(as.character(deconvolution_results$model),pattern = "\\|")),1)
     model_2 = head(unlist(str_split(as.character(deconvolution_results$model),pattern = "\\|")),2)[2]
     subtypes_1 = str_to_lower(as.character(unlist(str_split(model_1,pattern="_"))))
@@ -270,7 +275,9 @@ create_heatmap_differentiation_stages = function(
         Graphics_parameters = configure_graphics()
 
     # extract similarity measurements
-    subtype_index_vis = c(cands_1_index,cands_2_index,
+    subtype_index_vis = c(
+        cands_1_index,
+        cands_2_index,
         grep(
             colnames(deconvolution_results),
             pattern = paste0( c(
@@ -284,7 +291,7 @@ create_heatmap_differentiation_stages = function(
 
     vis_mat = deconvolution_results[subtype_index_vis]
     
-    # differentiation score scaling
+    # differentiation score scaling, zero offset
     for ( score in c("Confidence_score_de_dif","Confidence_score_dif")){
 
         vis_mat[,score] = as.double(vis_mat[,score])
@@ -293,6 +300,7 @@ create_heatmap_differentiation_stages = function(
         vis_mat[,score] = vis_mat[,score] / max(vis_mat[,score])
     }
     
+    # heuristic for significance
     if ( confidence_threshold > 1.0 )
         confidence_threshold = 
             mean(vis_mat[,"Confidence_score_dif"]) +
@@ -302,14 +310,18 @@ create_heatmap_differentiation_stages = function(
         
         subtype = str_to_lower(subtype)
         deconvolution_results[,subtype] = deconvolution_results[,subtype] - min(deconvolution_results[,subtype])
+        
         if ( max( deconvolution_results[,subtype]) > 0 )
             deconvolution_results[,subtype] = 
                 deconvolution_results[,subtype] /
-                max(deconvolution_results[,subtype])
+                max(deconvolution_results[,subtype]
+        )
         deconvolution_results[,subtype] = round(deconvolution_results[,subtype] * 100,1)
         
+        # if no manual definition of high subtype similarity has been set
         if (high_threshold > 100){
-            
+         
+            # heuristic   
             m = mean(deconvolution_results[,subtype])
             sd = sd(deconvolution_results[,subtype])*.5
             high_threshold_subtype = round(m + sd,1)
@@ -318,6 +330,7 @@ create_heatmap_differentiation_stages = function(
                 ( high_threshold_subtype == 0 ) |
                 ( length(high_threshold_subtype) == 0 )
             )
+                
             high_threshold_subtype = 1
             message(
                 paste0(
@@ -349,31 +362,33 @@ create_heatmap_differentiation_stages = function(
             subtype
         ] = "high"
         
-        cands_dif_endocrine = c("alpha","beta","gamma","delta")
         cands_dif_endocrine = cands_dif_endocrine[
             cands_dif_endocrine %in% colnames(deconvolution_results)
         ]
-        cands_dif_exokrine = c("ductal","acinar")
-        cands_dif_exokrine = cands_dif_exokrine[cands_dif_exokrine %in% colnames(deconvolution_results)]
+        cands_dif_exokrine = cands_dif_exokrine[
+            cands_dif_exokrine %in% colnames(deconvolution_results)
+        ]
+        
+        # identify the most similary subtype i.e. 'subtype' column
         
         if( subtype %in% cands_dif_endocrine){
             
-            max_indeces = as.integer(apply( 
+            max_indices = as.integer(apply( 
                 deconvolution_results[,cands_dif_endocrine],
                 MARGIN = 1,
                 FUN = which.max
             ))
-            max_subtypes = colnames(deconvolution_results[,cands_dif_endocrine])[max_indeces]
-            highest_percentage = max_subtypes == subtype 
+            max_subtypes = colnames(deconvolution_results[,cands_dif_endocrine])[max_indices]
+            highest_percentage = max_subtypes == subtype
 
         } else if ( subtype %in% cands_dif_exokrine){
             
-            max_indeces = as.integer(apply( 
+            max_indices = as.integer(apply( 
                 deconvolution_results[,cands_dif_exokrine],
                 MARGIN = 1,
                 FUN = which.max
             ))
-            max_subtypes = colnames(deconvolution_results[,cands_dif_exokrine])[max_indeces]
+            max_subtypes = colnames(deconvolution_results[,cands_dif_exokrine])[max_indices]
             highest_percentage = max_subtypes == subtype 
             
         } else {
@@ -381,7 +396,7 @@ create_heatmap_differentiation_stages = function(
         }
         
         vis_mat[
-            ! highest_percentage,
+            highest_percentage != TRUE,
             subtype
         ] = "low"
     }
@@ -417,7 +432,6 @@ create_heatmap_differentiation_stages = function(
     vis_mat$Confidence_score_dif[vis_mat$Confidence_score_dif == 0] = 1*10^-5
     vis_mat$Confidence_score_de_dif[vis_mat$Confidence_score_de_dif == 0] = 1*10^-5
     vis_mat$Ratio = ( 
-        #scale(vis_mat$Confidence_score_de_dif) / scale(vis_mat$Confidence_score_dif)
         scale(vis_mat$Confidence_score_de_dif / vis_mat$Confidence_score_dif)
     )
     vis_mat$Ratio_numeric = round(vis_mat$Ratio, 3)
@@ -433,48 +447,16 @@ create_heatmap_differentiation_stages = function(
     vis_mat$Ratio[medium_index] = "medium"
     vis_mat$Ratio[higher_index] = "high"
     
-    # case aggregated similarity
-    if (aggregate_differentiated_stages){
-        
-        vis_mat[,"aggregated_similarity"] = rep("",nrow(vis_mat))
-        for (i in 1:nrow(vis_mat)){
-
-            candidate_list_max = vis_mat[i,cands_dif]
-            candidate_list_index = which(candidate_list_max %in% c("low","high"))
-            
-            if (length(candidate_list_index) == 0){
-                vis_mat[i,"aggregated_similarity"] = "undetermined"
-                next()
-            }
-            
-            high_types = colnames(candidate_list_max)[candidate_list_index]
-            
-            if (length(high_types) == 1){
-                
-                max_type = high_types
-            } else {
-                
-                max_index = which.max(deconvolution_results[i,high_types])
-                vis_mat[i,"aggregated_similarity"] = colnames(deconvolution_results[,high_types])[max_index]
-            }
-        }
-        
-        vis_mat[
-            as.double(vis_mat$Confidence_score_dif) >=
-                confidence_threshold,
-            "aggregated_similarity"
-        ] = "not_significant"
-
-        vis_mat = vis_mat[,!(colnames(vis_mat) %in% cands_dif)]
-        
-        # rearrange order
-        
-        aggregated_similarity = vis_mat$aggregated_similarity
-        vis_mat = vis_mat[,colnames(vis_mat) != "aggregated_similarity"]
-        vis_mat = cbind(aggregated_similarity,vis_mat)
-        
-        vis_mat[vis_mat[,"aggregated_similarity"] == "","aggregated_similarity"] = "undetermined"
-    }
+    # calculate aggregated similarity
+    
+    ###vis_mat[,"aggregated_similarity"] = deconvolution_results$Subtype
+    
+    
+    vis_mat[
+        as.double(vis_mat$Confidence_score_dif) >=
+            confidence_threshold,
+        "aggregated_similarity"
+    ] = "not_significant"
 
     # add mki67 information
     if ("MKI67" %in% colnames(deconvolution_results)){
@@ -495,6 +477,29 @@ create_heatmap_differentiation_stages = function(
             "Ratio_numeric"
         ))
     ]
+    
+    if (aggregate_differentiated_stages){
+        
+        max_indices = apply(deconvolution_results[,
+            c(cands_dif_endocrine,cands_dif_exokrine)
+        ],FUN=which.max,MARGIN = 1)
+        subtype_selection = vis_mat[,c(cands_dif_endocrine,cands_dif_exokrine)]
+        vis_mat$Aggregated_similarity = rep("",nrow(vis_mat))
+        
+        for( j in 1:nrow(subtype_selection)){
+            
+            subtype_strength = subtype_selection[j,max_indices[j]]
+            if (subtype_strength == "low"){
+                vis_mat$Aggregated_similarity[j] = "not_significant"
+            } else {
+                vis_mat$Aggregated_similarity[j] = colnames(subtype_selection)[max_indices[j]]
+            }
+        }
+        
+        column_candidates = c("Aggregated_similarity","hisc","Grading","MKI67")
+        column_candidates = column_candidates[column_candidates %in% colnames(vis_mat)]
+        vis_mat_filtered = vis_mat[,column_candidates]
+    }
 
     # correlation heatmap
     pheatmap::pheatmap(
@@ -539,7 +544,7 @@ configure_graphics = function(){
         MKI67 = c(low = "green", medium = "yellow", high = "red"),
         Confidence_score_dif = c(low = "green", medium = "white", high = "red"),
         Study = c(Groetzinger = "darkgreen", Scarpa = "darkred"),
-        aggregated_similarity = c(
+        Aggregated_similarity = c(
             alpha = "blue",
             beta = "green",
             gamma = "brown",
