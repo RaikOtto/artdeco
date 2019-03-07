@@ -17,15 +17,18 @@
 #' or acinar & ductal or hisc subtyp shall be excluded
 #' @param training_nr_marker_genes Amount of genes to be utilized as marker genes
 #' for each cell type
+#' @param parallel_processes Amount of parallel processes used for training. Warning, RAM
+#' utilization increases linearly.
 #' @import stringr NMF
 #' @usage
 #' add_deconvolution_training_model_NMF(
-#' transcriptome_data,
-#' model_name,
-#' subtype_vector,
-#' rank_estimate,
-#' exclude_non_interpretable_NMF_components,
-#' training_nr_marker_genes
+#'     transcriptome_data,
+#'     model_name,
+#'     subtype_vector,
+#'     rank_estimate = 0,
+#'     exclude_non_interpretable_NMF_components = TRUE,
+#'     training_nr_marker_genes = 100,
+#'     parallel_processes = 1
 #' )
 #' @examples
 #' data("test_data")
@@ -48,8 +51,9 @@ add_deconvolution_training_model_NMF = function(
     model_name,
     subtype_vector,
     rank_estimate = 0,
-    exclude_non_interpretable_NMF_components = TRUE,
-    training_nr_marker_genes = 100
+    exclude_non_interpretable_NMF_components = FALSE,
+    training_nr_marker_genes = 100,
+    parallel_processes = 1
 ){
     canonical_subtypes = c("alpha","beta","gamma","delta","acinar","ductal","hisc")
 
@@ -104,15 +108,17 @@ add_deconvolution_training_model_NMF = function(
     
     if ( rank_estimate == 0 )
         rank_estimate = length(unique(subtype_vector))
-    library("NMF")
-    
+
     print("Commencing NMF training, this may take some time")
+    print(paste("Amount of parallel processes utilized: ", as.character(parallel_processes)), sep =" ")
+    
+    training_options = paste0('tp',parallel_processes)
 
     res = nmf(
         expression_training_mat_reduced,
         rank = rank_estimate,
         method = 'brunet',
-        .opt = 'tp8',
+        .opt = training_options,
         nrun = 10,
         maxIter = 100,
         seed = "random"
@@ -141,10 +147,11 @@ add_deconvolution_training_model_NMF = function(
     
     if(exclude_non_interpretable_NMF_components){
         
-        exclusion_index = which(!str_to_lower(
-            colnames(W)) %in% canonical_subtypes)
+        exclusion_index = which(
+            !(str_to_lower(colnames(W)) %in% canonical_subtypes)
+        )
         print(paste("Excluding component ",exclusion_index,sep=""))
-        W = W[,-exclusion_index]
+        W = W[,-1*exclusion_index]
     }
     res@fit@W = W
     

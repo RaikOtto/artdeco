@@ -85,21 +85,25 @@ add_deconvolution_training_model_bseqsc = function(
     expression_training_mat = expression_training_mat[row_var != 0,]
     expression_training_mat = expression_training_mat[rowSums(expression_training_mat) >= 1,]
 
-    if ( ! exists("marker_gene_list") ){
-
-        Marker_Gene_List <<- list()
-        for( subtype in unique(subtype_vector) ){
-            Marker_Gene_List[[subtype]] = identify_marker_genes(
-                expression_training_mat = expression_training_mat,
-                subtype_vector = subtype_vector,
-                subtype = subtype,
-                training_nr_marker_genes = training_nr_marker_genes
-            )
-        }
-        print("Finished extracting marker genes for subtypes")
-    } else {
-        Marker_Gene_List = marker_gene_list
+    markers <<- c()
+    Marker_Gene_List = list()
+    for( subtype in unique(subtype_vector) ){
+        
+        markers_subtype = identify_marker_genes(
+            expression_training_mat = expression_training_mat,
+            subtype_vector = subtype_vector,
+            subtype = subtype,
+            training_nr_marker_genes = training_nr_marker_genes
+        )
+        markers = c(
+            markers,
+            markers_subtype
+        )
+        Marker_Gene_List[[subtype]] = markers_subtype
     }
+    markers = unique(markers)
+    expression_training_mat_reduced = expression_training_mat[markers,]
+    print("Finished extracting marker genes for subtypes")
 
     # Prepare bseq training
     training_mat_bseq = new(
