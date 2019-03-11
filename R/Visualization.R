@@ -42,11 +42,6 @@ create_visualization_matrix = function(
     )
     colnames(deconvolution_results)[c(cands_1_index,cands_2_index)] =
         str_to_lower(colnames(deconvolution_results)[c(cands_1_index,cands_2_index)])
-    
-    correlation_matrix = cor(transcriptome_mat_vis)
-    deconvolution_results = deconvolution_results[
-        colnames(correlation_matrix),
-        ]
 
     # extract similarity measurements
     subtype_index_vis = c(
@@ -239,7 +234,6 @@ create_visualization_matrix = function(
     return(vis_mat)
 }
 
-
 #' create_PCA_differentiation_stages
 #'
 #' \code{create_PCA_differentiation_stages}
@@ -288,8 +282,8 @@ create_PCA_differentiation_stages = function(
         high_threshold = high_threshold
     )
 
-    colnames(transcriptome_mat_vis) = str_replace_all(
-        colnames(transcriptome_mat_vis),
+    colnames(visualization_data) = str_replace_all(
+        colnames(visualization_data),
         pattern = "^X",
         ""
     )
@@ -338,32 +332,62 @@ create_PCA_differentiation_stages = function(
           )
     )
     
-    #vis_mat_filtered = deconvolution_results[subtype_index_vis]
-
+    vis_mat = vis_mat[rownames(pcr$x),]
     
+    if (length(vis_mat$Grading) == 0){
+        
+        congruence_vec = vis_mat$MKI67
+        congruence_vec[(congruence_vec == "low" & vis_mat$Ratio == "low")] = "match"
+        congruence_vec[(congruence_vec == "medium" & vis_mat$Ratio == "medium")] = "match"
+        congruence_vec[(congruence_vec == "high" & vis_mat$Ratio == "high")] = "match"
+        
+        congruence_vec_size = congruence_vec
+        congruence_vec_size[congruence_vec_size == "match"] = 1
+        congruence_vec_size[congruence_vec_size != 1      ] = 5
+        congruence_vec = factor(congruence_vec,levels = c("high","medium","low","match"))
+
+    } else {
+    
+        congruence_vec = vis_mat$Grading
+        congruence_vec[(congruence_vec == "G1" & vis_mat$Ratio == "low")] = "match"
+        congruence_vec[(congruence_vec == "G2" & vis_mat$Ratio == "medium")] = "match"
+        congruence_vec[(congruence_vec == "G3" & vis_mat$Ratio == "high")] = "match"
+        congruence_vec_size = congruence_vec
+        congruence_vec_size[congruence_vec_size == "match"] = 1
+        congruence_vec_size[congruence_vec_size != 1      ] = 5
+    }
+
     p = ggbiplot::ggbiplot(
         pcr,
         obs.scale = .75,
-        groups = vis_mat$Grading,
+        groups = congruence_vec,
         ellipse = TRUE,
         circle = TRUE,
-        var.axes = F#,labels = meta_data$Name
+        var.axes = F
     )
+    #p = p + geom_point( 
+    #    aes( 
+    #        size = as.integer(congruence_vec_size)#,
+    #        #shape = vis_mat$Ratio
+    #    ),
+    #    color = "black", stroke = .1
+    #)
     p = p + geom_point(
         aes(
-            colour = as.character(vis_mat$Ratio),
-            shape = vis_mat$Ratio#,
-            #size = 5
+            colour = congruence_vec,
+            shape = as.character(congruence_vec),
+            size = 3
         )
     )
     p = p + guides(
-        color=guide_legend(
-            title="Ratio"
+        color = guide_legend(
+            title="Grading & ratio"
         ),
         #size = guide_legend(title="Ratio"),
         shape =  guide_legend(title="Grading")
     )
-    p
+    p = p + scale_color_manual( values = c("Darkgreen","Orange","Red","black","Green","Yellow") ) + scale_size(guide="none")
+    plot(p)
 }
 
 #' create_heatmap_differentiation_stages
@@ -427,6 +451,15 @@ create_heatmap_differentiation_stages = function(
     Graphics_parameters = "",
     high_threshold = 101
 ){
+    
+    # init variables
+    
+    subtype_cands = c("alpha","beta","gamma","delta","acinar","ductal","progenitor","hisc")
+    cands_dif_endocrine = c("alpha","beta","gamma","delta")
+    cands_dif_exokrine = c("ductal","acinar")
+    cands_de_dif = "hisc"
+    
+    ###
 
     vis_mat = create_visualization_matrix(
         deconvolution_results = deconvolution_results,
@@ -434,9 +467,8 @@ create_heatmap_differentiation_stages = function(
         high_threshold = high_threshold
     )
     
-    transcriptome_mat_vis = visualization_data
-    colnames(transcriptome_mat_vis) = str_replace_all(
-        colnames(transcriptome_mat_vis),
+    colnames(visualization_data) = str_replace_all(
+        colnames(visualization_data),
         pattern = "^X",
         ""
     )
@@ -456,8 +488,8 @@ create_heatmap_differentiation_stages = function(
     if (aggregate_differentiated_stages){
         
         max_indices = apply(deconvolution_results[,
-                                                  c(cands_dif_endocrine,cands_dif_exokrine)
-                                                  ],FUN=which.max,MARGIN = 1)
+            c(cands_dif_endocrine,cands_dif_exokrine)
+        ],FUN=which.max,MARGIN = 1)
         subtype_selection = vis_mat[,c(cands_dif_endocrine,cands_dif_exokrine)]
         vis_mat$Aggregated_similarity = rep("",nrow(vis_mat))
         
@@ -471,7 +503,7 @@ create_heatmap_differentiation_stages = function(
             }
         }
         
-        column_candidates = c("Aggregated_similarity","hisc","Grading","MKI67")
+        column_candidates = c("Aggregated_similarity","hisc","Grading","Ratio","MKI67")
         column_candidates = column_candidates[column_candidates %in% colnames(vis_mat)]
         
         vis_mat[
@@ -481,9 +513,11 @@ create_heatmap_differentiation_stages = function(
             ] = "not_significant"
         
         vis_mat_filtered = vis_mat[,column_candidates]
-        
     }
 
+    correlation_matrix = cor(visualization_data)
+    vis_mat_filtered = vis_mat_filtered[colnames(correlation_matrix),]
+    
     # correlation heatmap
     pheatmap::pheatmap(
         correlation_matrix,
