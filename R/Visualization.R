@@ -1,7 +1,9 @@
 create_visualization_matrix = function(
+    visualization_data,
     deconvolution_results,
     confidence_threshold,
-    high_threshold
+    high_threshold,
+    low_threshold
 ){
     
     # data cleansing
@@ -87,20 +89,23 @@ create_visualization_matrix = function(
             )
         deconvolution_results[,subtype] = round(deconvolution_results[,subtype] * 100,1)
         
+        # heuristic thresholds
+        m = mean(deconvolution_results[,subtype])
+        sd = sd(deconvolution_results[,subtype])*.25
+        
+        
         # if no manual definition of high subtype similarity has been set
         if (high_threshold > 100){
             
             # heuristic   
-            m = mean(deconvolution_results[,subtype])
-            sd = sd(deconvolution_results[,subtype])*.5
             high_threshold_subtype = round(m + sd,1)
             
             if (
                 ( high_threshold_subtype == 0 ) |
                 ( length(high_threshold_subtype) == 0 )
             )
-                
-                high_threshold_subtype = 1
+            high_threshold_subtype = 1
+            
             message(
                 paste0(
                     c("Setting high threshold for subtype ",subtype," to ",high_threshold_subtype),
@@ -111,32 +116,58 @@ create_visualization_matrix = function(
             high_threshold_subtype = high_threshold
         }
         
+        if (low_threshold <= 0){
+            
+            low_threshold_subtype = round(m - sd,1)
+            
+            if (
+                ( low_threshold_subtype < 0 ) |
+                ( length(high_threshold_subtype) == 0 )
+            )
+            low_threshold_subtype = 0
+            
+            message(
+                paste0(
+                    c("Setting low threshold for subtype ",subtype," to ",low_threshold_subtype),
+                    collapse = ""
+                )
+            )
+        } else {
+            low_threshold_subtype = low_threshold
+        }
+        
         if (! (subtype %in% colnames(deconvolution_results)))
             next()
         
-        quantile_threshold = quantile(
+        quants = quantile(
             deconvolution_results[,subtype],
             probs = seq(0,1,.01)
-        )[high_threshold_subtype]
+        )
+        
+        quantile_threshold_high = quants[high_threshold_subtype]
+        quantile_threshold_low = quants[low_threshold_subtype]
         
         vis_mat[
-            (deconvolution_results[,subtype] <= high_threshold_subtype) |
-                (deconvolution_results[,subtype] <= quantile_threshold ),
+            (deconvolution_results[,subtype] > quantile_threshold_high),
             subtype
-            ] = "low"
+        ] = "high"
         
         vis_mat[
-            (deconvolution_results[,subtype] > high_threshold_subtype) &
-                (deconvolution_results[,subtype] > quantile_threshold),
+            (deconvolution_results[,subtype] <= quantile_threshold_high),
             subtype
-            ] = "high"
+        ] = "medium"
         
+        vis_mat[
+            (deconvolution_results[,subtype] <= low_threshold_subtype),
+            subtype
+        ] = "low"
+
         cands_dif_endocrine = cands_dif_endocrine[
             cands_dif_endocrine %in% colnames(deconvolution_results)
-            ]
+        ]
         cands_dif_exokrine = cands_dif_exokrine[
             cands_dif_exokrine %in% colnames(deconvolution_results)
-            ]
+        ]
         
         # identify the most similary subtype i.e. 'subtype' column
         
@@ -203,18 +234,24 @@ create_visualization_matrix = function(
     vis_mat$Ratio = ( 
         scale(vis_mat$Confidence_score_de_dif / vis_mat$Confidence_score_dif)
     )
+    
     vis_mat$Ratio_numeric = round(vis_mat$Ratio, 3)
     
     ### ratio adjustment
     
-    lower_index = which(vis_mat$Ratio <= -.5)
-    higher_index = which(vis_mat$Ratio >=.5)
-    medium_index = 1:nrow(vis_mat)
-    medium_index = medium_index[!(medium_index %in% c(lower_index,higher_index))]
+    quants = quantile(
+        vis_mat$Ratio_numeric,
+        probs = seq(0,1,.01)
+    )
     
-    vis_mat$Ratio[lower_index] = "low"
+    high_index = which(vis_mat$Ratio > quants[high_threshold])
+    medium_index = which(vis_mat$Ratio <= quants[high_threshold])
+    low_index = which(vis_mat$Ratio < quants[low_threshold])
+
+    vis_mat$Ratio[high_index] = "high"
     vis_mat$Ratio[medium_index] = "medium"
-    vis_mat$Ratio[higher_index] = "high"
+    vis_mat$Ratio[low_index] = "low"
+    vis_mat$Ratio = as.character(vis_mat$Ratio)
     
     # calculate aggregated similarity
     
@@ -230,6 +267,12 @@ create_visualization_matrix = function(
         vis_mat[mki_67<quantiles[67],"MKI67"] = "medium"
         vis_mat[mki_67<=quantiles[34],"MKI67"] = "low"
     }
+    
+    colnames(visualization_data) = str_replace_all(
+        colnames(visualization_data),
+        pattern = "^X",
+        ""
+    )
 
     return(vis_mat)
 }
@@ -267,27 +310,16 @@ create_visualization_matrix = function(
 #' @import stringr ggplot2 pheatmap ggfortify
 #' @export
 create_PCA_differentiation_stages = function(
+    vis_mat,
     visualization_data,
     deconvolution_results,
     aggregate_differentiated_stages = FALSE,
     confidence_threshold = 1.1,
     show_colnames = FALSE,
     Graphics_parameters = "",
-    high_threshold = 101
+    high_threshold = 101,
+    low_threshold = 0
 ){
-        
-    vis_mat = create_visualization_matrix(
-        deconvolution_results = deconvolution_results,
-        confidence_threshold = confidence_threshold,
-        high_threshold = high_threshold
-    )
-
-    colnames(visualization_data) = str_replace_all(
-        colnames(visualization_data),
-        pattern = "^X",
-        ""
-    )
-    
     # init variables
     
     subtype_cands = c("alpha","beta","gamma","delta","acinar","ductal","progenitor","hisc")
@@ -445,11 +477,13 @@ create_PCA_differentiation_stages = function(
 create_heatmap_differentiation_stages = function(
     visualization_data,
     deconvolution_results,
+    vis_mat,
     aggregate_differentiated_stages = FALSE,
     confidence_threshold = 1.1,
     show_colnames = FALSE,
     Graphics_parameters = "",
-    high_threshold = 101
+    high_threshold = 66,
+    low_threshold = 33
 ){
     
     # init variables
@@ -461,18 +495,6 @@ create_heatmap_differentiation_stages = function(
     
     ###
 
-    vis_mat = create_visualization_matrix(
-        deconvolution_results = deconvolution_results,
-        confidence_threshold = confidence_threshold,
-        high_threshold = high_threshold
-    )
-    
-    colnames(visualization_data) = str_replace_all(
-        colnames(visualization_data),
-        pattern = "^X",
-        ""
-    )
-    
     # assert that graphics parameters are available
     if ( head(Graphics_parameters,1) == "" )
         Graphics_parameters = configure_graphics()
@@ -529,8 +551,6 @@ create_heatmap_differentiation_stages = function(
         show_colnames = show_colnames,
         show_rownames = FALSE
     )
-
-    return(vis_mat)
 }
 
 
@@ -547,17 +567,16 @@ configure_graphics = function(){
 
     Graphics_parameters         = list(
         NEC_NET                 = c(NEC= "red", NET = "lightblue"),
-        alpha        = c(not_significant = "gray", low = "white", high = "blue"),
-        beta         = c(not_significant = "gray", low = "white", high = "green"),
-        gamma        = c(not_significant = "gray", low = "white", high = "brown"),
-        delta        = c(not_significant = "gray", low = "white", high = "Purple"),
-        ductal     = c(not_significant = "gray", low = "white", high = "orange"),
-        acinar     = c(not_significant = "gray", low = "white", high = "cyan"),
-        #progenitor = c(not_significant = "gray", low = "white", high = "orange"),
-        hisc   = c(not_significant = "gray",low = "white", high = "black"),
-        hesc   = c(not_significant = "gray",low = "white", high = "black"),
-        Confidence_score_de_dif = c(low = "green", medium = "white", high = "red"),
+        alpha        = c(not_significant = "gray", low = "white", medium = "yellow", high = "blue"),
+        beta         = c(not_significant = "gray", low = "white", medium = "yellow",high = "green"),
+        gamma        = c(not_significant = "gray", low = "white", medium = "yellow",high = "brown"),
+        delta        = c(not_significant = "gray", low = "white", medium = "yellow",high = "Purple"),
+        ductal     = c(not_significant = "gray", low = "white", medium = "yellow",high = "orange"),
+        acinar     = c(not_significant = "gray", low = "white", medium = "yellow",high = "cyan"),
         Ratio = c(low = "darkgreen", medium = "yellow", high = "darkred"),
+        #progenitor = c(not_significant = "gray", low = "white", high = "orange"),
+        hisc   = c(not_significant = "gray",low = "white", medium = "yellow",high = "black"),
+        Confidence_score_de_dif = c(low = "green", medium = "white", high = "red"),
         MKI67 = c(low = "green", medium = "yellow", high = "red"),
         Confidence_score_dif = c(low = "green", medium = "white", high = "red"),
         Study = c(Groetzinger = "darkgreen", Scarpa = "darkred"),
