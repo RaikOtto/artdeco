@@ -26,12 +26,15 @@ prepare_result_matrix_bseqsc = function(
             
             if ("alpha" %in% str_to_lower(rownames(res_coeff))) # important sanity check
                 res_coeff = t(res_coeff)
+            row_Max = apply(res_coeff[,subtype_cands[subtype_cands %in% colnames(res_coeff)]],MARGIN=1,FUN=max)
             
             for (subtype in subtype_cands){
                 
                 if (!(subtype %in% colnames(res_coeff)) ) next
                 
-                result_matrix[ , subtype] = round(res_coeff[,subtype]*100,rounding_precision)
+                
+               # result_matrix[ , subtype] = round(res_coeff[,subtype]*100,rounding_precision)
+                result_matrix[ , subtype] = (res_coeff[,subtype] / row_Max)*100
                 result_matrix[result_matrix[ , subtype] > 100,subtype] = 100
             }
         }
@@ -49,6 +52,7 @@ prepare_result_matrix_bseqsc = function(
             
             if ("alpha" %in% rownames(res_coeff)) # sanity check
                 res_coeff = t(res_coeff)
+            row_Max = apply(res_coeff[,subtype_cands[subtype_cands %in% colnames(res_coeff)]],MARGIN=1,FUN=max)
             
             subtype_cands_2 = subtype_cands[
                 subtype_cands %in% colnames(res_coeff)
@@ -57,7 +61,8 @@ prepare_result_matrix_bseqsc = function(
             
             for (subtype in subtype_cands_2){
                 
-                result_matrix[ , subtype] = res_coeff[,subtype] * 100
+                #result_matrix[ , subtype] = res_coeff[,subtype] * 100
+                result_matrix[ , subtype] = (res_coeff[,subtype] / row_Max)*100
                 result_matrix[result_matrix[ , subtype] > 100,subtype] = 100
             }
         }
