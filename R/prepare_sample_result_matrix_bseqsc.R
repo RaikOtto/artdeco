@@ -6,6 +6,7 @@ prepare_sample_result_matrix_bseqsc = function(
     models_list
 ){
     
+    rounding_precision = 10
     #models = as.character(unlist(str_split(deconvolution_results$Model[1],pattern = "\\|")))
     # deconvolution_results[,"R_sqr_dif"] = rep("",nrow(deconvolution_results))
     deconvolution_results[,"Strength_subtype"] = rep("",nrow(deconvolution_results))
@@ -40,7 +41,7 @@ prepare_sample_result_matrix_bseqsc = function(
             sum(deconvolution_results[j,cands_dif])
         if (sum(deconvolution_results[j,cands_dif]) == 0)
             subtype_strength = deconvolution_results[j,max_subtype]
-        subtype_strength = round(subtype_strength * 100,1)
+        subtype_strength = round(subtype_strength * 100,rounding_precision)
         
         deconvolution_results[j,"Strength_subtype"] =
             subtype_strength
@@ -66,7 +67,7 @@ prepare_sample_result_matrix_bseqsc = function(
     for( j in 1:ncol(deconvolution_data)){
         
         de_strength = log( sum(deconvolution_results[j,cands_dif_2]) /
-                               sum(deconvolution_results[j,cands_dif_2]) +1 )
+                               sum(deconvolution_results[j,cands_dif_2]) + 1 )
         if (sum(deconvolution_results[j,cands_dif_2]) == 0)
             de_strength = 0
         deconvolution_results[j,"Strength_de_differentiation"] = 

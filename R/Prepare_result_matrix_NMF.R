@@ -3,7 +3,7 @@ prepare_result_matrix_NMF = function(
     deconvolution_data,
     models
 ){
-    
+    rounding_precision = 10
     result_matrix = data.frame(
         row.names = colnames(deconvolution_data),
         "Model" = rep( paste0(c(models),collapse="|"), ncol(deconvolution_data))
@@ -30,7 +30,7 @@ prepare_result_matrix_NMF = function(
                 
                 if (!(subtype %in% colnames(res_coeff)) ) next
                 
-                result_matrix[ , subtype] = round(res_coeff[,subtype]*100,1)
+                result_matrix[ , subtype] = round(res_coeff[,subtype]*100,rounding_precision)
                 result_matrix[result_matrix[ , subtype] > 100,subtype] = 100
             }
         }
