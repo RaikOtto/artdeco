@@ -1,4 +1,3 @@
-
 prepare_sample_result_matrix_bseqsc = function(
     deconvolution_results,
     prediction_stats_list,
