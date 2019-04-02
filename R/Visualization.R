@@ -61,14 +61,15 @@ create_visualization_matrix = function(
     )
     
     vis_mat = deconvolution_results[subtype_index_vis]
-    
+
     # differentiation score scaling, zero offset
     for ( score in c("Confidence_score_de_dif","Confidence_score_dif")){
         
         vis_mat[,score] = as.double(vis_mat[,score])
         vis_mat[vis_mat[,score] == 0.0,score] = 10^-5
         vis_mat[,score] = vis_mat[,score] - min(vis_mat[,score])
-        vis_mat[,score] = vis_mat[,score] / max(vis_mat[,score])
+        off_set = rnorm(nrow(vis_mat),sd=0.0001,mean=0)
+        vis_mat[,score] = vis_mat[,score] / max(vis_mat[,score]+off_set)
     }
     
     # heuristic for significance
@@ -229,18 +230,20 @@ create_visualization_matrix = function(
         higher_index = which( vis_mat[ ,score] >= (mean(vis_mat[ ,score])+sd(vis_mat[ ,score])*.5) )
         vis_mat[higher_index,score] = mean(vis_mat[ ,score]) + (sd(vis_mat[ ,score])*.5)
     }
-    vis_mat$Confidence_score_dif[vis_mat$Confidence_score_dif == 0] = 1*10^-5
-    vis_mat$Confidence_score_de_dif[vis_mat$Confidence_score_de_dif == 0] = 1*10^-5
+    vis_mat$Confidence_score_dif[vis_mat$Confidence_score_dif == 0] = rnorm(length(vis_mat$Confidence_score_dif),mean=1*10^-5, sd = 10^-5)
+    vis_mat$Confidence_score_de_dif[vis_mat$Confidence_score_de_dif == 0] = rnorm(length(vis_mat$Confidence_score_dif),mean=1*10^-5, sd = 10^-5)
     vis_mat$Ratio = ( 
         scale(vis_mat$Confidence_score_de_dif / vis_mat$Confidence_score_dif)
     )
-    
     vis_mat$Ratio_numeric = round(vis_mat$Ratio, 3)
+    vis_mat$Ratio[is.nan((vis_mat$Ratio))] = rnorm(length(vis_mat$Ratio),mean=10^-5,sd=10^-5)
     
     ### ratio adjustment
     
+    vis_mat$Ratio_numeric[is.na(vis_mat$Ratio_numeric)] = 0
+    off_set = rnorm(length(vis_mat$Ratio_numeric),mean=0.001,sd=0.001)
     quants = quantile(
-        vis_mat$Ratio_numeric,
+        vis_mat$Ratio_numeric + off_set,
         probs = seq(0,1,.01)
     )
     
@@ -504,7 +507,10 @@ create_heatmap_differentiation_stages = function(
         !(colnames(vis_mat) %in% c(
             "Confidence_score_de_dif",
             "Confidence_score_dif",
-            "Ratio_numeric"
+            "Ratio_numeric",
+            "Ratio",
+            "Zensur",
+            "OS_Tissue"
         ))
     ]
     if (aggregate_differentiated_stages){
@@ -525,7 +531,7 @@ create_heatmap_differentiation_stages = function(
             }
         }
         
-        column_candidates = c("Aggregated_similarity","hisc","Grading","Ratio","MKI67")
+        column_candidates = c("Aggregated_similarity","hisc","Grading","MKI67")
         column_candidates = column_candidates[column_candidates %in% colnames(vis_mat)]
         
         vis_mat[

@@ -5,7 +5,7 @@ prepare_sample_result_matrix_bseqsc = function(
     models_list
 ){
     
-    rounding_precision = 10
+    rounding_precision = 1
     #models = as.character(unlist(str_split(deconvolution_results$Model[1],pattern = "\\|")))
     # deconvolution_results[,"R_sqr_dif"] = rep("",nrow(deconvolution_results))
     deconvolution_results[,"Strength_subtype"] = rep("",nrow(deconvolution_results))
@@ -24,7 +24,7 @@ prepare_sample_result_matrix_bseqsc = function(
     }
     
     deconvolution_results[,"Confidence_score_dif"] = rep("",nrow(deconvolution_results))
-    deconvolution_results[,"Confidence_score_dif"] = abs(as.double(res_cor[,"RMSE"]))
+    deconvolution_results[,"Confidence_score_dif"] = round(abs(as.double(res_cor[,"RMSE"])),rounding_precision)
     
     cands_dif = cands_dif_1[
         (cands_dif_1 %in% colnames(deconvolution_results)) &
@@ -52,7 +52,7 @@ prepare_sample_result_matrix_bseqsc = function(
     }
     
     deconvolution_results[,"Differentiation_score"] = rep("",nrow(deconvolution_results))
-    deconvolution_results[,"Differentiation_score"] = res_cor
+    deconvolution_results[,"Differentiation_score"] = round(res_cor,rounding_precision)
     
     ### de dif
     
@@ -61,7 +61,7 @@ prepare_sample_result_matrix_bseqsc = function(
     
     deconvolution_results[,"Strength_de_differentiation"] = rep("",nrow(deconvolution_results))
     deconvolution_results[,"Confidence_score_de_dif"] = rep("",nrow(deconvolution_results))
-    deconvolution_results[,"Confidence_score_de_dif"] = abs( as.double(res_cor[,"RMSE"]) )
+    deconvolution_results[,"Confidence_score_de_dif"] = round(abs( as.double(res_cor[,"RMSE"]) ),rounding_precision)
     
     for( j in 1:ncol(deconvolution_data)){
         
@@ -70,7 +70,7 @@ prepare_sample_result_matrix_bseqsc = function(
         if (sum(deconvolution_results[j,cands_dif_2]) == 0)
             de_strength = 0
         deconvolution_results[j,"Strength_de_differentiation"] = 
-            as.double(de_strength)
+            round(as.double(de_strength),rounding_precision)
         
     }
     

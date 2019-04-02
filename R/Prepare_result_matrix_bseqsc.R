@@ -4,7 +4,7 @@ prepare_result_matrix_bseqsc = function(
     models
 ){
 
-    rounding_precision = 10
+    rounding_precision = 1
     result_matrix = data.frame(
         row.names = colnames(deconvolution_data),
         "Model" = rep( paste0(c(models),collapse="|"), ncol(deconvolution_data))
@@ -16,25 +16,24 @@ prepare_result_matrix_bseqsc = function(
         
         if (nr_fit == 1){
             
-            res_coeff = prediction_res_coeff_list[[nr_fit]]
-            colnames(res_coeff) = str_replace_all(colnames(res_coeff) ,"^X","")
+            res_coeff_1 = prediction_res_coeff_list[[nr_fit]]
+            colnames(res_coeff_1) = str_replace_all(colnames(res_coeff_1) ,"^X","")
             
-            res_coeff[ is.na(res_coeff) ] = 0.0
+            res_coeff_1[ is.na(res_coeff_1) ] = 0.0
             
-            colnames(res_coeff) = str_to_lower(colnames(res_coeff))
-            subtype_cands_1 = subtype_cands[subtype_cands %in% colnames(res_coeff)]
+            if ("alpha" %in% str_to_lower(rownames(res_coeff_1))) # important sanity check
+                res_coeff_1 = t(res_coeff_1)
             
-            if ("alpha" %in% str_to_lower(rownames(res_coeff))) # important sanity check
-                res_coeff = t(res_coeff)
-            row_Max = apply(res_coeff[,subtype_cands[subtype_cands %in% colnames(res_coeff)]],MARGIN=1,FUN=max)
+            colnames(res_coeff_1) = str_to_lower(colnames(res_coeff_1))
+            subtype_cands_1 = subtype_cands[subtype_cands %in% colnames(res_coeff_1)]
             
-            for (subtype in subtype_cands){
+            row_sums = rowSums(res_coeff_1[,subtype_cands[subtype_cands %in% colnames(res_coeff_1)]])
+            
+            for (subtype in subtype_cands_1){
                 
-                if (!(subtype %in% colnames(res_coeff)) ) next
+                if (!(subtype %in% colnames(res_coeff_1)) ) next
                 
-                
-               # result_matrix[ , subtype] = round(res_coeff[,subtype]*100,rounding_precision)
-                result_matrix[ , subtype] = (res_coeff[,subtype] / row_Max)*100
+                result_matrix[ , subtype] = round((res_coeff_1[,subtype] / row_sums)*100,rounding_precision)
                 result_matrix[result_matrix[ , subtype] > 100,subtype] = 100
             }
         }
@@ -42,27 +41,25 @@ prepare_result_matrix_bseqsc = function(
         
         if ( nr_fit == 2 ){
             
-            res_coeff = prediction_res_coeff_list[[nr_fit]]
-            colnames(res_coeff) = str_replace_all(colnames(res_coeff) ,"^X","")
-            res_coeff[ is.na(res_coeff) ] = 0.0
+            res_coeff_2 = prediction_res_coeff_list[[nr_fit]]
+            colnames(res_coeff_2) = str_replace_all(colnames(res_coeff_2) ,"^X","")
+            res_coeff_2[ is.na(res_coeff_2) ] = 0.0
             
+            res_coeff_2 = t(res_coeff_2)
+            colnames(res_coeff_2) = str_to_lower(colnames(res_coeff_2))
             
-            res_coeff = t(res_coeff)
-            colnames(res_coeff) = str_to_lower(colnames(res_coeff))
-            
-            if ("alpha" %in% rownames(res_coeff)) # sanity check
-                res_coeff = t(res_coeff)
-            row_Max = apply(res_coeff[,subtype_cands[subtype_cands %in% colnames(res_coeff)]],MARGIN=1,FUN=max)
-            
+            if ("alpha" %in% rownames(res_coeff_2)) # sanity check
+                res_coeff_2 = t(res_coeff_2)
+
             subtype_cands_2 = subtype_cands[
-                subtype_cands %in% colnames(res_coeff)
-                ]
+                subtype_cands %in% colnames(res_coeff_2)
+            ]
             subtype_cands_2 = subtype_cands_2[!(subtype_cands_2 %in% subtype_cands_1) ]
+            row_sums = rowSums(res_coeff_2[,subtype_cands[subtype_cands %in% colnames(res_coeff_2)]])
             
             for (subtype in subtype_cands_2){
                 
-                #result_matrix[ , subtype] = res_coeff[,subtype] * 100
-                result_matrix[ , subtype] = (res_coeff[,subtype] / row_Max)*100
+                result_matrix[ , subtype] = round((as.double(res_coeff_2[,subtype]) / row_sums)*100,1)
                 result_matrix[result_matrix[ , subtype] > 100,subtype] = 100
             }
         }
