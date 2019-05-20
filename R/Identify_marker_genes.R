@@ -50,7 +50,6 @@ identify_marker_genes = function(
     result_t$Average_Expr = round(result_t$Average_Expr, 1)
     result_t = result_t[order(result_t$Log_FC,decreasing = TRUE),]
 
-    result_t = result_t[order(result_t$Log_FC, decreasing = TRUE),]
     marker_genes = as.character(result_t$HGNC)
     marker_genes = marker_genes[marker_genes %in% rownames(expression_training_mat)]
     marker_genes = marker_genes[1:training_nr_marker_genes]
