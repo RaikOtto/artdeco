@@ -310,7 +310,7 @@ create_visualization_matrix = function(
 #'     deconvolution_results = deconvolution_results,
 #'     Graphics_parameters = ""
 #' )
-#' @import stringr ggplot2 pheatmap ggfortify
+#' @import stringr ggplot2 pheatmap
 #' @export
 create_PCA_differentiation_stages = function(
     vis_mat,
@@ -474,7 +474,7 @@ create_PCA_differentiation_stages = function(
 #'     Graphics_parameters = "",
 #'     high_threshold = 101
 #' )
-#' @import stringr ggplot2 pheatmap ggfortify
+#' @import stringr ggplot2 pheatmap
 #' @return Plots
 #' @export
 create_heatmap_differentiation_stages = function(

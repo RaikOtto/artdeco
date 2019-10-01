@@ -1,6 +1,6 @@
-#' Determine_differentiation_stage
+#' Deconvolve_transcriptome
 #'
-#' \code{Determine_differentiation_stage} measures the similarity
+#' \code{Deconvolve_transcriptome} measures the similarity
 #' of one or many query RNA-seq or microarray samples to samples
 #' with known differentiation stage contained in the training models.
 #'
@@ -18,7 +18,7 @@
 #' no hard-disk written output will occur.
 #' @import bseqsc MuSiC
 #' @usage
-#' Determine_differentiation_stage(
+#' Deconvolve_transcriptome(
 #'     transcriptome_data,
 #'     models,
 #'     nr_permutations,
@@ -26,13 +26,13 @@
 #' )
 #' @examples
 #' data("transcriptome_data")
-#' Determine_differentiation_stage(
+#' Deconvolve_transcriptome(
 #'     transcriptome_data = transcriptome
 #' )
 #' @return Similarity measurements of differentiation
 #' stages
 #' @export
-Determine_differentiation_stage = function(
+Deconvolve_transcriptome = function(
     transcriptome_data,
     deconvolution_algorithm = "music",
     models = c(
@@ -51,7 +51,12 @@ Determine_differentiation_stage = function(
             ""
     )
     rownames(transcriptome_data) = str_to_upper(rownames(transcriptome_data) )
-    deconvolution_data = new("ExpressionSet", exprs=as.matrix(transcriptome_data));
+    deconvolution_data = new(
+        "ExpressionSet",
+        exprs = as.matrix(
+            transcriptome_data
+        )
+    )
 
     models_list = list()
     parameter_list = list()

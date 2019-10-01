@@ -33,6 +33,7 @@ the R package. These will in the following be analyzed by the artdeco
 
 ```{r}
 library("artdeco")
+library("GEOquery")
 
 # obtain path to testdata
 path_transcriptome_file = system.file(
@@ -41,7 +42,7 @@ path_transcriptome_file = system.file(
 )
 
 # testrun
-deconvolution_results_absolute = Determine_differentiation_stage(
+deconvolution_results_absolute = Deconvolve_transcriptome(
     transcriptome_file_path = path_transcriptome_file,
     baseline = "absolute"
 )
@@ -77,7 +78,7 @@ The percent value quantifies to what extend a given transcriptome can be reconst
 ```{r}
 
 # testrun in relative mode
-deconvolution_results_relative = Determine_differentiation_stage(
+deconvolution_results_relative = Deconvolve_transcriptome(
     transcriptome_file_path = path_transcriptome_file,
     baseline = "relative"
 )
