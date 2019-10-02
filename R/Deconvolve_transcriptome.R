@@ -7,8 +7,9 @@
 #' @param transcriptome_data A data frame that contains the gene expression data.
 #' Rows are expected to be HGNC symbols and columns are expected to contain the samples.
 #' @param deconvolution_algorithm Which deconvolution algorithm to choose
-#' from. Options: 'music','bseqsc' (CIBERSORT), 'centroid' 
-#' @param models List of models to be used. Use show_models()
+#' from. Options: 'music','bseqsc' (CIBERSORT), 'nmf' 
+#' @param models List of models to be used. Use show_models_NMF(),
+#' show_models_music() or show_models_bseqsc()
 #' to view available models or add new model via
 #' add_deconvolution_training_model()
 #' @param nr_permutations Utilized to calculate p-value
@@ -27,14 +28,14 @@
 #' @examples
 #' data("transcriptome_data")
 #' Deconvolve_transcriptome(
-#'     transcriptome_data = transcriptome
+#'     transcriptome_data = transcriptome_data
 #' )
 #' @return Similarity measurements of differentiation
 #' stages
 #' @export
 Deconvolve_transcriptome = function(
     transcriptome_data,
-    deconvolution_algorithm = "music",
+    deconvolution_algorithm = "nmf",
     models = c(
         "Alpha_Beta_Gamma_Delta_Acinar_Ductal_Baron",
         "Alpha_Beta_Gamma_Delta_Acinar_Ductal_Hisc_Baron"
@@ -51,6 +52,8 @@ Deconvolve_transcriptome = function(
             ""
     )
     rownames(transcriptome_data) = str_to_upper(rownames(transcriptome_data) )
+    transcriptome_data = variance_filtering( expr_raw = transcriptome_data)
+    
     deconvolution_data = new(
         "ExpressionSet",
         exprs = as.matrix(

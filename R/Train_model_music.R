@@ -46,11 +46,17 @@ add_deconvolution_training_model_music = function(
         collapse = ""
     )
 
-    if(file.exists(model_path))
+    if (model_name == "my_model"){
+        
+    }else if (file.exists(model_path)){
         stop(paste0( collapse= "",
-                     c("Modelname ",model_name,
-                       " already exists, please choose different name or delete existing model"))
+            c(
+                "Modelname ",
+                model_name,
+                " already exists, please choose different name or delete existing model")
+            )
         )
+    }
 
     if (length(subtype_vector) == 0)
         stop(paste0("You have to provide the sample subtypes labels for model training"))
