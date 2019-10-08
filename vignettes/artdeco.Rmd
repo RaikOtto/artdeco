@@ -24,11 +24,12 @@ Start an R session e.g. using RStudio
     `install.packages("BiocManager")`
 
 `BiocManager::install("artdeco")`
+`BiocManager::install("GEOquery")`
 
 ## Test run
 
-57 representative PANnen bulk RNA-seq samples are shipped along with
-the R package. These will in the following be analyzed by the artdeco
+97 representative NEN samples are utilized for this vignette from the
+GSE733338 GSE package package. These will in the following be analyzed by the artdeco
  algorithm to demonstrate the utilization of artdeco.
 
 ```{r}
@@ -36,19 +37,19 @@ library("artdeco")
 library("GEOquery")
 
 # obtain path to testdata
-path_transcriptome_file = system.file(
-    "/Data/Expression_data/PANnen_Test_Data.tsv",
-    package="artdeco"
-)
+gse73338 = getGEO('GSE73338')
+transcriptome_data = exprs(gse73338$GSE73338_series_matrix.txt.gz)
+gene_names = featureData(gse73338$GSE73338_series_matrix.txt.gz)[[3]]
+rownames(transcriptome_data) = gene_names
 
 # testrun
-deconvolution_results_absolute = Deconvolve_transcriptome(
-    transcriptome_file_path = path_transcriptome_file,
-    baseline = "absolute"
+deconvolution_results = Deconvolve_transcriptome(
+    transcriptome_data = transcriptome_data,
+    deconvolution_algorithm = "nmf"
 )
 
 # show results
-deconvolution_results_absolute[1:2,]
+deconvolution_results[1:2,]
 ```
 The call returns a dataframe that contains the differentiation stage
 similarity predictions. 
@@ -74,19 +75,7 @@ The percent value quantifies to what extend a given transcriptome can be reconst
  by 5.7 to show how similar they are relative to the self-identification of cell subtypes. The
  'relative' mode divides by the maximal similarity measured for a given set of query data, i.e. 
  the maximally measured similarity is taken as divisor.
- 
-```{r}
 
-# testrun in relative mode
-deconvolution_results_relative = Deconvolve_transcriptome(
-    transcriptome_file_path = path_transcriptome_file,
-    baseline = "relative"
-)
-
-# show results
-deconvolution_results_relative[1:2,]
-```
- 
 # 2 Visualization of similarity predictions
 
 It is important to interpret the simialrity predictions given the clustering of the data. In
@@ -97,18 +86,16 @@ It is important to interpret the simialrity predictions given the clustering of 
  similarity predictions from step one are being passed on to the visualization function.
 
 ```{r}
-visualization_data_path = system.file(
-    "/Data/Expression_data/Visualization_PANnen.tsv",
-    package="artdeco")
-
-create_heatmap_differentiation_stages(
-    visualization_data_path,
-    deconvolution_results_relative
+create_heatmap_deconvolution(
+    deconvolution_results = deconvolution_results,
+    visualization_data = transcriptome_data,
+    utilize_sadanandam_genes = TRUE
 )
 
-create_heatmap_differentiation_stages(
-    visualization_data_path,
-    deconvolution_results_absolute
+create_PCA_deconvolution(
+    visualization_data = transcriptome_data,
+    deconvolution_results = deconvolution_results,
+    utilize_sadanandam_genes = TRUE
 )
 ```
 
@@ -117,38 +104,38 @@ create_heatmap_differentiation_stages(
 Adding a new model requires 1) training data and 2) a labeling vector of the training data
 specifying the cell type of each training sample
 ```{r}
-meta_data_path = system.file("Data/Meta_information/Meta_information.tsv", package = "artdeco")
-meta_data      = read.table(
-    meta_data_path, sep ="\t", header = TRUE,
-    stringsAsFactors = FALSE
-)
-subtype_vector = meta_data$Test_Subtype # extract the training sample subtype labels
 
+data(Lawlor) # Data from Lawlor et al.
+Lawlor[1:5,1:5]
+data(meta_data)
+
+subtype_vector = as.character(meta_data$Subtype) # extract the training sample subtype labels
 subtype_vector[1:6] # show subtype definition
 
-training_data_path = system.file(
-    "Data/Expression_data/PANnen_Test_Data.tsv", package = "artdeco")
-
-add_deconvolution_training_model(
-    transcriptome_data_path = training_data_path,
-    model_name = "My_model",
+add_deconvolution_training_model_NMF(
+    transcriptome_data = Lawlor,
+    model_name = "my_model",
     subtype_vector = subtype_vector,
-    marker_gene_list = list(),
-    training_nr_marker_genes = 5,
-    training_p_value_threshold = 0.05,
-    training_nr_permutations = 100
+    rank_estimate = 0,
+    exclude_non_interpretable_NMF_components = FALSE,
+    training_nr_marker_genes = 100,
+    parallel_processes = 1,
+    nrun = 1
 )
 ```
 Note that the training in the current version (1.0.0) of artdeco has to have HGNC symbols
 as rownames.
 
-Remove models is fairly straight forward:
+Remove models is fairly straight forward; list the models after specifying the Machine-Learning algorihm
+i.e. 'NMF' or 'bseqsc' etc..
 ```{r}
-models = list.files(system.file("Models/", package = "artdeco"))
+models = list.files(system.file("Models/NMF", package = "artdeco"))
 print(models)
-model_to_be_removed = models[length(models)]
-remove_model(
-    model_name = model_to_be_removed
+
+model_to_be_removed = "my_model"
+remove_model_NMF(
+    model_name = model_to_be_removed,
+    test_mode = TRUE
 )
 ```
 
@@ -157,15 +144,8 @@ remove_model(
 Please note that the expression data always has to have HGNC symbols as rownames and that the first 
 entry of the column names indicates the hgnc symbols, not the first sample name.
 ```{r}
-training_data_path = system.file(
-    "Data/Expression_data/PANnen_Test_Data.tsv", package = "artdeco")
-expression_matrix = read.table(
-    training_data_path,
-    sep ="\t",
-    header = TRUE,
-    row.names = 1)
-
-expression_matrix[1:5,1:5]
+data("Lawlor") # data from Lawlor et al.
+Lawlor[1:5,1:5]
 ```
 
 Contact: raik.otto@hu-berlin.de
