@@ -32,21 +32,19 @@
 #'     training_nr_marker_genes
 #' )
 #' @examples
-#' data("test_data")
-#' meta_data_path = system.file("Data/Meta_information/Meta_information.tsv", package = "artdeco")
-#' meta_data      = read.table(
-#'     meta_data_path, sep = "\t",
-#'     header = TRUE,
-#'     stringsAsFactors = FALSE
-#' )
-#' subtype_vector = meta_data$Subtype # extract the training sample subtype labels
+#' data("Lawlor") # Data from Lawlor et al.
+#' data(meta_data)
+#' 
+#' subtype_vector = as.character(meta_data$Subtype) # extract the training sample subtype labels
+#' 
 #' add_deconvolution_training_model_bseqsc(
-#'     transcriptome_data = test_data,
-#'     model_name = "Test_model",
-#'     subtype_vector,
+#'     transcriptome_data = Lawlor,
+#'     model_name = "my_model",
+#'     subtype_vector = subtype_vector,
+#'     marker_gene_list,
 #'     training_p_value_threshold = 0.05,
-#'     training_nr_permutations = 100,
-#'     training_nr_marker_genes = 100
+#'     training_nr_permutations = 2,
+#'     training_nr_marker_genes = 10
 #' )
 #' @return Stores a new model in the package directory
 #' @export
@@ -67,11 +65,17 @@ add_deconvolution_training_model_bseqsc = function(
         collapse = ""
     )
 
-    if(file.exists(model_path))
+    if (model_name == "my_model"){
+        
+    }else if (file.exists(model_path)){
         stop(paste0( collapse= "",
-                     c("Modelname ",model_name,
-                       " already exists, please choose different name or delete existing model"))
+            c(
+                "Modelname ",
+                model_name,
+                " already exists, please choose different name or delete existing model")
+            )
         )
+    }
 
     if (length(subtype_vector) == 0)
         stop(paste0("You have to provide the sample subtypes labels for model training"))

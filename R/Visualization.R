@@ -280,9 +280,9 @@ create_visualization_matrix = function(
     return(vis_mat)
 }
 
-#' create_PCA_differentiation_stages
+#' create_PCA_deconvolution
 #'
-#' \code{create_PCA_differentiation_stages}
+#' \code{create_PCA_deconvolution}
 #' visualizes the differentiation stage predictions as PCA.
 #' Please note that the first column of the expression
 #' data matrix has to contain the HGNC identifier
@@ -291,37 +291,50 @@ create_visualization_matrix = function(
 #' Notice the convention that the first row has to contain the HGNC identifier
 #' @param deconvolution_results The dataframe returned
 #' by the deconvolution analysis
+#' @param aggregate_differentiated_stages Whether to aggregate the deconvolution
+#' results
+#' @param confidence_threshold Threshold at which to discard a prediction
 #' @param Graphics_parameters Pheatmap visualization paramters.
 #' You can customize visualization colors.
 #' Read the vignette for more information.
+#' @param high_threshold Threshold at which to define a deconvolution results
+#' as 'high'
+#' @param low_threshold Threshold at which to define a deconvolution results
+#' as 'low'
+#' @param utilize_sadanandam_genes Whether to utilize the same genes as the 
+#' Sadanandam et al publication which have been utilize to create the DECO
+#' manuscript visualizations
 #' @usage
-#' create_PCA_differentiation_stages(
-#'     visualization_data_path,
-#'     deconvolution_results,
-#'     annotation_columns,
-#'     Graphics_parameters,
-#'     baseline
+#' create_PCA_deconvolution(
+#'    visualization_data,
+#'    deconvolution_results,
+#'    aggregate_differentiated_stages,
+#'    confidence_threshold,
+#'    Graphics_parameters,
+#'    high_threshold,
+#'    low_threshold,
+#'    utilize_sadanandam_genes
 #' )
 #' @examples
-#' data(deconvolution_results)
-#' data(visualization_data)
-#' create_PCA_differentiation_stages(
+#' data(deconvolution_results, envir = environment())
+#' data(visualization_data, envir = environment())
+#' create_PCA_deconvolution(
 #'     visualization_data = visualization_data,
 #'     deconvolution_results = deconvolution_results,
-#'     Graphics_parameters = ""
+#'     Graphics_parameters = "",
+#'     utilize_sadanandam_genes = TRUE
 #' )
-#' @import stringr ggplot2 pheatmap ggfortify
+#' @import stringr ggplot2 pheatmap
 #' @export
-create_PCA_differentiation_stages = function(
-    vis_mat,
+create_PCA_deconvolution = function(
     visualization_data,
     deconvolution_results,
     aggregate_differentiated_stages = FALSE,
     confidence_threshold = 1.1,
-    show_colnames = FALSE,
     Graphics_parameters = "",
     high_threshold = 101,
-    low_threshold = 0
+    low_threshold = 0,
+    utilize_sadanandam_genes = FALSE
 ){
     # init variables
     
@@ -330,7 +343,24 @@ create_PCA_differentiation_stages = function(
     cands_dif_exokrine = c("ductal","acinar")
     cands_de_dif = "hisc"
     
-    correlation_matrix = cor(visualization_data)
+    vis_mat = visualization_data
+    
+    if (utilize_sadanandam_genes == TRUE){
+        meta_data_path = system.file(
+            "Data/Meta_information/Stem_signatures.tsv",
+            package = "artdeco"
+        )
+        gene_t = read.table(
+            meta_data_path,
+            sep ="\t",
+            stringsAsFactors = F
+        )
+        gene_signature = str_to_upper(as.character(gene_t[13,3:nrow(gene_t)]))
+        rownames(vis_mat) = str_to_upper(rownames(vis_mat))
+        vis_mat = vis_mat[rownames(vis_mat) %in% gene_signature,]
+    }
+    
+    correlation_matrix = cor(vis_mat)
     pcr = prcomp(t(correlation_matrix))
 
     # ensure correct ordering of expression and annotation data
@@ -367,38 +397,41 @@ create_PCA_differentiation_stages = function(
           )
     )
     
-    vis_mat = vis_mat[rownames(pcr$x),]
+    vis_mat = vis_mat[,rownames(pcr$x)]
     
-    if (length(vis_mat$Grading) == 0){
+    if (length(deconvolution_results$Grading) == 0){
         
-        congruence_vec = vis_mat$MKI67
-        congruence_vec[(congruence_vec == "low" & vis_mat$Ratio == "low")] = "match"
-        congruence_vec[(congruence_vec == "medium" & vis_mat$Ratio == "medium")] = "match"
-        congruence_vec[(congruence_vec == "high" & vis_mat$Ratio == "high")] = "match"
+        congruence_vec = visualization_data[grep(rownames(visualization_data),pattern = "mki",ignore.case = TRUE),]
+        #congruence_vec[(congruence_vec == "low" & vis_mat$Ratio == "low")] = "match"
+        #congruence_vec[(congruence_vec == "medium" & vis_mat$Ratio == "medium")] = "match"
+        #congruence_vec[(congruence_vec == "high" & vis_mat$Ratio == "high")] = "match"
         
-        congruence_vec_size = congruence_vec
-        congruence_vec_size[congruence_vec_size == "match"] = 1
-        congruence_vec_size[congruence_vec_size != 1      ] = 5
-        congruence_vec = factor(congruence_vec,levels = c("high","medium","low","match"))
+        #congruence_vec_size = congruence_vec
+        #congruence_vec_size[congruence_vec_size == "match"] = 1
+        #congruence_vec_size[congruence_vec_size != 1      ] = 5
+        #congruence_vec = factor(congruence_vec,levels = c("high","medium","low","match"))
 
     } else {
     
-        congruence_vec = vis_mat$Grading
-        congruence_vec[(congruence_vec == "G1" & vis_mat$Ratio == "low")] = "match"
-        congruence_vec[(congruence_vec == "G2" & vis_mat$Ratio == "medium")] = "match"
-        congruence_vec[(congruence_vec == "G3" & vis_mat$Ratio == "high")] = "match"
-        congruence_vec_size = congruence_vec
-        congruence_vec_size[congruence_vec_size == "match"] = 1
-        congruence_vec_size[congruence_vec_size != 1      ] = 5
+        congruence_vec = deconvolution_results$Grading
+        #congruence_vec[(congruence_vec == "G1" & vis_mat$Ratio == "low")] = "match"
+        #congruence_vec[(congruence_vec == "G2" & vis_mat$Ratio == "medium")] = "match"
+        #congruence_vec[(congruence_vec == "G3" & vis_mat$Ratio == "high")] = "match"
+        #congruence_vec_size = congruence_vec
+        #congruence_vec_size[congruence_vec_size == "match"] = 1
+        #congruence_vec_size[congruence_vec_size != 1      ] = 5
     }
 
+    meta_vis_data = as.matrix(deconvolution_results[,c("Subtype")])
+    rownames(meta_vis_data) = rownames(deconvolution_results)
     p = ggbiplot::ggbiplot(
         pcr,
-        obs.scale = .75,
-        groups = congruence_vec,
+        #obs.scale = .75,
+        groups = meta_vis_data,
         ellipse = TRUE,
         circle = TRUE,
-        var.axes = F
+        var.axes = F,
+        labels = names(congruence_vec)
     )
     #p = p + geom_point( 
     #    aes( 
@@ -407,28 +440,28 @@ create_PCA_differentiation_stages = function(
     #    ),
     #    color = "black", stroke = .1
     #)
-    p = p + geom_point(
-        aes(
-            colour = congruence_vec,
-            shape = as.character(congruence_vec),
-            size = 3
-        )
-    )
-    p = p + guides(
-        color = guide_legend(
-            title="Grading & ratio"
-        ),
-        #size = guide_legend(title="Ratio"),
-        shape =  guide_legend(title="Grading")
-    )
-    p = p + scale_color_manual( values = c("Darkgreen","Orange","Red","black","Green","Yellow") ) + scale_size(guide="none")
+    #p = p + geom_point(
+    #    aes(
+    #        colour = congruence_vec,
+    #        shape = as.character(congruence_vec),
+    #        size = 3
+    #    )
+    #)
+    #p = p + guides(
+    #    color = guide_legend(
+    #        title="Grading & ratio"
+    #    ),
+    #    #size = guide_legend(title="Ratio"),
+    #    shape =  guide_legend(title="Grading")
+    #)
+    #p = p + scale_color_manual( values = c("Darkgreen","Orange","Red","black","Green","Yellow") ) + scale_size(guide="none")
     plot(p)
 }
 
-#' create_heatmap_differentiation_stages
+#' create_heatmap_deconvolution
 #'
-#' \code{create_heatmap_differentiation_stages}
-#' visualizes the differentiation stage predictions as heatmap.
+#' \code{create_heatmap_deconvolution}
+#' visualizes the deconvultion results as heatmap.
 #' Please note that the first column of the expression
 #' data matrix has to contain the HGNC identifier
 #'
@@ -450,43 +483,52 @@ create_PCA_differentiation_stages = function(
 #' @param high_threshold Threshold depending on which a deconvolution result
 #' is interpreted as 'high'. If not set, a statistical estimation will approximately
 #' identify a signficance threshold for a high similarity.
+#' @param low_threshold Threshold depending on which a deconvolution result
+#' is interpreted as 'low'. If not set, a statistical estimation will approximately
+#' identify a signficance threshold for a low similarity.
+#' @param utilize_sadanandam_genes Whether to utilize the same genes as the 
+#' Sadanandam et al publication which have been utilize to create the DECO
+#' manuscript visualizations
 #' @usage
-#' create_heatmap_differentiation_stages(
+#' create_heatmap_deconvolution(
 #'     visualization_data,
 #'     deconvolution_results,
 #'     aggregate_differentiated_stages,
 #'     confidence_threshold,
 #'     show_colnames,
 #'     Graphics_parameters,
-#'     high_threshold
+#'     high_threshold,
+#'     low_threshold,
+#'     utilize_sadanandam_genes
 #' )
 #' @examples
-#' data(visualization_data)
-#' data(deconvolution_results)
-#' data(meta_data)
+#' data(deconvolution_results, envir = environment())
+#' data(visualization_data, envir = environment())
 #'
-#' create_heatmap_differentiation_stages(
+#' create_heatmap_deconvolution(
 #'     visualization_data = visualization_data,
 #'     deconvolution_results = deconvolution_results,
 #'     aggregate_differentiated_stages = FALSE,
 #'     confidence_threshold = 1.1,
 #'     show_colnames = FALSE,
 #'     Graphics_parameters = "",
-#'     high_threshold = 101
+#'     high_threshold = 66,
+#'     low_threshold = 33,
+#'     utilize_sadanandam_genes = FALSE
 #' )
-#' @import stringr ggplot2 pheatmap ggfortify
+#' @import stringr ggplot2 pheatmap
 #' @return Plots
 #' @export
-create_heatmap_differentiation_stages = function(
+create_heatmap_deconvolution = function(
     visualization_data,
     deconvolution_results,
-    vis_mat,
     aggregate_differentiated_stages = FALSE,
     confidence_threshold = 1.1,
     show_colnames = FALSE,
     Graphics_parameters = "",
     high_threshold = 66,
-    low_threshold = 33
+    low_threshold = 33,
+    utilize_sadanandam_genes = FALSE
 ){
     
     # init variables
@@ -495,6 +537,7 @@ create_heatmap_differentiation_stages = function(
     cands_dif_endocrine = c("alpha","beta","gamma","delta")
     cands_dif_exokrine = c("ductal","acinar")
     cands_de_dif = "hisc"
+    vis_mat = visualization_data
     
     ###
 
@@ -502,54 +545,88 @@ create_heatmap_differentiation_stages = function(
     if ( head(Graphics_parameters,1) == "" )
         Graphics_parameters = configure_graphics()
     
+    if (utilize_sadanandam_genes == TRUE){
+        meta_data_path = system.file(
+            "Data/Meta_information/Stem_signatures.tsv",
+            package = "artdeco"
+        )
+        gene_t = read.table(
+            meta_data_path,
+            sep ="\t",
+            stringsAsFactors = F
+        )
+        gene_signature = str_to_upper(as.character(gene_t[13,3:nrow(gene_t)]))
+        rownames(vis_mat) = str_to_upper(rownames(vis_mat))
+        vis_mat = vis_mat[rownames(vis_mat) %in% gene_signature,]
+    }
+    
     # remove confidence scores
-    vis_mat_filtered = vis_mat[,
-        !(colnames(vis_mat) %in% c(
+    deconvolution_results_filtered = deconvolution_results[,
+        !(colnames(deconvolution_results) %in% c(
+            "model",
             "Confidence_score_de_dif",
             "Confidence_score_dif",
             "Ratio_numeric",
             "Ratio",
             "Zensur",
-            "OS_Tissue"
+            "OS_Tissue",
+            "Strength_de_differentiation",
+            "Differentiation_score",
+            "Aggregated_similarity"
         ))
     ]
+    
     if (aggregate_differentiated_stages){
         
-        max_indices = apply(deconvolution_results[,
-            c(cands_dif_endocrine,cands_dif_exokrine)
-        ],FUN=which.max,MARGIN = 1)
-        subtype_selection = vis_mat[,c(cands_dif_endocrine,cands_dif_exokrine)]
-        vis_mat$Aggregated_similarity = rep("",nrow(vis_mat))
+        max_indices = apply(
+            deconvolution_results[
+                ,
+                c(
+                    cands_dif_endocrine,
+                    cands_dif_exokrine
+                )
+            ],
+            FUN = which.max,
+            MARGIN = 1
+        )
+        subtype_selection = deconvolution_results[
+            ,
+            c(
+                cands_dif_endocrine,
+                cands_dif_exokrine
+            )
+        ]
+        deconvolution_results$Aggregated_similarity = rep("",nrow(deconvolution_results))
         
         for( j in 1:nrow(subtype_selection)){
             
             subtype_strength = subtype_selection[j,max_indices[j]]
             if (subtype_strength == "low"){
-                vis_mat$Aggregated_similarity[j] = "not_significant"
+                deconvolution_results$Aggregated_similarity[j] = "not_significant"
             } else {
-                vis_mat$Aggregated_similarity[j] = colnames(subtype_selection)[max_indices[j]]
+                deconvolution_results$Aggregated_similarity[j] = colnames(subtype_selection)[max_indices[j]]
             }
         }
         
         column_candidates = c("Aggregated_similarity","hisc","Grading","MKI67")
-        column_candidates = column_candidates[column_candidates %in% colnames(vis_mat)]
+        column_candidates = column_candidates[column_candidates %in% colnames(deconvolution_results)]
         
-        vis_mat[
-            as.double(vis_mat$Confidence_score_dif) >=
+        deconvolution_results[
+            as.double(deconvolution_results$Confidence_score_dif) >=
                 confidence_threshold,
             "aggregated_similarity"
             ] = "not_significant"
         
-        vis_mat_filtered = vis_mat[,column_candidates]
+        deconvolution_results_filtered = deconvolution_results[,column_candidates]
     }
 
-    correlation_matrix = cor(visualization_data)
-    vis_mat_filtered = vis_mat_filtered[colnames(correlation_matrix),]
+    correlation_matrix = cor(vis_mat)
+    deconvolution_results_filtered = deconvolution_results_filtered[colnames(correlation_matrix),]
     
     # correlation heatmap
     pheatmap::pheatmap(
         correlation_matrix,
-        annotation_col = vis_mat_filtered,
+        annotation_col = deconvolution_results_filtered,
         annotation_colors = Graphics_parameters,
         annotation_legend = TRUE,
         treeheight_col = 0,

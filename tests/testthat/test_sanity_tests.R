@@ -1,6 +1,6 @@
 context("Sanity checks")
 
-test_that("Assert that data can be analyzed by Determine_differentiation_stage", {
+test_that("Assert that data can be analyzed by Deconvolve_transcriptome", {
 
     library("artdeco")
     path_transcriptome_file = system.file(
@@ -10,12 +10,12 @@ test_that("Assert that data can be analyzed by Determine_differentiation_stage",
 
     expect_true( length(path_transcriptome_file) > 0)
 
-    deconvolution_results_relative = Determine_differentiation_stage(
+    deconvolution_results_relative = Deconvolve_transcriptome(
         transcriptome_file_path = path_transcriptome_file,
         baseline = "relative"
     )
 
-    deconvolution_results_absolute = Determine_differentiation_stage(
+    deconvolution_results_absolute = Deconvolve_transcriptome(
         transcriptome_file_path = path_transcriptome_file,
         baseline = "absolute"
     )

@@ -15,6 +15,9 @@ Deconvolve_NMF = function(
         W = as.data.frame(model_basis@fit@W)
     
         dec_data = as.data.frame(exprs(deconvolution_data))
+        if (rownames(dec_data)[1] == "1"){
+            stop("Genenames of input data missing, only found '1' as first gene name.")
+        }
         W = W[rownames(W) %in% rownames(dec_data),]
         dec_data = dec_data[rownames(dec_data) %in% rownames(W),]
         dec_data = dec_data[rownames(W),]
