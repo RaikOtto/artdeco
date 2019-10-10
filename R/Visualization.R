@@ -515,7 +515,7 @@ create_PCA_deconvolution = function(
 #'     high_threshold = 66,
 #'     low_threshold = 33,
 #'     utilize_sadanandam_genes = FALSE
-#' )
+
 #' @import stringr ggplot2 pheatmap
 #' @return Plots
 #' @export
@@ -636,7 +636,6 @@ create_heatmap_deconvolution = function(
     )
 }
 
-
 #' configure_graphics
 #'
 #' \code{configure_graphics} configure the graphics paramters
@@ -645,7 +644,6 @@ create_heatmap_deconvolution = function(
 #' @examples
 #' graphical_configuration = configure_graphics()
 #' @return Heatmap related graphics configuration
-#' @export
 configure_graphics = function(){
 
     Graphics_parameters         = list(

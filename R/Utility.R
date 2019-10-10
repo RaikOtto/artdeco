@@ -10,9 +10,8 @@
 #'     test_mode
 #' )
 #' @examples
-#' model = list.files(system.file("Models/", package = "artdeco"))[1]
 #' remove_model_bseqsc(
-#'     model_name = model,
+#'     model_name = "My_model",
 #'     test_mode = TRUE
 #' )
 #' @import stringr
@@ -36,14 +35,23 @@ remove_model_bseqsc = function(
     )
     
     # check if model exists
-    if (!file.exists(model_path)){
-        stop( paste0(c(
-            "Cannot delete model ", model_name, ", model not found."
-        ),collapse = "" )
-        )
+    if ( 
+        file.exists(model_path)
+    ){
+        file.remove(model_path)
+    }else if ( test_mode){
+        print("Test mode active")
     }else{
-        if (! test_mode)
-            file.remove(model_path)
+        stop(
+            paste0(
+                c(
+                    "Cannot delete model ",
+                    model_name,
+                    ", model not found."
+                ),
+                collapse = ""
+            )
+        )    
     }
     print(paste0("Deleted model: ",model_name))
 }
@@ -60,9 +68,8 @@ remove_model_bseqsc = function(
 #'     test_mode
 #' )
 #' @examples
-#' model = list.files(system.file("Models/", package = "artdeco"))[1]
 #' remove_model_NMF(
-#'     model_name = model,
+#'     model_name = "My_model",
 #'     test_mode = TRUE
 #' )
 #' @import stringr
@@ -71,7 +78,7 @@ remove_model_NMF = function(
     model_name,
     test_mode = FALSE
 ){
-
+    
     # procure path
     model_name = str_replace_all(
         model_name,
@@ -86,14 +93,23 @@ remove_model_NMF = function(
     )
     
     # check if model exists
-    if (!file.exists(model_path)){
-        stop( paste0(c(
-            "Cannot delete model ", model_name, ", model not found."
-        ),collapse = "" )
-        )
+    if ( 
+        file.exists(model_path)
+    ){
+        file.remove(model_path)
+    }else if ( test_mode){
+        print("Test mode active")
     }else{
-        if (! test_mode)
-            file.remove(model_path)
+        stop(
+            paste0(
+                c(
+                    "Cannot delete model ",
+                    model_name,
+                    ", model not found."
+                ),
+                collapse = ""
+            )
+        )    
     }
     print(paste0("Deleted model: ",model_name))
 }
@@ -110,9 +126,8 @@ remove_model_NMF = function(
 #'     test_mode
 #' )
 #' @examples
-#' model = list.files(system.file("Models/", package = "artdeco"))[1]
 #' remove_model_music(
-#'     model_name = model,
+#'     model_name = "My_model",
 #'     test_mode = TRUE
 #' )
 #' @import stringr
@@ -136,14 +151,23 @@ remove_model_music = function(
     )
     
     # check if model exists
-    if (!file.exists(model_path)){
-        stop( paste0(c(
-            "Cannot delete model ", model_name, ", model not found."
-        ),collapse = "" )
-        )
+    if ( 
+        file.exists(model_path)
+    ){
+        file.remove(model_path)
+    }else if ( test_mode){
+        print("Test mode active")
     }else{
-        if (! test_mode)
-            file.remove(model_path)
+        stop(
+            paste0(
+                c(
+                    "Cannot delete model ",
+                    model_name,
+                    ", model not found."
+                ),
+                collapse = ""
+            )
+        )    
     }
     print(paste0("Deleted model: ",model_name))
 }
@@ -410,10 +434,9 @@ prepare_result_matrix_deprecated = function(
 #'     subtypes,
 #'     model,
 #'     fit,
-#'     parameter_list,
+#'     parameter_list
 #' )
 #'@import stringr
-#'@export
 #'@return dataframe containing baseline adjusted similarities
 quantify_similarity = function(
     meta_data,

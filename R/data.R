@@ -1,11 +1,39 @@
+#' deconvolution_results
+#'
 #' Deconvolution data utilized for testing purposes
-"deconvolution_results"
+#'
+#' @name deconvolution_results
+#' @docType data
+#' @keywords dataset
+#'
+NULL
 
+#' meta_data
+#'
 #' Meta information of the Lawlor et al. study
-"meta_data"
+#'
+#' @name meta_data
+#' @docType data
+#' @keywords dataset
+#'
+NULL
 
-#' Lawlor et al. scRNA training data
-"Lawlor"
-
+#' visualization_data
+#'
 #' Visualization of the deconvolved data
-"visualization_data"
+#'
+#' @name visualization_data
+#' @docType data
+#' @keywords dataset
+#'
+NULL
+
+#' Lawlor
+#'
+#' Lawlor et al. scRNA training data
+#'
+#' @name Lawlor
+#' @docType data
+#' @keywords dataset
+#'
+NULL

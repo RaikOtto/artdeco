@@ -45,7 +45,6 @@
 #'     seed = 123,
 #'     verbose = TRUE
 #' )
-#' @export
 simulateCellTypes = function(
     referenceCellTypes,
     markerGenes,
@@ -295,7 +294,6 @@ simulateCounts = function(
 #'     seed = 123,
 #'     verbose = TRUE
 #' )
-#' @export
 simulateNegativeControls = function(
     nGenes,
     numSamples,
