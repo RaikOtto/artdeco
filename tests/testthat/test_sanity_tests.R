@@ -3,77 +3,52 @@ context("Sanity checks")
 test_that("Assert that data can be analyzed by Deconvolve_transcriptome", {
 
     library("artdeco")
-    path_transcriptome_file = system.file(
-        "/Data/Expression_data/PANnen_Test_Data.tsv",
-        package="artdeco"
+    data("visualization_data")
+
+    expect_true( nrow(visualization_data) == 12997 )
+    expect_true( ncol(visualization_data) == 97 )
+
+    deconvolution_results = Deconvolve_transcriptome(
+         transcriptome_data = visualization_data
     )
-
-    expect_true( length(path_transcriptome_file) > 0)
-
-    deconvolution_results_relative = Deconvolve_transcriptome(
-        transcriptome_file_path = path_transcriptome_file,
-        baseline = "relative"
-    )
-
-    deconvolution_results_absolute = Deconvolve_transcriptome(
-        transcriptome_file_path = path_transcriptome_file,
-        baseline = "absolute"
-    )
-
 
     expect_true(
-        nrow(deconvolution_results_relative) == 57)
+        nrow(deconvolution_results) == 97)
 
     expect_true(
-        ncol(deconvolution_results_relative) == 13)
+        ncol(deconvolution_results) == 14)
 
 })
 
 test_that("Test if visualization works", {
 
     library("artdeco")
-    visualization_data_path = system.file(
-        "/Data/Expression_data/Visualization_PANnen.tsv",
-        package="artdeco")
-    expect_true( length(visualization_data_path) > 0)
+    data(deconvolution_results, envir = environment())
+    data(visualization_data, envir = environment())
 
-    meta_data_path = system.file(
-        "Data/Meta_information/Meta_information.tsv",
-        package = "artdeco"
-    )
-    meta_data      = read.table(
-        meta_data_path, sep ="\t",
-        header = TRUE,
-        stringsAsFactors = FALSE
-    )
-    rownames(meta_data) = meta_data$Sample
-
-    create_heatmap_differentiation_stages(
-        visualization_data_path,
-        deconvolution_results = meta_data
+    create_heatmap_deconvolution(
+        visualization_data,
+        deconvolution_results = deconvolution_results
     )
 })
 
 test_that("Adding models", {
     ### adding models
 
-    meta_data_path = system.file(
-        "Data/Meta_information/Meta_information.tsv",
-        package = "artdeco"
-    )
-    meta_data      = read.table(
-        meta_data_path, sep ="\t", header = TRUE,
-        stringsAsFactors = FALSE)
-    expect_true( length(meta_data_path) > 0)
+    data(meta_data)
+    
+    expect_true( nrow(meta_data) == 638 )
+    expect_true( ncol(meta_data) == 15 )
+    
+    rownames(meta_data) = as.character(meta_data$Name)
 
     subtype_vector = meta_data$Subtype # extract the training sample subtype labels
-    expect_true( length(subtype_vector) > 0)
 
-    training_data_path = system.file(
-        "Data/Expression_data/PANnen_Test_Data.tsv", package = "artdeco")
-    expect_true( length(training_data_path) > 0)
+    data("Lawlor")
+    expect_true( nrow(Lawlor) == 20655)
+    expect_true( ncol(Lawlor) == 638)
 
-    model_name = "Test_model"
+    model_name = "my_model"
     model_path = paste(
         c(system.file("Models/", package="artdeco"),"/",model_name,".RDS"),
         collapse = ""
@@ -82,17 +57,26 @@ test_that("Adding models", {
     if (file.exists(model_path))
         file.remove(model_path)
 
-    add_deconvolution_training_model(
-        transcriptome_data_path = training_data_path,
-        model_name = "Test_model",
-        subtype_vector,
-        training_p_value_threshold = 0.05,
-        training_nr_permutations = 100,
-        training_nr_marker_genes = 100
+    data(meta_data)
+     
+    subtype_vector = as.character(meta_data$Subtype) # extract the training sample subtype labels
+     
+    add_deconvolution_training_model_NMF(
+         transcriptome_data = Lawlor,
+         model_name = "my_model",
+         subtype_vector = subtype_vector,
+         rank_estimate = 0,
+         exclude_non_interpretable_NMF_components = FALSE,
+         training_nr_marker_genes = 100,
+         parallel_processes = 1,
+         nrun = 1
     )
-    expect_true(file.exists(model_path))
+    
+    #expect_true(file.exists(model_path))
 
     # remove model
-    remove_model(model_name)
-    expect_false(file.exists(model_path))
+    remove_model_NMF(
+        model_name = "My_model",
+        test_mode = TRUE
+    )
 })
