@@ -13,5 +13,5 @@ Heatmap related graphics configuration
 \code{configure_graphics} configure the graphics paramters
 }
 \examples{
-graphical_configuration = configure_graphics()
+graphical_configuration = artdeco:::configure_graphics()
 }

@@ -40,20 +40,3 @@ of specific cell-types using a negative binomial distribution.
 Simulation is based on biological data and marker genes
 of these cell-types.
 }
-\examples{
-markerGenes = 1:10
-referenceCellTypes = matrix(
-    rbinom(20*20, c(100,500,1000),prob = .8),
-    ncol = 20,
-    dimnames = list(
-        1:20,1:20
-    )
-)
-simulateCellTypes(
-    referenceCellTypes = referenceCellTypes,
-    markerGenes = markerGenes,
-    numSamples = 20,
-    seed = 123,
-    verbose = TRUE
-)
-}

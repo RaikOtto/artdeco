@@ -41,13 +41,3 @@ following a negative binomial distribution. Parameters of the negative
 binomial are randomly sampled from a normal distribution.
 Can be used as negative controls for benchmarking purposes.
 }
-\examples{
-simulateNegativeControls(
-    nGenes = 20000,
-    numSamples = 10,
-    normMean = 50,
-    normSD = 500,
-    seed = 123,
-    verbose = TRUE
-)
-}

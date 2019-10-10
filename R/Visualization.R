@@ -353,7 +353,7 @@ create_PCA_deconvolution = function(
         gene_t = read.table(
             meta_data_path,
             sep ="\t",
-            stringsAsFactors = F
+            stringsAsFactors = FALSE
         )
         gene_signature = str_to_upper(as.character(gene_t[13,3:nrow(gene_t)]))
         rownames(vis_mat) = str_to_upper(rownames(vis_mat))
@@ -370,7 +370,7 @@ create_PCA_deconvolution = function(
 
     # assert that graphics parameters are available
     if ( head(Graphics_parameters,1) == "" )
-        Graphics_parameters = configure_graphics()
+        Graphics_parameters = artdeco:::configure_graphics()
     
     dif_index = grep(
         colnames(deconvolution_results),
@@ -430,7 +430,7 @@ create_PCA_deconvolution = function(
         groups = meta_vis_data,
         ellipse = TRUE,
         circle = TRUE,
-        var.axes = F,
+        var.axes = FALSE,
         labels = names(congruence_vec)
     )
     #p = p + geom_point( 
@@ -515,7 +515,7 @@ create_PCA_deconvolution = function(
 #'     high_threshold = 66,
 #'     low_threshold = 33,
 #'     utilize_sadanandam_genes = FALSE
-
+#' )
 #' @import stringr ggplot2 pheatmap
 #' @return Plots
 #' @export
@@ -543,7 +543,7 @@ create_heatmap_deconvolution = function(
 
     # assert that graphics parameters are available
     if ( head(Graphics_parameters,1) == "" )
-        Graphics_parameters = configure_graphics()
+        Graphics_parameters = artdeco:::configure_graphics()
     
     if (utilize_sadanandam_genes == TRUE){
         meta_data_path = system.file(
@@ -553,7 +553,7 @@ create_heatmap_deconvolution = function(
         gene_t = read.table(
             meta_data_path,
             sep ="\t",
-            stringsAsFactors = F
+            stringsAsFactors = FALSE
         )
         gene_signature = str_to_upper(as.character(gene_t[13,3:nrow(gene_t)]))
         rownames(vis_mat) = str_to_upper(rownames(vis_mat))
@@ -642,7 +642,7 @@ create_heatmap_deconvolution = function(
 #' @usage
 #' configure_graphics()
 #' @examples
-#' graphical_configuration = configure_graphics()
+#' graphical_configuration = artdeco:::configure_graphics()
 #' @return Heatmap related graphics configuration
 configure_graphics = function(){
 
@@ -677,7 +677,7 @@ configure_graphics = function(){
             #progenitor     = "orange",
             Not_significant= "gray"
         ),
-        Grading          = c( G1 = "darkgreen",G2 = "Yellow", G3 = "darkred", G0 = "white")
+        Grading = c( G1 = "darkgreen",G2 = "Yellow", G3 = "darkred", G0 = "white")
     )
     return(Graphics_parameters)
 }

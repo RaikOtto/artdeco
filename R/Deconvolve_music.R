@@ -22,7 +22,7 @@ Deconvolve_music = function(
             clusters = 'cellType',
             samples = 'sampleID',
             select.ct = subtypes,
-            verbose = F,
+            verbose = FALSE,
             iter.max = nr_permutations
         )
 

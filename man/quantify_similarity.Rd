@@ -9,9 +9,7 @@ quantify_similarity(
     subtypes,
     model,
     fit,
-    parameter_list,
-    baseline,
-    not_sig_samples
+    parameter_list
 )
 }
 \arguments{
@@ -24,10 +22,6 @@ quantify_similarity(
 \item{fit}{Deconvolution fit}
 
 \item{parameter_list}{List of parameters of the models}
-
-\item{baseline}{Absolut or relative mode}
-
-\item{not_sig_samples}{list of not significantly deconvolable samples}
 }
 \value{
 dataframe containing baseline adjusted similarities
