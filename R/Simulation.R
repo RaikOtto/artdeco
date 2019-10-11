@@ -29,23 +29,6 @@
 #'     seed,
 #'     verbose
 #' )
-#' @examples
-#' markerGenes = 1:10
-#' referenceCellTypes = matrix(
-#'     rbinom(20*20, c(100,500,1000),prob = .8),
-#'     ncol = 20,
-#'     dimnames = list(
-#'         1:20,1:20
-#'     )
-#' )
-#' simulateCellTypes(
-#'     referenceCellTypes = referenceCellTypes,
-#'     markerGenes = markerGenes,
-#'     numSamples = 20,
-#'     seed = 123,
-#'     verbose = TRUE
-#' )
-#' @export
 simulateCellTypes = function(
     referenceCellTypes,
     markerGenes,
@@ -286,16 +269,6 @@ simulateCounts = function(
 #'     seed,
 #'     verbose
 #' )
-#' @examples
-#' simulateNegativeControls(
-#'     nGenes = 20000,
-#'     numSamples = 10,
-#'     normMean = 50,
-#'     normSD = 500,
-#'     seed = 123,
-#'     verbose = TRUE
-#' )
-#' @export
 simulateNegativeControls = function(
     nGenes,
     numSamples,

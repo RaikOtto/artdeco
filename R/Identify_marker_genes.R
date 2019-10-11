@@ -54,5 +54,5 @@ identify_marker_genes = function(
     marker_genes = marker_genes[marker_genes %in% rownames(expression_training_mat)]
     marker_genes = marker_genes[1:training_nr_marker_genes]
 
-    return(result_t)
+    return(marker_genes)
 }

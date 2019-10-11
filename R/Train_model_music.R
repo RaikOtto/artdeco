@@ -1,6 +1,6 @@
-#' add_deconvolution_training_model
+#' add_deconvolution_training_model_music
 #'
-#' \code{add_deconvolution_training_model} adds a new model
+#' \code{add_deconvolution_training_model_music} adds a new model
 #'
 #' @param transcriptome_data Path to transcriptomic data to be
 #' used for training. Has to contain the cell subtypes to which the
@@ -18,24 +18,20 @@
 #'     subtype_vector
 #' )
 #' @examples
-#' data("test_data")
-#' meta_data_path = system.file("Data/Meta_information/Meta_information.tsv", package = "artdeco")
-#' meta_data      = read.table(
-#'     meta_data_path, sep = "\t",
-#'     header = TRUE,
-#'     stringsAsFactors = FALSE
-#' )
+#' data("Lawlor") # Data from Lawlor et al.
+#' data(meta_data)
+#' 
 #' subtype_vector = meta_data$Subtype # extract the training sample subtype labels
-#' add_deconvolution_training_model(
-#'     transcriptome_data_path = transcriptome_data_path,
-#'     model_name = "Test_model",
-#'     subtype_vector
+#' add_deconvolution_training_model_music(
+#'     transcriptome_data = Lawlor,
+#'     model_name = "my_model",
+#'     subtype_vector = subtype_vector
 #' )
 #' @return Stores a new model in the package directory
 #' @export
 add_deconvolution_training_model_music = function(
-    transcriptome_data_path = "",
-    model_name = "",
+    transcriptome_data,
+    model_name = "my_model",
     subtype_vector
 ){
 

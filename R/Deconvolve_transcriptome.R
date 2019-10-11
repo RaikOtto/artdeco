@@ -21,14 +21,15 @@
 #' @usage
 #' Deconvolve_transcriptome(
 #'     transcriptome_data,
+#'     deconvolution_algorithm,
 #'     models,
 #'     nr_permutations,
 #'     output_file
 #' )
 #' @examples
-#' data("transcriptome_data")
+#' data("visualization_data")
 #' Deconvolve_transcriptome(
-#'     transcriptome_data = transcriptome_data
+#'     transcriptome_data = visualization_data
 #' )
 #' @return Similarity measurements of differentiation
 #' stages

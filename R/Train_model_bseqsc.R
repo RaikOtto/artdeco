@@ -41,10 +41,8 @@
 #'     transcriptome_data = Lawlor,
 #'     model_name = "my_model",
 #'     subtype_vector = subtype_vector,
-#'     marker_gene_list,
-#'     training_p_value_threshold = 0.05,
-#'     training_nr_permutations = 2,
-#'     training_nr_marker_genes = 10
+#'     training_nr_permutations = 10,
+#'     training_nr_marker_genes = 100
 #' )
 #' @return Stores a new model in the package directory
 #' @export
@@ -140,48 +138,50 @@ add_deconvolution_training_model_bseqsc = function(
     pData(test_mat) = data.frame( as.character(subtype_vector) )
     colnames(pData(test_mat)) = "subtype_vector"
     
-    fit = bseqsc_proportions(
-        test_mat,
-        Basis,
-        verbose = TRUE,
-        absolute = TRUE,
-        log = F,
-        perm = training_nr_permutations,
+    if ( model_name != "my_model" ){
+        fit = bseqsc_proportions(
+            test_mat,
+            Basis,
+            verbose = TRUE,
+            absolute = TRUE,
+            log = FALSE,
+            perm = training_nr_permutations
+        )
+    
+        print("Finished threshold determination")
+    
+        res_coeff = t(fit$coefficients)
+        res_coeff_mat = as.double(unlist(res_coeff))
+        res_coeff_mat = as.data.frame(
+            matrix(
+                res_coeff_mat,
+                ncol = ncol(res_coeff),
+                nrow = nrow(res_coeff)
+            )
+        )
+        rownames(res_coeff_mat) = rownames(res_coeff)
+        colnames(res_coeff_mat) = colnames(res_coeff)
+        res_cor   = fit$stats
+    
+        res_coeff[ is.na(res_coeff) ] = 0.0
+        res_cor[ is.na(res_cor) ] = 0.0
+    
+        self_scores = list()
+        for (subtype in unique(subtype_vector)){
+            self_scores[[subtype]] = as.double(
+                res_coeff[
+                    which(subtype_vector == subtype),
+                    subtype
+                ]
+            )
+        }
+    
+        model = list(Basis, self_scores, Marker_Gene_List)
+    
+        print(paste0("Storing model: ", model_path))
         
-    )
-
-    print("Finished threshold determination")
-
-    res_coeff = t(fit$coefficients)
-    res_coeff_mat = as.double(unlist(res_coeff))
-    res_coeff_mat = as.data.frame(
-        matrix(
-            res_coeff_mat,
-            ncol = ncol(res_coeff),
-            nrow = nrow(res_coeff)
-        )
-    )
-    rownames(res_coeff_mat) = rownames(res_coeff)
-    colnames(res_coeff_mat) = colnames(res_coeff)
-    res_cor   = fit$stats
-
-    res_coeff[ is.na(res_coeff) ] = 0.0
-    res_cor[ is.na(res_cor) ] = 0.0
-
-    self_scores = list()
-    for (subtype in unique(subtype_vector)){
-        self_scores[[subtype]] = as.double(
-            res_coeff[
-                which(subtype_vector == subtype),
-                subtype
-            ]
-        )
+        saveRDS(model,model_path)
     }
-
-    model = list(Basis, self_scores, Marker_Gene_List)
-
-    print(paste0("Storing model: ", model_path))
-    saveRDS(model,model_path)
 
     print(paste0("Finished training model: ", model_name))
 }
