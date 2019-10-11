@@ -17,7 +17,7 @@
 #' precise p-value estimates
 #' @param output_file Path of output file. If not specified,
 #' no hard-disk written output will occur.
-#' @import bseqsc MuSiC
+#' @import NMF
 #' @usage
 #' Deconvolve_transcriptome(
 #'     transcriptome_data,
@@ -33,6 +33,7 @@
 #' )
 #' @return Similarity measurements of differentiation
 #' stages
+#' @import NMF Biobase
 #' @export
 Deconvolve_transcriptome = function(
     transcriptome_data,

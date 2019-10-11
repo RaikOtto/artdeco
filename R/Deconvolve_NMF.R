@@ -1,3 +1,9 @@
+#' Deconvolve_NMF
+#' @param deconvolution_data Data to be deconvolved
+#' @param models_list List of models
+#' @param models Models utilized
+#' @param nr_permutations Amount of permutations 
+#' @import NMF
 Deconvolve_NMF = function(
     deconvolution_data,
     models_list,

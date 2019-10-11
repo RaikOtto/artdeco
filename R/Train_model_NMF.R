@@ -71,7 +71,7 @@ add_deconvolution_training_model_NMF = function(
     )
 
     if (model_name == "my_model"){
-        
+        return("")
     }else if (file.exists(model_path)){
         stop(paste0( collapse= "",
             c(

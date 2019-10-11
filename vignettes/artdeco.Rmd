@@ -85,6 +85,10 @@ It is important to interpret the simialrity predictions given the clustering of 
  similarity predictions from step one are being passed on to the visualization function.
 
 ```{r}
+
+library(devtools)
+install_github("vqv/ggbiplot")
+
 create_heatmap_deconvolution(
     deconvolution_results = deconvolution_results,
     visualization_data = transcriptome_data,

@@ -12,11 +12,11 @@ Imports:
     limma,
     msir,
     stats,
-    bseqsc,
-    ggbiplot,
     pheatmap,
-    MuSiC,
-    NMF
+    NMF,
+    GEOquery,
+    Biobase,
+    devtools
 Depends: 
     R (>= 3.6)
 License: Artistic-2.0

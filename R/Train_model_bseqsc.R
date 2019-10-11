@@ -20,7 +20,7 @@
 #' improves the p-value estiamtes
 #' @param training_nr_marker_genes How many genes should be utilized
 #' as list of marker genes
-#' @import stringr bseqsc
+#' @import stringr
 #' @usage
 #' add_deconvolution_training_model_bseqsc(
 #'     transcriptome_data,
@@ -64,7 +64,7 @@ add_deconvolution_training_model_bseqsc = function(
     )
 
     if (model_name == "my_model"){
-        
+        return("")
     }else if (file.exists(model_path)){
         stop(paste0( collapse= "",
             c(
