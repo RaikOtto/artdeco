@@ -14,6 +14,8 @@ Deconvolve_bseq_sc = function(
         model_basis = models_list[[pred_model]]
         model_basis = model_basis[[1]]
         
+        require(bseqsc)
+        
         fit = bseqsc_proportions(
             deconvolution_data,
             model_basis,
