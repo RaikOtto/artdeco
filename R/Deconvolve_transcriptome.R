@@ -82,7 +82,7 @@ Deconvolve_transcriptome = function(
         stop("Only bseqsc, NMF and MuSiC implemented as of now.")
     }
     
-    models = models[[1]]
+    models = as.character(unlist(models))
     for (model in models){
         
         model_path = paste0(c(
