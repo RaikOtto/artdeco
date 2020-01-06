@@ -6,8 +6,7 @@ prepare_sample_result_matrix_bseqsc = function(
 ){
     
     rounding_precision = 1
-    #models = as.character(unlist(str_split(deconvolution_results$Model[1],pattern = "\\|")))
-    # deconvolution_results[,"R_sqr_dif"] = rep("",nrow(deconvolution_results))
+
     deconvolution_results[,"Strength_subtype"] = rep("",nrow(deconvolution_results))
     deconvolution_results[,"Subtype"] = rep("",nrow(deconvolution_results))
     
