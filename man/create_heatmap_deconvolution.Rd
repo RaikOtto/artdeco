@@ -19,7 +19,7 @@ create_heatmap_deconvolution(
 \arguments{
 \item{visualization_data}{Matrix of the transcriptome data
 data that shall be visualized. Notice the convention
-that the first row has to contain the HGNC identifier}
+that the row names have to contain the HGNC identifier}
 
 \item{deconvolution_results}{The dataframe returned
 by the deconvolution analysis}
@@ -56,8 +56,9 @@ Plots
 \description{
 \code{create_heatmap_deconvolution}
 visualizes the deconvolution results as heatmap.
-Please note that the first column of the expression
-data matrix has to contain the HGNC identifier
+Please note that the rows of the expression data matrix 
+are expected to be HGNC symbols and columns are expected 
+to contain the samples.
 }
 \examples{
 data(deconvolution_results, envir = environment())
