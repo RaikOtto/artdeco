@@ -4,8 +4,7 @@
 \alias{simulateCounts}
 \title{Simulate count data based on negative binomial distribution}
 \usage{
-simulateCounts(simParam, nSamples, nGenes, simSeed = NULL,
-  simMarkers = TRUE)
+simulateCounts(simParam, nSamples, nGenes, simSeed = NULL, simMarkers = TRUE)
 }
 \arguments{
 \item{simParam}{List of parameters estimated by

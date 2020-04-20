@@ -461,7 +461,7 @@ create_PCA_deconvolution = function(
 #' create_heatmap_deconvolution
 #'
 #' \code{create_heatmap_deconvolution}
-#' visualizes the deconvultion results as heatmap.
+#' visualizes the deconvolution results as heatmap.
 #' Please note that the first column of the expression
 #' data matrix has to contain the HGNC identifier
 #'

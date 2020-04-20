@@ -4,8 +4,12 @@
 \alias{identify_marker_genes}
 \title{identify_marker_genes}
 \usage{
-identify_marker_genes(expression_training_mat, subtype_vector, subtype,
-  training_nr_marker_genes)
+identify_marker_genes(
+  expression_training_mat,
+  subtype_vector,
+  subtype,
+  training_nr_marker_genes
+)
 }
 \arguments{
 \item{expression_training_mat}{matrix that contains the expression data}
