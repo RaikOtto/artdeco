@@ -469,7 +469,7 @@ create_PCA_deconvolution = function(
 #' to contain the samples.
 #'
 #' @param visualization_data Matrix of the transcriptome data
-#' data that shall be visualized. Notice the convention
+#' that shall be visualized. Notice the convention
 #' that the row names have to contain the HGNC identifier
 #' @param deconvolution_results The dataframe returned
 #' by the deconvolution analysis

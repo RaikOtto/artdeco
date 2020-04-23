@@ -18,7 +18,7 @@ create_heatmap_deconvolution(
 }
 \arguments{
 \item{visualization_data}{Matrix of the transcriptome data
-data that shall be visualized. Notice the convention
+that shall be visualized. Notice the convention
 that the row names have to contain the HGNC identifier}
 
 \item{deconvolution_results}{The dataframe returned
