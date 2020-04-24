@@ -1,3 +1,143 @@
 # artdeco R Package
 
 This repository hosts the Alikeness based on Regression on Transcriptomic DECOnvolution (ART DÈCO) R Package.
+A R package that determines the differentiation stage of pancreatic neuroendocrinal 
+neoplasia (PANnen) based on bulk RNA-seq or on mRNA array exepriments of cancer-tissue.
+
+# 1 How to make it work:  Quickstart
+
+## Installing artdeco
+
+Start an R session e.g. using RStudio
+
+`if (!requireNamespace("BiocManager", quietly=TRUE))`
+    `install.packages("BiocManager")`
+
+`BiocManager::install("GEOquery")`
+
+## Test run
+
+97 representative NEN samples are utilized for this vignette from the
+GSE733338 GSE package. In the following, these will be analyzed by the artdeco
+ algorithm to demonstrate the utilization of artdeco.
+
+```{r}
+library("artdeco")
+library("GEOquery")
+
+# obtain path to testdata
+gse73338 = getGEO('GSE73338')
+transcriptome_data = exprs(gse73338$GSE73338_series_matrix.txt.gz)
+gene_names = featureData(gse73338$GSE73338_series_matrix.txt.gz)[[3]]
+rownames(transcriptome_data) = gene_names
+
+# testrun
+deconvolution_results = Deconvolve_transcriptome(
+    transcriptome_data = transcriptome_data,
+    deconvolution_algorithm = "nmf"
+)
+
+# show results
+deconvolution_results[1:2,]
+```
+The call returns a dataframe that contains the differentiation stage
+similarity predictions. 
+
+### Explanation test run results
+
+Percent-wise similarities of the testdata samples to all scRNA derived training
+ samples are shown, both as written interpretation e.g. "significant similarity (to this cell type)"
+ or "no significant similarity (to this cell type)" as well as percent scalars.
+
+## Explanation percent similarities 
+
+The percent value quantifies to what extend a given transcriptome can be reconstructed utilizing
+ a given reference cell type e.g. by the insulin producing 'beta' cell type as basis. The nu-SVM 
+ regression based similarity determination has the limitation that the returned unit-less scalar 
+ is challenging to interpret: It is not clearly decidable whether a scalar indicates a high or low
+ similarity. Thus, artdeco interprets the returned scalar. Measurements may be calculated based
+ on a trained model (absolute) or relative to all analyzed within a given run (relative).
+ The default 'absolute' mode interprets the returned scalar for a given sample relative to the 
+ maximal similarity measured for each model subtype during training. I.e. the returned scalar is
+ divided by the maximal similarity observed for training set samples. E.g. when a scRNA beta cell
+ received the similarity 5.7 to the beta set, than all subsequent beta similarities are divided 
+ by 5.7 to show how similar they are relative to the self-identification of cell subtypes. The
+ 'relative' mode divides by the maximal similarity measured for a given set of query data, i.e. 
+ the maximally measured similarity is taken as divisor.
+
+# 2 Visualization of similarity predictions
+
+It is important to interpret the simialrity predictions given the clustering of the data. In
+ order to detect clusters, a correlation heatmap can be used along with an overlay of similarity
+ predictions. The rational is, that samples that show a comparable differentiation state should
+ cluster together, which is why a heatmap creator is included in the artdeco package and can
+ be utilized as follows. First the analyzed transcriptome data is loaded and afterwards the 
+ similarity predictions from step one are being passed on to the visualization function.
+
+```{r}
+
+library(devtools)
+install_github("vqv/ggbiplot")
+
+create_heatmap_deconvolution(
+    deconvolution_results = deconvolution_results,
+    visualization_data = transcriptome_data,
+    utilize_sadanandam_genes = TRUE
+)
+
+create_PCA_deconvolution(
+    visualization_data = transcriptome_data,
+    deconvolution_results = deconvolution_results,
+    utilize_sadanandam_genes = TRUE
+)
+```
+
+# 3 Adding and removing models
+
+Adding a new model requires 1) training data and 2) a labeling vector of the training data
+specifying the cell type of each training sample.
+```{r}
+
+data(Lawlor) # Data from Lawlor et al.
+Lawlor[1:5,1:5]
+data(meta_data)
+
+subtype_vector = as.character(meta_data$Subtype) # extract the training sample subtype labels
+subtype_vector[1:6] # show subtype definition
+
+add_deconvolution_training_model_NMF(
+    transcriptome_data = Lawlor,
+    model_name = "my_model",
+    subtype_vector = subtype_vector,
+    rank_estimate = 0,
+    exclude_non_interpretable_NMF_components = FALSE,
+    training_nr_marker_genes = 100,
+    parallel_processes = 1,
+    nrun = 1
+)
+```
+Note that the training data in the current version (1.0.0) of artdeco has to have HGNC symbols
+as row names.
+
+Removing models is fairly straight forward; list the models after specifying the Machine-Learning algorihm
+i.e. 'NMF' or 'bseqsc' etc..
+```{r}
+models = list.files(system.file("Models/NMF", package = "artdeco"))
+print(models)
+
+model_to_be_removed = "my_model"
+remove_model_NMF(
+    model_name = model_to_be_removed,
+    test_mode = TRUE
+)
+```
+
+# 4 Important: data format
+
+Please note that the expression data always has to have HGNC symbols as row names and that the column names contain the samples.
+```{r}
+data("Lawlor") # data from Lawlor et al.
+Lawlor[1:5,1:5]
+```
+
+Contact: raik.otto@hu-berlin.de
