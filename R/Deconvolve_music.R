@@ -35,7 +35,7 @@ Deconvolve_music = function(
     deconvolution_results = prepare_result_matrix_music(
         prediction_res_coeff_list = prediction_res_coeff_list,
         deconvolution_data = deconvolution_data,
-        prediction_stats_list = prediction_stats_list,
+        #prediction_stats_list = prediction_stats_list,
         models = models
     )
     colnames(deconvolution_results) = str_to_lower(colnames(deconvolution_results))

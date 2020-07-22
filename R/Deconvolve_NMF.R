@@ -58,7 +58,12 @@ Deconvolve_NMF = function(
         deconvolution_data = deconvolution_data,
         models = models
     )
-    colnames(deconvolution_results) = str_to_lower(colnames(deconvolution_results))
+    #### CHANGE #
+    #colnames(deconvolution_results) = str_to_lower(colnames(deconvolution_results))
+    
+    col_idx <- match(c("model", "alpha", "beta", "gamma", "delta", "acinar", "ductal", "hisc", "Strength_subtype", "Subtype", "score"), 
+                     colnames(deconvolution_results))
+    deconvolution_results <- deconvolution_results[,col_idx]
     
     #deconvolution_results = prepare_sample_result_matrix_NMF(
     #    deconvolution_results = deconvolution_results,

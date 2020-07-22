@@ -564,6 +564,7 @@ create_heatmap_deconvolution = function(
     }
     
     # remove confidence scores
+    ### CHANGE # added 'score'
     deconvolution_results_filtered = deconvolution_results[,
         !(colnames(deconvolution_results) %in% c(
             "model",
@@ -575,7 +576,8 @@ create_heatmap_deconvolution = function(
             "OS_Tissue",
             "Strength_de_differentiation",
             "Differentiation_score",
-            "Aggregated_similarity"
+            "Aggregated_similarity",
+            "score"
         ))
     ]
     
