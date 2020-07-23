@@ -13,17 +13,17 @@ test_that("Assert that data can be analyzed by Deconvolve_transcriptome", {
     )
 
     expect_true(
-        nrow(deconvolution_results) == 97)
+        nrow(deconvolution_results) == 194)
 
     expect_true(
-        ncol(deconvolution_results) == 14)
+        ncol(deconvolution_results) == 10)
 
 })
 
 test_that("Test if visualization works", {
 
     library("artdeco")
-    data(deconvolution_results, envir = environment())
+    #data(deconvolution_results, envir = environment())
     data(visualization_data, envir = environment())
 
     create_heatmap_deconvolution(
