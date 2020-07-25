@@ -37,7 +37,13 @@ Deconvolve_bseq_sc = function(
         prediction_stats_list = prediction_stats_list,
         models = models
     )
-    colnames(deconvolution_results) = str_to_lower(colnames(deconvolution_results))
+    #### CHANGE #
+    #colnames(deconvolution_results) = str_to_lower(colnames(deconvolution_results))
+    
+    col_idx <- match(c("model", "alpha", "beta", "gamma", "delta", "acinar", "ductal", "hisc", "Strength_subtype", "Subtype", "Sig_score",
+                       "P_value", "Correlation", "RMSE"), colnames(deconvolution_results))
+    deconvolution_results <- deconvolution_results[,col_idx]
+    colnames(deconvolution_results)[colnames(deconvolution_results) == "Sig_score"] <- "score"
     
     #deconvolution_results = prepare_sample_result_matrix_bseqsc(
     #    deconvolution_results = deconvolution_results,
