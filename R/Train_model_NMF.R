@@ -69,10 +69,8 @@ add_deconvolution_training_model_NMF = function(
         c(system.file("Models/NMF", package="artdeco"),"/",model_name,".RDS"),
         collapse = ""
     )
-
-    if (model_name == "my_model"){
-        return("")
-    }else if (file.exists(model_path)){
+    
+    if (file.exists(model_path)){
         stop(paste0( collapse= "",
             c(
                 "Modelname ",
@@ -86,6 +84,7 @@ add_deconvolution_training_model_NMF = function(
         stop(paste0("You have to provide the sample subtypes labels for model training"))
     #subtype_vector = str_to_lower(subtype_vector)
 
+    print("Variance filtering")
     expression_training_mat = variance_filtering(transcriptome_data)
 
     ### Data cleansing
@@ -131,7 +130,7 @@ add_deconvolution_training_model_NMF = function(
         rank = rank_estimate,
         method = 'brunet',
         .opt = training_options,
-        nrun = nrun,
+        #nrun = nrun,
         maxIter = 100,
         seed = "random"
     )
