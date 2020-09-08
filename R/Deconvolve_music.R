@@ -6,7 +6,6 @@ Deconvolve_music = function(
 ){
     
     prediction_res_coeff_list = list()
-    prediction_stats_list = list()
     
     for (pred_model in models){
         
@@ -36,7 +35,10 @@ Deconvolve_music = function(
         deconvolution_data = deconvolution_data,
         models = models
     )
-    colnames(deconvolution_results) = str_to_lower(colnames(deconvolution_results))
+    
+    col_idx <- match(c("model", "alpha", "beta", "gamma", "delta", "acinar", "ductal", "hisc", "Strength_subtype", "Subtype", "score"), 
+                     colnames(deconvolution_results))
+    deconvolution_results <- deconvolution_results[,col_idx]
     
     return(deconvolution_results)
 }
