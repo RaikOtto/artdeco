@@ -7,7 +7,7 @@ prepare_result_matrix_music = function(
     rounding_precision = 1
     result_matrix = data.frame(
         row.names = colnames(deconvolution_data),
-        "Model" = rep( paste0(c(models),collapse="|"), ncol(deconvolution_data))
+        "model" = rep( paste0(c(models),collapse="|"), ncol(deconvolution_data))
     )
     
     subtype_cands = c("alpha","beta","gamma","delta","acinar","ductal","hisc")
@@ -66,14 +66,52 @@ prepare_result_matrix_music = function(
         ## end fit 2
     }
     
-    colnames(result_matrix)[colnames(result_matrix) == "progenitor"] = "Progenitor"
-    colnames(result_matrix)[colnames(result_matrix) == "hisc"] = "HISC"
-    colnames(result_matrix)[colnames(result_matrix) == "alpha"] = "Alpha"
-    colnames(result_matrix)[colnames(result_matrix) == "beta"] = "Beta"
-    colnames(result_matrix)[colnames(result_matrix) == "gamma"] = "Gamma"
-    colnames(result_matrix)[colnames(result_matrix) == "delta"] = "Delta"
-    colnames(result_matrix)[colnames(result_matrix) == "acinar"] = "Acinar"
-    colnames(result_matrix)[colnames(result_matrix) == "ductal"] = "Ductal"
+    #colnames(result_matrix)[colnames(result_matrix) == "progenitor"] = "Progenitor"
+    #colnames(result_matrix)[colnames(result_matrix) == "hisc"] = "HISC"
+    #colnames(result_matrix)[colnames(result_matrix) == "alpha"] = "Alpha"
+    #colnames(result_matrix)[colnames(result_matrix) == "beta"] = "Beta"
+    #colnames(result_matrix)[colnames(result_matrix) == "gamma"] = "Gamma"
+    #colnames(result_matrix)[colnames(result_matrix) == "delta"] = "Delta"
+    #colnames(result_matrix)[colnames(result_matrix) == "acinar"] = "Acinar"
+    #colnames(result_matrix)[colnames(result_matrix) == "ductal"] = "Ductal"
+    
+    # add code from prepare_sample_result_matrix_NMF
+    # so that columns subtype and strength_subtype are added
+    # can be added; doesn't have to be added
+    
+    result_matrix[,"Strength_subtype"] = rep("",nrow(result_matrix))
+    result_matrix[,"Subtype"] = rep("",nrow(result_matrix))
+    
+    cands_dif_1 = c("alpha","beta","gamma","delta","acinar","ductal")
+    if("hisc" %in% colnames(result_matrix)){
+        cands_dif_2 = "hisc"
+    } else {
+        cands_dif_2 = c("acinar","ductal")
+    }
+    
+    cands_dif = cands_dif_1[
+        (cands_dif_1 %in% colnames(result_matrix)) &
+            !(cands_dif_1 %in% cands_dif_2)
+        ]
+    
+    for( j in 1:ncol(deconvolution_data)){
+        
+        max_subtype = colnames(result_matrix[cands_dif])[
+            which.max(result_matrix[j,cands_dif])
+            ]
+        subtype_strength = result_matrix[j,max_subtype] /
+            sum(result_matrix[j,cands_dif])
+        if (sum(result_matrix[j,cands_dif]) == 0)
+            subtype_strength = result_matrix[j,max_subtype]
+        subtype_strength = round(subtype_strength * 100,rounding_precision)
+        
+        result_matrix[j,"Strength_subtype"] = subtype_strength
+        
+        if (subtype_strength == 0)
+            max_subtype = "not_significant"
+        
+        result_matrix[j,"Subtype"] = max_subtype
+    }
     
     return(result_matrix)
 }

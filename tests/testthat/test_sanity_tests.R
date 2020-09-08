@@ -4,21 +4,29 @@ test_that("Assert that data can be analyzed by Deconvolve_transcriptome", {
 
     library("artdeco")
     data("visualization_data")
+    data("deconvolution_results")
 
-    expect_true( nrow(visualization_data) == 12997 )
+    expect_true( nrow(visualization_data) == 12997 ) # do same for deconvolution_results
     expect_true( ncol(visualization_data) == 97 )
 
-    deconvolution_results = Deconvolve_transcriptome(
+    deconvolution_results_test = Deconvolve_transcriptome(
          transcriptome_data = visualization_data
     )
 
+    #expect_true(
+    #    deconvolution_results_test == deconvolution_results)
     expect_true(
         nrow(deconvolution_results) == 194)
 
     expect_true(
-        ncol(deconvolution_results) == 10)
+        ncol(deconvolution_results) == 11)
 
+    expect_true(
+        colnames(deconvolution_results_test)==c("model", "alpha", "beta", "gamma", "delta", "acinar", "ductal", "hisc", 
+                                                "Strength_subtype", "Subtype", "score"))
 })
+
+
 
 test_that("Test if visualization works", {
 
@@ -31,6 +39,8 @@ test_that("Test if visualization works", {
         deconvolution_results = deconvolution_results
     )
 })
+
+
 
 test_that("Adding models", {
     ### adding models
