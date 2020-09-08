@@ -16,14 +16,16 @@ test_that("Assert that data can be analyzed by Deconvolve_transcriptome", {
         nrow(deconvolution_results) == 194)
 
     expect_true(
-        ncol(deconvolution_results) == 10)
+        ncol(deconvolution_results) == 11)
 
 })
 
 test_that("Test if visualization works", {
 
     library("artdeco")
-    #data(deconvolution_results, envir = environment())
+    deconvolution_results = deconvolution_results[
+        colnames(deconvolution_results) != "Strength_subtype"
+    ]
     data(visualization_data, envir = environment())
 
     create_heatmap_deconvolution(
@@ -50,7 +52,7 @@ test_that("Adding models", {
 
     model_name = "my_model"
     model_path = paste(
-        c(system.file("Models/", package="artdeco"),"/",model_name,".RDS"),
+        c(system.file("Models/NMF", package="artdeco"),"/",model_name,".RDS"),
         collapse = ""
     )
 
@@ -72,7 +74,7 @@ test_that("Adding models", {
          nrun = 1
     )
     
-    #expect_true(file.exists(model_path))
+    expect_true(file.exists(model_path))
 
     # remove model
     remove_model_NMF(
