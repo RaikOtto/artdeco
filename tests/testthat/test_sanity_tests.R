@@ -13,17 +13,18 @@ test_that("Assert that data can be analyzed by Deconvolve_transcriptome", {
          transcriptome_data = visualization_data
     )
 
-    #expect_true(
-    #    deconvolution_results_test == deconvolution_results)
     expect_true(
-        nrow(deconvolution_results) == 194)
+        nrow(deconvolution_results) == 97)
 
     expect_true(
-        ncol(deconvolution_results) == 11)
+        ncol(deconvolution_results) == 14)
 
     expect_true(
-        colnames(deconvolution_results_test)==c("model", "alpha", "beta", "gamma", "delta", "acinar", "ductal", "hisc", 
-                                                "Strength_subtype", "Subtype", "score"))
+        identical(
+            colnames(deconvolution_results_test),
+            c("model", "alpha", "beta", "gamma", "delta", "acinar", "ductal", "hisc","Strength_subtype", "Subtype", "score")
+        )
+    )
 })
 
 
@@ -60,14 +61,17 @@ test_that("Adding models", {
     expect_true( nrow(Lawlor) == 20655)
     expect_true( ncol(Lawlor) == 638)
 
-    model_name = "my_model"
+    model_name = "My_model"
     model_path = paste(
         c(system.file("Models/NMF", package="artdeco"),"/",model_name,".RDS"),
         collapse = ""
     )
 
+    # remove model
     if (file.exists(model_path))
-        file.remove(model_path)
+        remove_model_NMF(
+            model_name = model_name
+        )
 
     data(meta_data)
      
@@ -75,7 +79,7 @@ test_that("Adding models", {
      
     add_deconvolution_training_model_NMF(
          transcriptome_data = Lawlor,
-         model_name = "my_model",
+         model_name = model_name,
          subtype_vector = subtype_vector,
          rank_estimate = 0,
          exclude_non_interpretable_NMF_components = FALSE,
@@ -88,7 +92,6 @@ test_that("Adding models", {
 
     # remove model
     remove_model_NMF(
-        model_name = "My_model",
-        test_mode = TRUE
+        model_name = model_name
     )
 })
