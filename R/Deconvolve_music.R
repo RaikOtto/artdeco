@@ -16,7 +16,7 @@ Deconvolve_music = function(
         pData(model_basis)$sampleID = colnames(exprs(model_basis))
         subtypes = as.character(unique(pData(model_basis)$cellType))
         
-        Est.prop.GSE50244 = music_prop(
+        Est.prop.GSE50244 = MuSiC::music_prop(
             bulk.eset = deconvolution_data,
             sc.eset = model_basis,
             clusters = 'cellType',
@@ -26,8 +26,7 @@ Deconvolve_music = function(
             iter.max = nr_permutations
         )
 
-        prediction_res_coeff_list[[pred_model]] = Est.prop.GSE50244$Est.prop.allgene
-        prediction_stats_list[[pred_model]]     = Est.prop.GSE50244$r.squared.full
+        prediction_res_coeff_list[[pred_model]] = Est.prop.GSE50244$Est.prop.allgene # cell type proportions
     }
     
     # create results matrix called meta_data
@@ -35,16 +34,9 @@ Deconvolve_music = function(
     deconvolution_results = prepare_result_matrix_music(
         prediction_res_coeff_list = prediction_res_coeff_list,
         deconvolution_data = deconvolution_data,
-        prediction_stats_list = prediction_stats_list,
         models = models
     )
     colnames(deconvolution_results) = str_to_lower(colnames(deconvolution_results))
     
-    #deconvolution_results = prepare_sample_result_matrix_music(
-    #    deconvolution_results = deconvolution_results,
-    #    prediction_stats_list = prediction_stats_list,
-    #    deconvolution_data = deconvolution_data,
-    #    models_list = models_list
-    #)
     return(deconvolution_results)
 }
