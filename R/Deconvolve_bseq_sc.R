@@ -16,7 +16,7 @@ Deconvolve_bseq_sc = function(
         
         require(bseqsc)
         
-        fit = bseqsc_proportions(
+        fit = bseqsc::bseqsc_proportions(
             deconvolution_data,
             model_basis,
             verbose = FALSE,

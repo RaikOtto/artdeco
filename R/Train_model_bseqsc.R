@@ -118,7 +118,7 @@ add_deconvolution_training_model_bseqsc = function(
     colnames(pData(training_mat_bseq)) = "subtype_vector"
 
     Basis = suppressMessages(
-        bseqsc_basis(
+        bseqsc::bseqsc_basis(
             training_mat_bseq,
             Marker_Gene_List,
             clusters = 'subtype_vector',

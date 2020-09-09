@@ -16,7 +16,7 @@ Deconvolve_music = function(
         pData(model_basis)$sampleID = colnames(exprs(model_basis))
         subtypes = as.character(unique(pData(model_basis)$cellType))
         
-        Est.prop.GSE50244 = music_prop(
+        Est.prop.GSE50244 = MuSiC::music_prop(
             bulk.eset = deconvolution_data,
             sc.eset = model_basis,
             clusters = 'cellType',

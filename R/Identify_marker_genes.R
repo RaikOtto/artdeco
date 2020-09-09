@@ -19,6 +19,8 @@ identify_marker_genes = function(
     groups[groups != "CASE"] = "CTRL"
     design <- model.matrix(~0 + groups)
     colnames(design) = c("Case","Ctrl")
+    
+    Case = "Case"; Ctrl = "Ctrl"
 
     vfit = lmFit(expression_training_mat,design)
     contr.matrix = makeContrasts(
