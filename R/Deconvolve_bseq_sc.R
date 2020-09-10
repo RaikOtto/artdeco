@@ -20,7 +20,7 @@ Deconvolve_bseq_sc = function(
             deconvolution_data,
             model_basis,
             verbose = FALSE,
-            absolute = TRUE,
+            absolute = FALSE,
             log = FALSE,
             perm = nr_permutations
         )

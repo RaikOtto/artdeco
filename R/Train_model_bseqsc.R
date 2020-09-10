@@ -20,7 +20,7 @@
 #' improves the p-value estiamtes
 #' @param training_nr_marker_genes How many genes should be utilized
 #' as list of marker genes
-#' @import stringr
+#' @import stringr bseqsc
 #' @usage
 #' add_deconvolution_training_model_bseqsc(
 #'     transcriptome_data,

@@ -142,8 +142,6 @@ Deconvolve_transcriptome = function(
     } else {
         stop("Algorithm type not recognized. Options are music, bseqsc and DeconRNASeq, aborting.")
     }
-        
-    
 
     if ( output_file != "" ){
         message(paste("Writing output to file: ",output_file, sep =""))
