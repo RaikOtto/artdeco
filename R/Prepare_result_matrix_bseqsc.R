@@ -59,7 +59,7 @@ prepare_result_matrix_bseqsc = function(
             result_matrix_template[
                 result_matrix_template$model == model,
                 bseq_parameter
-            ] = prediction_stats[,1:4]
+            ] = prediction_stats[,1:ncol(prediction_stats)]
     }
     
     

@@ -14,9 +14,7 @@ Deconvolve_bseq_sc = function(
         model_basis = models_list[[pred_model]]
         model_basis = model_basis[[1]]
         
-        require(bseqsc)
-        
-        fit = bseqsc::bseqsc_proportions(
+        bseqsc_fit = bseqsc::bseqsc_proportions(
             deconvolution_data,
             model_basis,
             verbose = FALSE,
@@ -25,8 +23,8 @@ Deconvolve_bseq_sc = function(
             perm = nr_permutations
         )
         
-        prediction_res_coeff_list[[pred_model]] = fit$coefficients
-        prediction_stats_list[[pred_model]] = fit$stats
+        prediction_res_coeff_list[[pred_model]] = bseqsc_fit$coefficients
+        prediction_stats_list[[pred_model]] = bseqsc_fit$stats
     }
     
     # create results matrix called meta_data

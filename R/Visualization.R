@@ -372,7 +372,7 @@ create_PCA_deconvolution = function(
 
     # assert that graphics parameters are available
     if ( head(Graphics_parameters,1) == "" )
-        Graphics_parameters = artdeco::configure_graphics()
+        Graphics_parameters = artdeco:::configure_graphics()
     
     dif_index = grep(
         colnames(deconvolution_results),
@@ -511,7 +511,7 @@ create_heatmap_deconvolution = function(
 
     # assert that graphics parameters are available
     if ( head(Graphics_parameters,1) == "" )
-        Graphics_parameters = artdeco::configure_graphics()
+        Graphics_parameters = artdeco:::configure_graphics()
     
     if (utilize_sadanandam_genes == TRUE){
         meta_data_path = system.file(
