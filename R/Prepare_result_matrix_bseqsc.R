@@ -60,22 +60,8 @@ prepare_result_matrix_bseqsc = function(
                 result_matrix_template$model == model,
                 bseq_parameter
             ] = prediction_stats[,1:4]
-
-            #for (subtype in subtype_cands_found){
-                
-            #    result_matrix_template[ , subtype] = round((as.double(res_coeff[,subtype]) / row_sums)*100,1)
-            #    result_matrix_template[result_matrix_template[ , subtype] > 100,subtype] = 100
-            #}
     }
     
-    #colnames(result_matrix_template)[colnames(result_matrix_template) == "progenitor"] = "Progenitor"
-    #colnames(result_matrix_template)[colnames(result_matrix_template) == "hisc"] = "HISC"
-    #colnames(result_matrix_template)[colnames(result_matrix_template) == "alpha"] = "Alpha"
-    #colnames(result_matrix_template)[colnames(result_matrix_template) == "beta"] = "Beta"
-    #colnames(result_matrix_template)[colnames(result_matrix_template) == "gamma"] = "Gamma"
-    #colnames(result_matrix_template)[colnames(result_matrix_template) == "delta"] = "Delta"
-    #colnames(result_matrix_template)[colnames(result_matrix_template) == "acinar"] = "Acinar"
-    #colnames(result_matrix_template)[colnames(result_matrix_template) == "ductal"] = "Ductal"
     
     # add code from prepare_sample_result_matrix_NMF
     # so that columns subtype and strength_subtype are added
