@@ -36,8 +36,9 @@ Deconvolve_bseq_sc = function(
         models = models
     )
     
+    deconvolution_results$Sample = rownames(deconvolution_results)
     col_idx <- match(c("model", "alpha", "beta", "gamma", "delta", "acinar", "ductal", "hisc", "strength_subtype", "subtype", "sig_score",
-                       "p_value", "correlation", "rmse"), str_to_lower(colnames(deconvolution_results)))
+                       "p_value", "correlation", "rmse","sample"), str_to_lower(colnames(deconvolution_results)))
     deconvolution_results <- deconvolution_results[,col_idx]
     colnames(deconvolution_results)[colnames(deconvolution_results) == "Sig_score"] <- "score"
     
