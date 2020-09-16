@@ -70,9 +70,6 @@ prepare_result_matrix_bseqsc = function(
     result_matrix_template[,"Strength_subtype"] = rep("",nrow(result_matrix_template))
     result_matrix_template[,"Subtype"] = rep("",nrow(result_matrix_template))
     
-    res_cor = prediction_stats_list[[1]]
-    res_cor[ is.na(res_cor) ] = 0.0
-    
     cands_dif_1 = c("alpha","beta","gamma","delta","acinar","ductal")
     if("hisc" %in% colnames(result_matrix_template)){
         cands_dif_2 = "hisc"
@@ -85,7 +82,7 @@ prepare_result_matrix_bseqsc = function(
             !(cands_dif_1 %in% cands_dif_2)
         ]
     
-    for( j in 1:ncol(deconvolution_data)){
+    for( j in 1:nrow(result_matrix_template)){
         
         max_subtype = colnames(result_matrix_template[cands_dif])[
             which.max(result_matrix_template[j,cands_dif])
@@ -104,6 +101,7 @@ prepare_result_matrix_bseqsc = function(
         result_matrix_template[j,"Subtype"] = max_subtype
     }
     
+    result_matrix_template$Strength_subtype <- as.numeric(result_matrix_template$Strength_subtype)
     
     return(result_matrix_template)
 }

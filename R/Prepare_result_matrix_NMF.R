@@ -75,10 +75,7 @@ prepare_result_matrix_NMF = function(
     
     result_matrix_template[,"Strength_subtype"] = rep("",nrow(result_matrix_template))
     result_matrix_template[,"Subtype"] = rep("",nrow(result_matrix_template))
-    
-    #res_cor = prediction_stats_list[[1]]
-    #res_cor[ is.na(res_cor) ] = 0.0
-    
+
     cands_dif_1 = c("alpha","beta","gamma","delta","acinar","ductal")
     if("hisc" %in% colnames(result_matrix_template)){
         cands_dif_2 = "hisc"
@@ -113,7 +110,6 @@ prepare_result_matrix_NMF = function(
     }
     
     result_matrix_template$Strength_subtype <- as.numeric(result_matrix_template$Strength_subtype)
-    
     
     return(result_matrix_template)
 }
