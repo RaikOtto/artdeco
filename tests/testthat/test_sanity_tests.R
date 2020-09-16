@@ -6,18 +6,16 @@ test_that("Assert that data can be analyzed by Deconvolve_transcriptome", {
     data("visualization_data")
     data("deconvolution_results")
 
-    expect_true( nrow(visualization_data) == 12997 ) # do same for deconvolution_results
+    expect_true( nrow(visualization_data) == 12997 )
     expect_true( ncol(visualization_data) == 97 )
 
     deconvolution_results_test = Deconvolve_transcriptome(
          transcriptome_data = visualization_data
     )
 
-    expect_true(
-        nrow(deconvolution_results) == 97)
+    expect_true(nrow(deconvolution_results) == 97 )
 
-    expect_true(
-        ncol(deconvolution_results) == 14)
+    expect_true(ncol(deconvolution_results) == 14 )
 
     expect_true(
         identical(
@@ -40,6 +38,11 @@ test_that("Test if visualization works", {
     create_heatmap_deconvolution(
         visualization_data,
         deconvolution_results = deconvolution_results
+    )
+    
+    create_PCA_deconvolution(
+        visualization_data,
+        deconvolution_results
     )
 })
 
