@@ -15,10 +15,12 @@ prepare_result_matrix_NMF = function(
     rownames(result_matrix_template) = colnames(deconvolution_data)
     result_matrix_template_ori = result_matrix_template
     
-    for ( i in 1:( length(models) - 1)){
-        result_matrix_template = rbind(result_matrix_template, result_matrix_template_ori)
+    if (length(models) > 1){
+        for ( i in 1:( length(models) - 1)){
+            result_matrix_template = rbind(result_matrix_template, result_matrix_template_ori)
+        }
     }
-    
+        
     model_vec = rep("", nrow(result_matrix_template)) # create "model" column
     for(i in 1:length(models)){
         start_index =  (i-1) * nrow(result_matrix_template_ori)  + 1

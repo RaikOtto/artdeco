@@ -15,8 +15,10 @@ prepare_result_matrix_bseqsc = function(
     rownames(result_matrix_template) = colnames(deconvolution_data)
     result_matrix_template_ori = result_matrix_template
     
-    for ( i in 1:( length(models) - 1)){
-        result_matrix_template = rbind(result_matrix_template, result_matrix_template_ori)
+    if (length(models) > 1){
+        for ( i in 1:( length(models) - 1)){
+            result_matrix_template = rbind(result_matrix_template, result_matrix_template_ori)
+        }
     }
     
     model_vec = rep("", nrow(result_matrix_template))
@@ -102,6 +104,10 @@ prepare_result_matrix_bseqsc = function(
     }
     
     result_matrix_template$Strength_subtype <- as.numeric(result_matrix_template$Strength_subtype)
+    result_matrix_template$RMSE <- as.numeric(result_matrix_template$RMSE)
+    result_matrix_template$P_value <- as.numeric(result_matrix_template$P_value)
+    result_matrix_template$Correlation <- as.numeric(result_matrix_template$Correlation)
+    result_matrix_template$Sig_score <- as.numeric(result_matrix_template$Sig_score)
     
     return(result_matrix_template)
 }
