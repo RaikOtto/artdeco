@@ -116,7 +116,7 @@ remove_model_NMF = function(
 
 #' remove_model_music
 #'
-#' \code{remove_model_music} removes a model from the NMF library
+#' \code{remove_model_music} removes a model from the music library
 #'
 #' @param model_name Name of the model
 #' @param test_mode Testrun indicator

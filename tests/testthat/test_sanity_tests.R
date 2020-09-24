@@ -36,13 +36,13 @@ test_that("Test if visualization works", {
     data(visualization_data, envir = environment())
 
     create_heatmap_deconvolution(
-        visualization_data,
+        visualization_data = visualization_data,
         deconvolution_results = deconvolution_results
     )
     
     create_PCA_deconvolution(
-        visualization_data,
-        deconvolution_results
+        visualization_data = visualization_data,
+        deconvolution_results = deconvolution_results
     )
 })
 

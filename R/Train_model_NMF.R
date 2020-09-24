@@ -4,12 +4,11 @@
 #'
 #' @param transcriptome_data Transcriptomic data to be
 #' used for training. Has to contain the cell subtypes to which the
-#' similarity has to be calculated. Note that the first column has
-#' to contain the HGNC symbols and the header not! not the first
-#' sample name but a mere label for this HGNC row.
+#' similarity will be calculated. Note that the row names have
+#' to contain the HGNC symbols and the column names the sample names.
 #' @param model_name Name of the model
 #' @param subtype_vector Character vector containing the subtype
-#' labels of the training data samples
+#' labels of the training data samples (\code{transcriptome_data})
 #' @param rank_estimate Rank of the NMF model. Will be set to amount of 
 #' different subtypes defined in the subtype_vector if not specified manually
 #' @param exclude_non_interpretable_NMF_components Boolean parameter that indicates
