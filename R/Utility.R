@@ -1,3 +1,67 @@
+#' remove_model
+#'
+#' \code{remove_model} removes a model from a library
+#'
+#' @param model_name Name of the model
+#' @param lib_name Name of the library that contains the model ("NMF", "music" or "bseqsc")
+#' @param test_mode Testrun indicator
+#' @usage
+#' remove_model(
+#'     model_name,
+#'     lib_name,
+#'     test_mode
+#' )
+#' @examples
+#' remove_model(
+#'     model_name = "My_model",
+#'     lib_name = "bseqsc",
+#'     test_mode = TRUE
+#' )
+#' @import stringr
+#' @export
+remove_model = function(
+    model_name,
+    lib_name,
+    test_mode = FALSE
+){
+    
+    # procure path
+    model_name = str_replace_all(
+        model_name,
+        pattern = "(.rds)|(.RDS)",
+        ""
+    )
+    
+    model_path <- paste0(system.file("Models", package = "artdeco"), 
+                         "/", lib_name, "/", model_name, ".RDS")
+    #model_path = paste0(
+    #    c(system.file("Models/bseqsc", package = "artdeco"),
+    #      "/", paste0(model_name, ".RDS")
+    #    ), sep ="", collapse = ""
+    #)
+    
+    # check if model exists
+    if ( 
+        file.exists(model_path)
+    ){
+        file.remove(model_path)
+    }else if ( test_mode){
+        print("Test mode active")
+    }else{
+        stop(
+            paste0(
+                c(
+                    "Cannot delete model ",
+                    model_name,
+                    ", model not found. Check the library name."
+                ),
+                collapse = ""
+            )
+        )    
+    }
+    print(paste0("Deleted model ", model_name, "of library ", lib_name, "."))
+}
+
 #' remove_model_bseqsc
 #'
 #' \code{remove_model_bseqsc} removes a model from the bseqsc library
