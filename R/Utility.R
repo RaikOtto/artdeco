@@ -271,7 +271,7 @@ show_models = function(
         names(models) <- c("NMF", "music", "bseqsc")
         
     } else {
-        model_path = paste0(package_path, "/Models/", lib_name)
+        model_path = paste0(package_path, "Models/", lib_name)
         models = stringr::str_replace_all(
             list.files(model_path),
             pattern = ".RDS",
