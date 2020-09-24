@@ -3,7 +3,7 @@
 #' \code{remove_model} removes a model from a library
 #'
 #' @param model_name Name of the model
-#' @param lib_name Name of the library that contains the model ("NMF", "music" or "bseqsc")
+#' @param lib_name Name of the library that contains the model (e.g. "NMF", "music" or "bseqsc")
 #' @param test_mode Testrun indicator
 #' @usage
 #' remove_model(
@@ -21,7 +21,7 @@
 #' @export
 remove_model = function(
     model_name,
-    lib_name,
+    lib_name = "NMF",
     test_mode = FALSE
 ){
     
@@ -234,6 +234,51 @@ remove_model_music = function(
         )    
     }
     print(paste0("Deleted model: ",model_name))
+}
+
+#' show_models
+#'
+#' \code{show_models} shows which models have been trained for what library
+#'
+#'@param lib_name Specify the library (e.g. "NMF", "music", "bseqsc" or "all")
+#'@usage
+#' show_models(
+#' lib_name
+#' )
+#'@examples
+#' show_models(
+#' lib_name = "NMF"
+#' )
+#'@import stringr
+#'@export
+#'@return list of models
+show_models = function(
+    lib_name = "NMF"
+){
+    
+    package_path = system.file("", package = "artdeco")
+    
+    if (lib_name == "all"){
+        model_path_nmf <- paste0(package_path,"Models/NMF")
+        model_path_music <- paste0(package_path,"Models/music")
+        model_path_bseqsc <- paste0(package_path,"Models/bseqsc")
+        
+        nmf_models <- stringr::str_replace_all(list.files(model_path_nmf), pattern = ".RDS", "")
+        music_models <- stringr::str_replace_all(list.files(model_path_music), pattern = ".RDS", "")
+        bseqsc_models <- stringr::str_replace_all(list.files(model_path_bseqsc), pattern = ".RDS", "")
+        
+        models <- list(nmf_models, music_models, bseqsc_models)
+        names(models) <- c("NMF", "music", "bseqsc")
+        
+    } else {
+        model_path = paste0(package_path, "/Models/", lib_name)
+        models = stringr::str_replace_all(
+            list.files(model_path),
+            pattern = ".RDS",
+            "")
+    }
+    
+    return(models)
 }
 
 #' show_models_music
