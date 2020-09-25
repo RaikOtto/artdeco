@@ -1,7 +1,7 @@
 Package: artdeco
 Title: Alikeness based on Regression on Transciptome DECOnvolution
-Version: 0.99.1
-Authors@R: person("Raik", "Otto", email = "raik.otto@hu-berlin.de", role = c("aut", "cre"))
+Version: 0.99.2
+Authors@R: c(person("Raik", "Otto", role = c("aut", "cre"), email = 'raik.otto@hu-berlin.de'))
 Description: This packages determines the similarity cancer sample
  transcriptomes to samples with known differentiation stage. Training data input 
  are healthy training scRNA samples and either RNA-seq Bulk or microarray data. 
@@ -22,9 +22,7 @@ Depends:
 License: Artistic-2.0
 LazyData: TRUE
 Type: Package
-Maintainer: 'Raik Otto' <raik.otto@hu-berlin.de>
-Date: 2018-11-07
-Author: Raik Otto
+Date: 2020-09-07
 RoxygenNote: 7.1.0.9000
 NeedsCompilation: no
 Packaged: 2018-11-07 17:31:35 UTC; raikotto
