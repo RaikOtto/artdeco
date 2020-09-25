@@ -4,23 +4,22 @@
 #'
 #' @param transcriptome_data Path to transcriptomic data to be
 #' used for training. Has to contain the cell subtypes to which the
-#' similarity has to be calculated. Note that the first column has
-#' to contain the HGNC symbols and the header not! not the first
-#' sample name but a mere label for this HGNC row.
+#' similarity will be calculated. Note that the row names have
+#' to contain the HGNC symbols and the column names the sample names.
 #' @param model_name Name of the model
 #' @param subtype_vector Character vector containing the subtype
-#' labels of the training data samples
-#' @param marker_gene_list List the contains the marker genes
+#' labels of the training data samples (\code{transcriptome_data})
+#' @param marker_gene_list List that contains the marker genes
 #' for each subtype. Has to be in the type of list() with each
 #' subtype being an entry.
 #' @param training_p_value_threshold P-value at which a training
 #' is deemed successfull
 #' @param training_nr_permutations Amount of perturbation which
-#' result in a p-value. Higher number of perturbation generally
+#' results in a p-value. Higher number of perturbation generally
 #' improves the p-value estiamtes
 #' @param training_nr_marker_genes How many genes should be utilized
 #' as list of marker genes
-#' @import stringr
+#' @import stringr bseqsc
 #' @usage
 #' add_deconvolution_training_model_bseqsc(
 #'     transcriptome_data,

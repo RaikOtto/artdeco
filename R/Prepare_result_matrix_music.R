@@ -66,15 +66,7 @@ prepare_result_matrix_music = function(
         ## end fit 2
     }
     
-    #colnames(result_matrix)[colnames(result_matrix) == "progenitor"] = "Progenitor"
-    #colnames(result_matrix)[colnames(result_matrix) == "hisc"] = "HISC"
-    #colnames(result_matrix)[colnames(result_matrix) == "alpha"] = "Alpha"
-    #colnames(result_matrix)[colnames(result_matrix) == "beta"] = "Beta"
-    #colnames(result_matrix)[colnames(result_matrix) == "gamma"] = "Gamma"
-    #colnames(result_matrix)[colnames(result_matrix) == "delta"] = "Delta"
-    #colnames(result_matrix)[colnames(result_matrix) == "acinar"] = "Acinar"
-    #colnames(result_matrix)[colnames(result_matrix) == "ductal"] = "Ductal"
-    
+
     # add code from prepare_sample_result_matrix_NMF
     # so that columns subtype and strength_subtype are added
     # can be added; doesn't have to be added
@@ -94,7 +86,7 @@ prepare_result_matrix_music = function(
             !(cands_dif_1 %in% cands_dif_2)
         ]
     
-    for( j in 1:ncol(deconvolution_data)){
+    for( j in 1:nrow(result_matrix)){
         
         max_subtype = colnames(result_matrix[cands_dif])[
             which.max(result_matrix[j,cands_dif])
@@ -112,6 +104,8 @@ prepare_result_matrix_music = function(
         
         result_matrix[j,"Subtype"] = max_subtype
     }
+    
+    result_matrix$Strength_subtype <- as.numeric(result_matrix$Strength_subtype)
     
     return(result_matrix)
 }

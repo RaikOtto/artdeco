@@ -14,19 +14,17 @@ Deconvolve_bseq_sc = function(
         model_basis = models_list[[pred_model]]
         model_basis = model_basis[[1]]
         
-        require(bseqsc)
-        
-        fit = bseqsc::bseqsc_proportions(
+        bseqsc_fit = bseqsc::bseqsc_proportions(
             deconvolution_data,
             model_basis,
             verbose = FALSE,
-            absolute = TRUE,
+            absolute = FALSE,
             log = FALSE,
             perm = nr_permutations
         )
         
-        prediction_res_coeff_list[[pred_model]] = fit$coefficients
-        prediction_stats_list[[pred_model]] = fit$stats
+        prediction_res_coeff_list[[pred_model]] = bseqsc_fit$coefficients
+        prediction_stats_list[[pred_model]] = bseqsc_fit$stats
     }
     
     # create results matrix called meta_data
@@ -38,10 +36,9 @@ Deconvolve_bseq_sc = function(
         models = models
     )
     
-    col_idx <- match(c("model", "alpha", "beta", "gamma", "delta", "acinar", "ductal", "hisc", "Strength_subtype", "Subtype", "Sig_score",
-                       "P_value", "Correlation", "RMSE"), colnames(deconvolution_results))
+    col_idx <- match(c("model", "alpha", "beta", "gamma", "delta", "acinar", "ductal", "hisc", "strength_subtype", "subtype", "sig_score",
+                       "p_value", "correlation", "rmse"), str_to_lower(colnames(deconvolution_results)))
     deconvolution_results <- deconvolution_results[,col_idx]
-    colnames(deconvolution_results)[colnames(deconvolution_results) == "Sig_score"] <- "score"
     
     return(deconvolution_results)
 }

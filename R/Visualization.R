@@ -65,7 +65,7 @@ create_visualization_matrix = function(
     # differentiation score scaling, zero offset
     for ( score in c("Confidence_score_de_dif","Confidence_score_dif")){
         
-        vis_mat[,score] = as.double(vis_mat[,score])
+        vis_mat[,score] = 0#as.double(vis_mat[,score])
         vis_mat[vis_mat[,score] == 0.0,score] = 10^-5
         vis_mat[,score] = vis_mat[,score] - min(vis_mat[,score])
         off_set = rnorm(nrow(vis_mat),sd=0.0001,mean=0)
@@ -404,28 +404,15 @@ create_PCA_deconvolution = function(
     if (length(deconvolution_results$Grading) == 0){
         
         congruence_vec = visualization_data[grep(rownames(visualization_data),pattern = "mki",ignore.case = TRUE),]
-        #congruence_vec[(congruence_vec == "low" & vis_mat$Ratio == "low")] = "match"
-        #congruence_vec[(congruence_vec == "medium" & vis_mat$Ratio == "medium")] = "match"
-        #congruence_vec[(congruence_vec == "high" & vis_mat$Ratio == "high")] = "match"
-        
-        #congruence_vec_size = congruence_vec
-        #congruence_vec_size[congruence_vec_size == "match"] = 1
-        #congruence_vec_size[congruence_vec_size != 1      ] = 5
-        #congruence_vec = factor(congruence_vec,levels = c("high","medium","low","match"))
 
     } else {
     
         congruence_vec = deconvolution_results$Grading
-        #congruence_vec[(congruence_vec == "G1" & vis_mat$Ratio == "low")] = "match"
-        #congruence_vec[(congruence_vec == "G2" & vis_mat$Ratio == "medium")] = "match"
-        #congruence_vec[(congruence_vec == "G3" & vis_mat$Ratio == "high")] = "match"
-        #congruence_vec_size = congruence_vec
-        #congruence_vec_size[congruence_vec_size == "match"] = 1
-        #congruence_vec_size[congruence_vec_size != 1      ] = 5
     }
 
     meta_vis_data = as.matrix(deconvolution_results[,c("Subtype")])
     rownames(meta_vis_data) = rownames(deconvolution_results)
+    
     p = ggbiplot::ggbiplot(
         pcr,
         #obs.scale = .75,
@@ -435,28 +422,6 @@ create_PCA_deconvolution = function(
         var.axes = FALSE,
         labels = names(congruence_vec)
     )
-    #p = p + geom_point( 
-    #    aes( 
-    #        size = as.integer(congruence_vec_size)#,
-    #        #shape = vis_mat$Ratio
-    #    ),
-    #    color = "black", stroke = .1
-    #)
-    #p = p + geom_point(
-    #    aes(
-    #        colour = congruence_vec,
-    #        shape = as.character(congruence_vec),
-    #        size = 3
-    #    )
-    #)
-    #p = p + guides(
-    #    color = guide_legend(
-    #        title="Grading & ratio"
-    #    ),
-    #    #size = guide_legend(title="Ratio"),
-    #    shape =  guide_legend(title="Grading")
-    #)
-    #p = p + scale_color_manual( values = c("Darkgreen","Orange","Red","black","Green","Yellow") ) + scale_size(guide="none")
     plot(p)
 }
 

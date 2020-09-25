@@ -15,10 +15,12 @@ prepare_result_matrix_NMF = function(
     rownames(result_matrix_template) = colnames(deconvolution_data)
     result_matrix_template_ori = result_matrix_template
     
-    for ( i in 1:( length(models) - 1)){
-        result_matrix_template = rbind(result_matrix_template, result_matrix_template_ori)
+    if (length(models) > 1){
+        for ( i in 1:( length(models) - 1)){
+            result_matrix_template = rbind(result_matrix_template, result_matrix_template_ori)
+        }
     }
-    
+        
     model_vec = rep("", nrow(result_matrix_template)) # create "model" column
     for(i in 1:length(models)){
         start_index =  (i-1) * nrow(result_matrix_template_ori)  + 1
@@ -67,17 +69,7 @@ prepare_result_matrix_NMF = function(
         #    result_matrix_template[result_matrix_template[ , subtype] > 100,subtype] = 100
         #}
     }
-    
 
-    #colnames(result_matrix_template)[colnames(result_matrix_template) == "progenitor"] = "Progenitor"
-    #colnames(result_matrix_template)[colnames(result_matrix_template) == "hisc"] = "HISC"
-    #colnames(result_matrix_template)[colnames(result_matrix_template) == "alpha"] = "Alpha"
-    #colnames(result_matrix_template)[colnames(result_matrix_template) == "beta"] = "Beta"
-    #colnames(result_matrix_template)[colnames(result_matrix_template) == "gamma"] = "Gamma"
-    #colnames(result_matrix_template)[colnames(result_matrix_template) == "delta"] = "Delta"
-    #colnames(result_matrix_template)[colnames(result_matrix_template) == "acinar"] = "Acinar"
-    #colnames(result_matrix_template)[colnames(result_matrix_template) == "ductal"] = "Ductal"
-    
     
     # add code from prepare_sample_result_matrix_NMF
     # so that columns subtype and strength_subtype are added
@@ -85,10 +77,7 @@ prepare_result_matrix_NMF = function(
     
     result_matrix_template[,"Strength_subtype"] = rep("",nrow(result_matrix_template))
     result_matrix_template[,"Subtype"] = rep("",nrow(result_matrix_template))
-    
-    res_cor = prediction_stats_list[[1]]
-    res_cor[ is.na(res_cor) ] = 0.0
-    
+
     cands_dif_1 = c("alpha","beta","gamma","delta","acinar","ductal")
     if("hisc" %in% colnames(result_matrix_template)){
         cands_dif_2 = "hisc"
@@ -101,7 +90,8 @@ prepare_result_matrix_NMF = function(
             !(cands_dif_1 %in% cands_dif_2)
         ]
     
-    for( j in 1:ncol(deconvolution_data)){
+    
+    for( j in 1:nrow(result_matrix_template)){
         
         max_subtype = colnames(result_matrix_template[cands_dif])[
             which.max(result_matrix_template[j,cands_dif])
@@ -120,6 +110,8 @@ prepare_result_matrix_NMF = function(
         
         result_matrix_template[j,"Subtype"] = max_subtype
     }
+    
+    result_matrix_template$Strength_subtype <- as.numeric(result_matrix_template$Strength_subtype)
     
     return(result_matrix_template)
 }
