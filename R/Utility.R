@@ -259,9 +259,9 @@ show_models = function(
     package_path = system.file("", package = "artdeco")
     
     if (lib_name == "all"){
-        model_path_nmf <- paste0(package_path,"Models/NMF")
-        model_path_music <- paste0(package_path,"Models/music")
-        model_path_bseqsc <- paste0(package_path,"Models/bseqsc")
+        model_path_nmf <- paste0(package_path,"/Models/NMF")
+        model_path_music <- paste0(package_path,"/Models/music")
+        model_path_bseqsc <- paste0(package_path,"/Models/bseqsc")
         
         nmf_models <- stringr::str_replace_all(list.files(model_path_nmf), pattern = ".RDS", "")
         music_models <- stringr::str_replace_all(list.files(model_path_music), pattern = ".RDS", "")
@@ -271,7 +271,7 @@ show_models = function(
         names(models) <- c("NMF", "music", "bseqsc")
         
     } else {
-        model_path = paste0(package_path, "Models/", lib_name)
+        model_path = paste0(package_path, "/Models/", lib_name)
         models = stringr::str_replace_all(
             list.files(model_path),
             pattern = ".RDS",
