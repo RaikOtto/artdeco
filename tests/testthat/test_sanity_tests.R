@@ -48,8 +48,8 @@ test_that("Test if visualization works", {
 
 
 
-test_that("Adding models", {
-    ### adding models
+test_that("Adding, showing and removing models", {
+    # add model
 
     data(meta_data)
     
@@ -58,7 +58,7 @@ test_that("Adding models", {
     
     rownames(meta_data) = as.character(meta_data$Name)
 
-    subtype_vector = meta_data$Subtype # extract the training sample subtype labels
+    subtype_vector = as.character(meta_data$Subtype) # extract the training sample subtype labels
 
     data("Lawlor")
     expect_true( nrow(Lawlor) == 20655)
@@ -66,35 +66,45 @@ test_that("Adding models", {
 
     model_name = "My_model"
     model_path = paste(
-        c(system.file("Models/NMF", package="artdeco"),"/",model_name,".RDS"),
+        c(system.file("Models/NMF", package="artdeco"),"/", model_name,".RDS"),
         collapse = ""
     )
+    
+    add_deconvolution_training_model_NMF(
+        transcriptome_data = Lawlor,
+        model_name = model_name,
+        subtype_vector = subtype_vector,
+        rank_estimate = 0,
+        exclude_non_interpretable_NMF_components = FALSE,
+        training_nr_marker_genes = 100,
+        parallel_processes = 1,
+        nrun = 1
+    )
+    
+    # test existence of newly added model
+    expect_true(file.exists(model_path))
+    nmf_models <- show_models_NMF()
+    nmf_models_too <- show_models(lib_name = "NMF")
+    
+    expect_true(tail(nmf_models, 1) == model_name)
+    expect_true(tail(nmf_models_too, 1) == model_name)
+
+        
+    # test if model is non-empty
+    #new_model <- readRDS(model_path)
+    
+    #expect_true(dim(new_model@fit@W) == c(595, 8))
+    #expect_true(dim(new_model@fit@H) == c(8, 638))
+    
+    #expect_true(all(colnames(new_model@fit@H) == colnames(Lawlor)))
+    
 
     # remove model
     if (file.exists(model_path))
         remove_model_NMF(
             model_name = model_name
-        )
-
-    data(meta_data)
-     
-    subtype_vector = as.character(meta_data$Subtype) # extract the training sample subtype labels
-     
-    add_deconvolution_training_model_NMF(
-         transcriptome_data = Lawlor,
-         model_name = model_name,
-         subtype_vector = subtype_vector,
-         rank_estimate = 0,
-         exclude_non_interpretable_NMF_components = FALSE,
-         training_nr_marker_genes = 100,
-         parallel_processes = 1,
-         nrun = 1
-    )
+        ) # or remove_model(model_name = model_name, lib_name = "NMF")
     
-    expect_true(file.exists(model_path))
+    expect_true(!file.exists(model_path))
 
-    # remove model
-    remove_model_NMF(
-        model_name = model_name
-    )
 })

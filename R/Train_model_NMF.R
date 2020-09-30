@@ -78,6 +78,10 @@ add_deconvolution_training_model_NMF = function(
             )
         )
     }
+    
+    if (class(subtype_vector) == "factor"){
+        stop(paste0("subtype_vector has to be a character vector"))
+    }
 
     if (length(subtype_vector) == 0)
         stop(paste0("You have to provide the sample subtypes labels for model training"))
