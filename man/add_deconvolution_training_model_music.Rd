@@ -13,14 +13,13 @@ add_deconvolution_training_model_music(
 \arguments{
 \item{transcriptome_data}{Path to transcriptomic data to be
 used for training. Has to contain the cell subtypes to which the
-similarity has to be calculated. Note that the first column has
-to contain the HGNC symbols and the header not! not the first
-sample name but a mere label for this HGNC row.}
+similarity will be calculated. Note that the row names have
+to contain the HGNC symbols and the column names the sample names.}
 
 \item{model_name}{Name of the model}
 
 \item{subtype_vector}{Character vector containing the subtype
-labels of the training data samples}
+labels of the training data samples (\code{transcriptome_data})}
 }
 \value{
 Stores a new model in the package directory

@@ -17,16 +17,15 @@ add_deconvolution_training_model_bseqsc(
 \arguments{
 \item{transcriptome_data}{Path to transcriptomic data to be
 used for training. Has to contain the cell subtypes to which the
-similarity has to be calculated. Note that the first column has
-to contain the HGNC symbols and the header not! not the first
-sample name but a mere label for this HGNC row.}
+similarity will be calculated. Note that the row names have
+to contain the HGNC symbols and the column names the sample names.}
 
 \item{model_name}{Name of the model}
 
 \item{subtype_vector}{Character vector containing the subtype
-labels of the training data samples}
+labels of the training data samples (\code{transcriptome_data})}
 
-\item{marker_gene_list}{List the contains the marker genes
+\item{marker_gene_list}{List that contains the marker genes
 for each subtype. Has to be in the type of list() with each
 subtype being an entry.}
 
@@ -34,7 +33,7 @@ subtype being an entry.}
 is deemed successfull}
 
 \item{training_nr_permutations}{Amount of perturbation which
-result in a p-value. Higher number of perturbation generally
+results in a p-value. Higher number of perturbation generally
 improves the p-value estiamtes}
 
 \item{training_nr_marker_genes}{How many genes should be utilized
