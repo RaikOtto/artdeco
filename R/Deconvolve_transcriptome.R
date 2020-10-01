@@ -140,7 +140,7 @@ Deconvolve_transcriptome = function(
         )
         
     } else {
-        stop("Algorithm type not recognized. Options are music, bseqsc and DeconRNASeq, aborting.")
+        stop("Algorithm type not recognized. Options are music, bseqsc and nmf, aborting.")
     }
 
     if ( output_file != "" ){

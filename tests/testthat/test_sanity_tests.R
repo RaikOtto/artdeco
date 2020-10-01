@@ -21,6 +21,16 @@ test_that("Assert that data can be analyzed by Deconvolve_transcriptome", {
             colnames(deconvolution_results_test),
             c("model", "alpha", "beta", "gamma", "delta", "acinar", "ductal", "hisc","Strength_subtype", "Subtype", "score")
         )
+    
+    expect_error(deconvolution_results_test = Deconvolve_transcriptome(
+        transcriptome_data = visualization_data,
+        deconvolution_algorithm = "DeconRNASeq"
+    ))
+    expect_error(deconvolution_results_test = Deconvolve_transcriptome(
+        transcriptome_data = visualization_data,
+        models = "my_model"
+    ))
+    
 })
 
 
@@ -77,15 +87,33 @@ test_that("Adding, showing and removing models", {
         collapse = ""
     )
     
+    expect_error(add_deconvolution_training_model_NMF( # no model name given
+        transcriptome_data = Lawlor,
+        subtype_vector = subtype_vector
+    ))
+    
+    expect_error(add_deconvolution_training_model_NMF( # model already exists
+        transcriptome_data = Lawlor,
+        model_name = "Alpha_Beta_Gamma_Delta_Acinar_Ductal_Baron",
+        subtype_vector = subtype_vector
+    ))
+    
+    expect_error(add_deconvolution_training_model_NMF( # subtype_vector is not character vector
+        transcriptome_data = Lawlor,
+        model_name = model_name,
+        subtype_vector = meta_data$Subtype
+    ))
+    
+    expect_error(add_deconvolution_training_model_NMF( # no subtype labels given
+        transcriptome_data = Lawlor,
+        model_name = model_name,
+        subtype_vector = c()
+    ))
+    
     add_deconvolution_training_model_NMF(
         transcriptome_data = Lawlor,
         model_name = model_name,
-        subtype_vector = subtype_vector,
-        rank_estimate = 0,
-        exclude_non_interpretable_NMF_components = FALSE,
-        training_nr_marker_genes = 100,
-        parallel_processes = 1,
-        nrun = 1
+        subtype_vector = subtype_vector
     )
     
     # test existence of newly added model
