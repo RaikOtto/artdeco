@@ -1,6 +1,6 @@
 Package: artdeco
 Title: Alikeness based on Regression on Transciptome DECOnvolution
-Version: 0.99.2
+Version: 0.99.3
 Authors@R: c(person("Raik", "Otto", role = c("aut", "cre"), email = 'raik.otto@hu-berlin.de'))
 Description: This packages determines the similarity cancer sample
  transcriptomes to samples with known differentiation stage. Training data input 
@@ -17,13 +17,14 @@ Imports:
     GEOquery,
     Biobase,
     devtools
+Remotes: git::https://https://github.com/xuranw/MuSiC.git
 Depends: 
     R (>= 3.6)
 License: Artistic-2.0
 LazyData: TRUE
 Type: Package
 Date: 2020-09-07
-RoxygenNote: 7.1.0.9000
+RoxygenNote: 7.1.1
 NeedsCompilation: no
 Packaged: 2018-11-07 17:31:35 UTC; raikotto
 Suggests: 

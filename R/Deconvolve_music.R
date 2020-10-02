@@ -7,7 +7,6 @@
 #' @param models_list List of models to be used.
 #' @param models Which model to use
 #' @param nr_permutations Amount perturbations
-#' @import xbioc
 Deconvolve_music = function(
     deconvolution_data,
     models_list,

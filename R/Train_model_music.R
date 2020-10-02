@@ -52,14 +52,15 @@ add_deconvolution_training_model_music = function(
             )
         )
     }
-
+    
+    subtype_vector = as.character(subtype_vector)
+    
     if (class(subtype_vector) == "factor"){
         stop(paste0("subtype_vector has to be a character vector"))
     }
     
     if (length(subtype_vector) == 0)
         stop(paste0("You have to provide the sample subtypes labels for model training"))
-    #subtype_vector = str_to_lower(subtype_vector)
 
     expression_training_mat = transcriptome_data
 
@@ -76,7 +77,7 @@ add_deconvolution_training_model_music = function(
     fData(eset) = data.frame( as.character(subtype_vector) )
     colnames(fData(eset)) = "cellType"
     pData(eset)$sampleID = colnames(expression_training_mat)
-    pData(eset)$cellType = fData(eset)$cellType
+    pData(eset)$cellType = as.character(fData(eset)$cellType)
 
     model = list(
         eset
