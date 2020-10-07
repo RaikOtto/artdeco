@@ -7,15 +7,13 @@ test_that("Assert that data can be analyzed by Deconvolve_transcriptome", {
     data("visualization_data")
     data("deconvolution_results")
 
-    expect_equal(nrow(visualization_data), 12997)
-    expect_equal(ncol(visualization_data), 97)
+    expect_equal(dim(visualization_data), c(12997, 97))
 
     deconvolution_results_test = Deconvolve_transcriptome(
          transcriptome_data = visualization_data
     )
 
-    expect_equal(nrow(deconvolution_results), 97)
-    expect_equal(ncol(deconvolution_results), 14)
+    expect_equal(dim(deconvolution_results), c(97, 14))
 
     expect_identical(
             colnames(deconvolution_results_test),
@@ -69,16 +67,14 @@ test_that("Adding, showing and removing models", {
 
     data(meta_data)
     
-    expect_equal(nrow(meta_data), 638)
-    expect_equal(ncol(meta_data), 15)
+    expect_equal(dim(meta_data), c(638, 15))
     
     rownames(meta_data) = as.character(meta_data$Name)
 
     subtype_vector = as.character(meta_data$Subtype) # extract the training sample subtype labels
 
     data("Lawlor")
-    expect_equal(nrow(Lawlor), 20655)
-    expect_equal(ncol(Lawlor), 638)
+    expect_equal(dim(Lawlor), c(20655, 638))
 
     # add new model
     model_name = "My_model"
