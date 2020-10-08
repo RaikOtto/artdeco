@@ -17,7 +17,7 @@ Imports:
     GEOquery,
     Biobase,
     devtools
-Remotes: git::https://https://github.com/xuranw/MuSiC.git
+Remotes: git::https://github.com/xuranw/MuSiC.git
 Depends: 
     R (>= 3.6)
 License: Artistic-2.0
