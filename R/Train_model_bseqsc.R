@@ -74,7 +74,7 @@ add_deconvolution_training_model_bseqsc = function(
         )
     }
     
-    if (class(subtype_vector) == "factor"){
+    if (!is.character(subtype_vector)){
         stop(paste0("subtype_vector has to be a character vector"))
     }
 

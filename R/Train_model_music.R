@@ -20,7 +20,7 @@
 #' data("Lawlor") # Data from Lawlor et al.
 #' data(meta_data)
 #' 
-#' subtype_vector = meta_data$Subtype # extract the training sample subtype labels
+#' subtype_vector = as.character(meta_data$Subtype) # extract the training sample subtype labels
 #' add_deconvolution_training_model_music(
 #'     transcriptome_data = Lawlor,
 #'     model_name = "my_model",
@@ -53,9 +53,9 @@ add_deconvolution_training_model_music = function(
         )
     }
     
-    subtype_vector = as.character(subtype_vector)
+    #subtype_vector = as.character(subtype_vector)
     
-    if (class(subtype_vector) == "factor"){
+    if (!is.character(subtype_vector)){
         stop(paste0("subtype_vector has to be a character vector"))
     }
     

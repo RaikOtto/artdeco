@@ -22,7 +22,8 @@ Deconvolve_NMF = function(
     
         dec_data = as.data.frame(exprs(deconvolution_data))
         if (rownames(dec_data)[1] == "1"){
-            stop("Genenames of input data missing, only found '1' as first gene name.")
+            stop("Genenames of input data missing, only found '1' as first 
+                 gene name.")
         }
         W = W[rownames(W) %in% rownames(dec_data),]
         dec_data = dec_data[rownames(dec_data) %in% rownames(W),]
@@ -59,8 +60,10 @@ Deconvolve_NMF = function(
         models = models
     )
     
-    col_idx <- match(c("model", "alpha", "beta", "gamma", "delta", "acinar", "ductal", "hisc", "Strength_subtype", "Subtype", "score"), 
-                     colnames(deconvolution_results))
+    col_idx <- match(c("model", "alpha", "beta", "gamma", "delta", "acinar", 
+                       "ductal", "hisc", "Strength_subtype", "Subtype", 
+                       "score"), colnames(deconvolution_results))
+    
     deconvolution_results <- deconvolution_results[,col_idx]
     
     return(deconvolution_results)
