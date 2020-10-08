@@ -31,7 +31,7 @@ Stores a new model in the package directory
 data("Lawlor") # Data from Lawlor et al.
 data(meta_data)
 
-subtype_vector = meta_data$Subtype # extract the training sample subtype labels
+subtype_vector = as.character(meta_data$Subtype) # extract the training sample subtype labels
 add_deconvolution_training_model_music(
     transcriptome_data = Lawlor,
     model_name = "my_model",

@@ -7,8 +7,9 @@
 Deconvolve_music(deconvolution_data, models_list, models, nr_permutations)
 }
 \arguments{
-\item{deconvolution_data}{A data frame that contains the gene expression data.
-Rows are expected to be HGNC symbols and columns are expected to contain the samples.}
+\item{deconvolution_data}{A data frame that contains the gene expression 
+data. Rows are expected to be HGNC symbols and columns are expected to 
+contain the samples.}
 
 \item{models_list}{List of models to be used.}
 
