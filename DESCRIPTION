@@ -16,7 +16,8 @@ Imports:
     NMF,
     GEOquery,
     Biobase,
-    devtools
+    devtools,
+    xbioc
 Remotes: 
     git::https://github.com/xuranw/MuSiC.git
     git::https://github.com/renozao/xbioc.git
