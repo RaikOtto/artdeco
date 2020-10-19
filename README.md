@@ -15,5 +15,7 @@ remotes::install_github("RaikOtto/artdeco")
 ```
 
 ## More Information
-Please see the [artdeco wiki](https://github.com/RaikOtto/artdeco/wiki).
-Contact: raik.otto@hu-berlin.de
+Please see the [artdeco wiki](https://github.com/RaikOtto/artdeco/wiki).   
+
+***
+Contact: [raik.otto@hu-berlin.de](mailto:raik.otto@hu-berlin.de)
