@@ -23,23 +23,24 @@ Notice the convention that the row names have to contain the HGNC identifier}
 by the deconvolution analysis}
 
 \item{aggregate_differentiated_stages}{Whether to aggregate the deconvolution
-results}
+results. Default vale FALSE.}
 
-\item{confidence_threshold}{Threshold at which to discard a prediction}
+\item{confidence_threshold}{Threshold at which to discard a prediction. 
+Default value 1.1}
 
 \item{Graphics_parameters}{Pheatmap visualization paramters.
 You can customize visualization colors.
 Read the vignette for more information.}
 
 \item{high_threshold}{Threshold at which to define a deconvolution results
-as 'high'}
+as 'high'. Default value 101.}
 
 \item{low_threshold}{Threshold at which to define a deconvolution results
-as 'low'}
+as 'low'. Default value 0.}
 
 \item{utilize_sadanandam_genes}{Whether to utilize the same genes as the 
 Sadanandam et al publication which have been utilize to create the DECO
-manuscript visualizations}
+manuscript visualizations. Default value FALSE.}
 }
 \description{
 \code{create_PCA_deconvolution}

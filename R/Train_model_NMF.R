@@ -10,15 +10,15 @@
 #' @param subtype_vector Character vector containing the subtype
 #' labels of the training data samples (\code{transcriptome_data})
 #' @param rank_estimate Rank of the NMF model. Will be set to amount of 
-#' different subtypes defined in the subtype_vector if not specified manually
+#' different subtypes defined in the subtype_vector if not specified manually.
 #' @param exclude_non_interpretable_NMF_components Boolean parameter that indicates
 #' whether trained NMF components that cannot clearly be associated with either an endocrine
-#' or acinar & ductal or hisc subtyp shall be excluded
+#' or acinar & ductal or hisc subtyp shall be excluded. Default value FALSE.
 #' @param training_nr_marker_genes Amount of genes to be utilized as marker genes
-#' for each cell type
+#' for each cell type. Default value 100.
 #' @param parallel_processes Amount of parallel processes used for training. Warning, RAM
-#' utilization increases linearly.
-#' @param nrun Amount of times the NMF model will be trained
+#' utilization increases linearly. Default value 1.
+#' @param nrun Amount of times the NMF model will be trained. Default value 10.
 #' @import stringr NMF
 #' @usage
 #' add_deconvolution_training_model_NMF(

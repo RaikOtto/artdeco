@@ -4,7 +4,7 @@
 #'
 #' @param model_name Name of the model
 #' @param lib_name Name of the library that contains the model (e.g. "NMF", "music" or "bseqsc")
-#' @param test_mode Testrun indicator
+#' @param test_mode Testrun indicator. Default value FALSE.
 #' @usage
 #' remove_model(
 #'     model_name,
@@ -67,7 +67,7 @@ remove_model = function(
 #' \code{remove_model_bseqsc} removes a model from the bseqsc library
 #'
 #' @param model_name Name of the model
-#' @param test_mode Testrun indicator
+#' @param test_mode Testrun indicator. Default value FALSE.
 #' @usage
 #' remove_model_bseqsc(
 #'     model_name,
@@ -125,7 +125,7 @@ remove_model_bseqsc = function(
 #' \code{remove_model_NMF} removes a model from the NMF library
 #'
 #' @param model_name Name of the model
-#' @param test_mode Testrun indicator
+#' @param test_mode Testrun indicator. Default value FALSE.
 #' @usage
 #' remove_model_NMF(
 #'     model_name,
@@ -183,7 +183,7 @@ remove_model_NMF = function(
 #' \code{remove_model_music} removes a model from the music library
 #'
 #' @param model_name Name of the model
-#' @param test_mode Testrun indicator
+#' @param test_mode Testrun indicator. Default value FALSE.
 #' @usage
 #' remove_model_music(
 #'     model_name,

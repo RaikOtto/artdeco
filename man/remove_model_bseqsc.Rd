@@ -12,7 +12,7 @@ remove_model_bseqsc(
 \arguments{
 \item{model_name}{Name of the model}
 
-\item{test_mode}{Testrun indicator}
+\item{test_mode}{Testrun indicator. Default value FALSE.}
 }
 \description{
 \code{remove_model_bseqsc} removes a model from the bseqsc library

@@ -294,18 +294,19 @@ create_visualization_matrix = function(
 #' @param deconvolution_results The dataframe returned
 #' by the deconvolution analysis
 #' @param aggregate_differentiated_stages Whether to aggregate the deconvolution
-#' results
-#' @param confidence_threshold Threshold at which to discard a prediction
+#' results. Default vale FALSE.
+#' @param confidence_threshold Threshold at which to discard a prediction. 
+#' Default value 1.1
 #' @param Graphics_parameters Pheatmap visualization paramters.
 #' You can customize visualization colors.
 #' Read the vignette for more information.
 #' @param high_threshold Threshold at which to define a deconvolution results
-#' as 'high'
+#' as 'high'. Default value 101.
 #' @param low_threshold Threshold at which to define a deconvolution results
-#' as 'low'
+#' as 'low'. Default value 0.
 #' @param utilize_sadanandam_genes Whether to utilize the same genes as the 
 #' Sadanandam et al publication which have been utilize to create the DECO
-#' manuscript visualizations
+#' manuscript visualizations. Default value FALSE.
 #' @usage
 #' create_PCA_deconvolution(
 #'    visualization_data,
@@ -441,10 +442,10 @@ create_PCA_deconvolution = function(
 #' @param aggregate_differentiated_stages Show the differentiation stage similarities
 #' aggregated over all differentiated stages - alpha, beta, gamma, delta
 #' accinar and ductal - or specific for each differentiation stage.
-#' Default value FALSE, alternative value TRUE
+#' Default value FALSE, alternative value TRUE.
 #' @param confidence_threshold Threshold above which deconvolutions are deemed unsuccessful
-#' and corresponding results being masked on the the plots
-#' @param show_colnames Whether to show the sample column names
+#' and corresponding results being masked on the the plots. Default value 1.1
+#' @param show_colnames Whether to show the sample column names. Default value FALSE
 #' @param Graphics_parameters Pheatmap visualization paramters.
 #' You can customize visualization colors.
 #' Read the vignette for more information.
@@ -456,7 +457,7 @@ create_PCA_deconvolution = function(
 #' identify a signficance threshold for a low similarity.
 #' @param utilize_sadanandam_genes Whether to utilize the same genes as the 
 #' Sadanandam et al publication which have been utilize to create the DECO
-#' manuscript visualizations
+#' manuscript visualizations. Default value FALSE.
 #' @usage
 #' create_heatmap_deconvolution(
 #'     visualization_data,

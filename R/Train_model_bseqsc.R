@@ -13,12 +13,12 @@
 #' for each subtype. Has to be in the type of list() with each
 #' subtype being an entry.
 #' @param training_p_value_threshold P-value at which a training
-#' is deemed successfull
+#' is deemed successfull. Default value 0.05
 #' @param training_nr_permutations Amount of perturbation which
 #' results in a p-value. Higher number of perturbation generally
-#' improves the p-value estiamtes
+#' improves the p-value estiamtes. Default 100.
 #' @param training_nr_marker_genes How many genes should be utilized
-#' as list of marker genes
+#' as list of marker genes. Default 100.
 #' @import stringr
 #' @usage
 #' add_deconvolution_training_model_bseqsc(

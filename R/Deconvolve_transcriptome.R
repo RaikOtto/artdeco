@@ -11,10 +11,10 @@
 #' @param models List of models to be used. Use show_models_NMF(),
 #' show_models_music() or show_models_bseqsc()
 #' to view available models or add new model via
-#' add_deconvolution_training_model()
+#' add_deconvolution_training_model_*()
 #' @param nr_permutations Utilized to calculate p-value
 #' Higher amount of permutations generally lead to more
-#' precise p-value estimates
+#' precise p-value estimates. Default value 1000.
 #' @param output_file Path of output file. If not specified,
 #' no hard-disk written output will occur.
 #' @import NMF

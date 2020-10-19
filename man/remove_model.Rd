@@ -15,7 +15,7 @@ remove_model(
 
 \item{lib_name}{Name of the library that contains the model (e.g. "NMF", "music" or "bseqsc")}
 
-\item{test_mode}{Testrun indicator}
+\item{test_mode}{Testrun indicator. Default value FALSE.}
 }
 \description{
 \code{remove_model} removes a model from a library

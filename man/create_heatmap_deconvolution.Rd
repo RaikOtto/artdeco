@@ -27,12 +27,12 @@ by the deconvolution analysis}
 \item{aggregate_differentiated_stages}{Show the differentiation stage similarities
 aggregated over all differentiated stages - alpha, beta, gamma, delta
 accinar and ductal - or specific for each differentiation stage.
-Default value FALSE, alternative value TRUE}
+Default value FALSE, alternative value TRUE.}
 
 \item{confidence_threshold}{Threshold above which deconvolutions are deemed unsuccessful
-and corresponding results being masked on the the plots}
+and corresponding results being masked on the the plots. Default value 1.1}
 
-\item{show_colnames}{Whether to show the sample column names}
+\item{show_colnames}{Whether to show the sample column names. Default value FALSE}
 
 \item{Graphics_parameters}{Pheatmap visualization paramters.
 You can customize visualization colors.
@@ -48,7 +48,7 @@ identify a signficance threshold for a low similarity.}
 
 \item{utilize_sadanandam_genes}{Whether to utilize the same genes as the 
 Sadanandam et al publication which have been utilize to create the DECO
-manuscript visualizations}
+manuscript visualizations. Default value FALSE.}
 }
 \value{
 Plots
