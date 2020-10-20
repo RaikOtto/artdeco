@@ -12,16 +12,21 @@ create_visualization_matrix = function(
 
     # init variables
     
-    subtype_cands = c("alpha","beta","gamma","delta","acinar","ductal","progenitor","hisc")
+    subtype_cands = c("alpha","beta","gamma","delta","acinar","ductal",
+                      "progenitor","hisc")
     cands_dif_endocrine = c("alpha","beta","gamma","delta")
     cands_dif_exokrine = c("ductal","acinar")
     
     # get the index for differentiated state
     
-    model_1 = head(unlist(str_split(as.character(deconvolution_results$model),pattern = "\\|")),1)
-    model_2 = head(unlist(str_split(as.character(deconvolution_results$model),pattern = "\\|")),2)[2]
-    subtypes_1 = str_to_lower(as.character(unlist(str_split(model_1,pattern="_"))))
-    subtypes_2 = str_to_lower(as.character(unlist(str_split(model_2,pattern="_"))))
+    model_1 = head(unlist(str_split(as.character(deconvolution_results$model),
+                                    pattern = "\\|")),1)
+    model_2 = head(unlist(str_split(as.character(deconvolution_results$model),
+                                    pattern = "\\|")),2)[2]
+    subtypes_1 = str_to_lower(as.character(unlist(str_split(model_1,
+                                                            pattern="_"))))
+    subtypes_2 = str_to_lower(as.character(unlist(str_split(model_2,
+                                                            pattern="_"))))
     subtypes_1 = subtypes_1[str_to_lower(subtypes_1) %in% subtype_cands]
     subtypes_2 = subtypes_2[str_to_lower(subtypes_2) %in% subtype_cands]
     cands_dif_2 = subtypes_2[!(subtypes_2 %in% subtypes_1)]
@@ -43,7 +48,8 @@ create_visualization_matrix = function(
         )
     )
     colnames(deconvolution_results)[c(cands_1_index,cands_2_index)] =
-        str_to_lower(colnames(deconvolution_results)[c(cands_1_index,cands_2_index)])
+        str_to_lower(colnames(deconvolution_results)
+                     [c(cands_1_index,cands_2_index)])
 
     # extract similarity measurements
     subtype_index_vis = c(
@@ -81,14 +87,16 @@ create_visualization_matrix = function(
     for(subtype in c(cands_dif_2,cands_dif_1)){
         
         subtype = str_to_lower(subtype)
-        deconvolution_results[,subtype] = deconvolution_results[,subtype] - min(deconvolution_results[,subtype])
+        deconvolution_results[,subtype] = deconvolution_results[,subtype] - 
+            min(deconvolution_results[,subtype])
         
         if ( max( deconvolution_results[,subtype]) > 0 )
             deconvolution_results[,subtype] = 
             deconvolution_results[,subtype] /
             max(deconvolution_results[,subtype]
             )
-        deconvolution_results[,subtype] = round(deconvolution_results[,subtype] * 100,1)
+        deconvolution_results[,subtype] = round(
+            deconvolution_results[,subtype] * 100,1)
         
         # heuristic thresholds
         m = mean(deconvolution_results[,subtype])
@@ -109,7 +117,8 @@ create_visualization_matrix = function(
             
             message(
                 paste0(
-                    c("Setting high threshold for subtype ",subtype," to ",high_threshold_subtype),
+                    c("Setting high threshold for subtype ",subtype,
+                      " to ",high_threshold_subtype),
                     collapse = ""
                 )
             )
@@ -129,7 +138,8 @@ create_visualization_matrix = function(
             
             message(
                 paste0(
-                    c("Setting low threshold for subtype ",subtype," to ",low_threshold_subtype),
+                    c("Setting low threshold for subtype ",subtype,
+                      " to ",low_threshold_subtype),
                     collapse = ""
                 )
             )
@@ -179,7 +189,8 @@ create_visualization_matrix = function(
                 MARGIN = 1,
                 FUN = which.max
             ))
-            max_subtypes = colnames(deconvolution_results[,cands_dif_endocrine])[max_indices]
+            max_subtypes = colnames(
+                deconvolution_results[, cands_dif_endocrine])[max_indices]
             highest_percentage = max_subtypes == subtype
             
         } else if ( subtype %in% cands_dif_exokrine){
@@ -189,7 +200,8 @@ create_visualization_matrix = function(
                 MARGIN = 1,
                 FUN = which.max
             ))
-            max_subtypes = colnames(deconvolution_results[,cands_dif_exokrine])[max_indices]
+            max_subtypes = colnames(
+                deconvolution_results[, cands_dif_exokrine])[max_indices]
             highest_percentage = max_subtypes == subtype 
             
         } else {
@@ -224,19 +236,28 @@ create_visualization_matrix = function(
     # differentiation score scaling
     for ( score in c("Confidence_score_de_dif","Confidence_score_dif")){
         
-        lower_index = which( vis_mat[ ,score] <= (mean(vis_mat[ ,score])-sd(vis_mat[ ,score])*.5) )
-        vis_mat[lower_index,score] = mean(vis_mat[ ,score]) - (sd(vis_mat[ ,score])*.5)
+        lower_index = which(vis_mat[, score] <= (mean(vis_mat[, score]) -
+                                                     sd(vis_mat[, score]) * 
+                                                     .5))
+        vis_mat[lower_index, score] = mean(vis_mat[, score]) - 
+            (sd(vis_mat[, score]) * .5)
         
-        higher_index = which( vis_mat[ ,score] >= (mean(vis_mat[ ,score])+sd(vis_mat[ ,score])*.5) )
-        vis_mat[higher_index,score] = mean(vis_mat[ ,score]) + (sd(vis_mat[ ,score])*.5)
+        higher_index = which(vis_mat[, score] >= (mean(vis_mat[, score]) +
+                                                      sd(vis_mat[, score]) * 
+                                                      .5))
+        vis_mat[higher_index, score] = mean(vis_mat[, score]) + 
+            (sd(vis_mat[, score]) * .5)
     }
-    vis_mat$Confidence_score_dif[vis_mat$Confidence_score_dif == 0] = rnorm(length(vis_mat$Confidence_score_dif),mean=1*10^-5, sd = 10^-5)
-    vis_mat$Confidence_score_de_dif[vis_mat$Confidence_score_de_dif == 0] = rnorm(length(vis_mat$Confidence_score_dif),mean=1*10^-5, sd = 10^-5)
+    vis_mat$Confidence_score_dif[vis_mat$Confidence_score_dif == 0] = 
+        rnorm(length(vis_mat$Confidence_score_dif),mean=1*10^-5, sd = 10^-5)
+    vis_mat$Confidence_score_de_dif[vis_mat$Confidence_score_de_dif == 0] = 
+        rnorm(length(vis_mat$Confidence_score_dif),mean=1*10^-5, sd = 10^-5)
     vis_mat$Ratio = ( 
         scale(vis_mat$Confidence_score_de_dif / vis_mat$Confidence_score_dif)
     )
     vis_mat$Ratio_numeric = round(vis_mat$Ratio, 3)
-    vis_mat$Ratio[is.nan((vis_mat$Ratio))] = rnorm(length(vis_mat$Ratio),mean=10^-5,sd=10^-5)
+    vis_mat$Ratio[is.nan((vis_mat$Ratio))] = rnorm(length(vis_mat$Ratio), 
+                                                   mean = 10^-5, sd = 10^-5)
     
     ### ratio adjustment
     
@@ -342,7 +363,8 @@ create_PCA_deconvolution = function(
 ){
     # init variables
     
-    subtype_cands = c("alpha","beta","gamma","delta","acinar","ductal","progenitor","hisc")
+    subtype_cands = c("alpha","beta","gamma","delta","acinar","ductal",
+                      "progenitor","hisc")
     cands_dif_endocrine = c("alpha","beta","gamma","delta")
     cands_dif_exokrine = c("ductal","acinar")
     cands_de_dif = "hisc"
@@ -390,23 +412,20 @@ create_PCA_deconvolution = function(
     )
     
     # extract similarity measurements
-    subtype_index_vis = c(dif_index,de_dif_index,
-          grep(
-              colnames(deconvolution_results),
-              pattern = paste0( c(
-                  "Grading",
-                  "NEC_NET",
-                  "Study"
-              ), collapse = "|")
-          )
-    )
+    subtype_index_vis = c(dif_index,de_dif_index, 
+                          grep(colnames(deconvolution_results), 
+                               pattern = paste0( c("Grading", "NEC_NET", 
+                                                   "Study"), 
+                                                 collapse = "|")))
     
     vis_mat = vis_mat[,rownames(pcr$x)]
     
     if (length(deconvolution_results$Grading) == 0){
         
-        congruence_vec = visualization_data[grep(rownames(visualization_data),pattern = "mki",ignore.case = TRUE),]
-
+        congruence_vec = visualization_data[grep(rownames(visualization_data),
+                                                 pattern = "mki",
+                                                 ignore.case = TRUE), ]
+        
     } else {
     
         congruence_vec = deconvolution_results$Grading
@@ -440,22 +459,24 @@ create_PCA_deconvolution = function(
 #' that the row names have to contain the HGNC identifier.
 #' @param deconvolution_results The dataframe returned
 #' by the deconvolution analysis.
-#' @param aggregate_differentiated_stages Show the differentiation stage similarities
-#' aggregated over all differentiated stages - alpha, beta, gamma, delta
-#' accinar and ductal - or specific for each differentiation stage.
-#' Default value FALSE, alternative value TRUE.
-#' @param confidence_threshold Threshold above which deconvolutions are deemed unsuccessful
-#' and corresponding results being masked on the the plots. Default value 1.1.
-#' @param show_colnames Whether to show the sample column names. Default value FALSE.
+#' @param aggregate_differentiated_stages Show the differentiation stage 
+#' similarities aggregated over all differentiated stages - alpha, beta, 
+#' gamma, delta, accinar and ductal - or specific for each differentiation 
+#' stage. Default value FALSE, alternative value TRUE.
+#' @param confidence_threshold Threshold above which deconvolutions are 
+#' deemed unsuccessful and corresponding results being masked on the the 
+#' plots. Default value 1.1.
+#' @param show_colnames Whether to show the sample column names. Default 
+#' value FALSE.
 #' @param Graphics_parameters Pheatmap visualization paramters.
 #' You can customize visualization colors.
 #' Read the vignette for more information.
 #' @param high_threshold Threshold depending on which a deconvolution result
-#' is interpreted as 'high'. If not set, a statistical estimation will approximately
-#' identify a signficance threshold for a high similarity.
+#' is interpreted as 'high'. If not set, a statistical estimation will 
+#' approximately identify a signficance threshold for a high similarity.
 #' @param low_threshold Threshold depending on which a deconvolution result
-#' is interpreted as 'low'. If not set, a statistical estimation will approximately
-#' identify a signficance threshold for a low similarity.
+#' is interpreted as 'low'. If not set, a statistical estimation will 
+#' approximately identify a signficance threshold for a low similarity.
 #' @param utilize_sadanandam_genes Whether to utilize the same genes as the 
 #' Sadanandam et al publication which have been utilize to create the DECO
 #' manuscript visualizations. Default value FALSE.
@@ -503,7 +524,8 @@ create_heatmap_deconvolution = function(
     
     # init variables
     
-    subtype_cands = c("alpha","beta","gamma","delta","acinar","ductal","progenitor","hisc")
+    subtype_cands = c("alpha","beta","gamma","delta","acinar","ductal",
+                      "progenitor","hisc")
     cands_dif_endocrine = c("alpha","beta","gamma","delta")
     cands_dif_exokrine = c("ductal","acinar")
     cands_de_dif = "hisc"
@@ -568,20 +590,24 @@ create_heatmap_deconvolution = function(
                 cands_dif_exokrine
             )
         ]
-        deconvolution_results$Aggregated_similarity = rep("",nrow(deconvolution_results))
+        deconvolution_results$Aggregated_similarity = 
+            rep("",nrow(deconvolution_results))
         
         for( j in 1:nrow(subtype_selection)){
             
             subtype_strength = subtype_selection[j,max_indices[j]]
             if (subtype_strength == "low"){
-                deconvolution_results$Aggregated_similarity[j] = "not_significant"
+                deconvolution_results$Aggregated_similarity[j] = 
+                    "not_significant"
             } else {
-                deconvolution_results$Aggregated_similarity[j] = colnames(subtype_selection)[max_indices[j]]
+                deconvolution_results$Aggregated_similarity[j] = 
+                    colnames(subtype_selection)[max_indices[j]]
             }
         }
         
         column_candidates = c("Aggregated_similarity","hisc","Grading","MKI67")
-        column_candidates = column_candidates[column_candidates %in% colnames(deconvolution_results)]
+        column_candidates = column_candidates[
+            column_candidates %in% colnames(deconvolution_results)]
         
         deconvolution_results[
             as.double(deconvolution_results$Confidence_score_dif) >=
@@ -589,11 +615,13 @@ create_heatmap_deconvolution = function(
             "aggregated_similarity"
             ] = "not_significant"
         
-        deconvolution_results_filtered = deconvolution_results[,column_candidates]
+        deconvolution_results_filtered = deconvolution_results[
+            ,column_candidates]
     }
 
     correlation_matrix = cor(vis_mat)
-    deconvolution_results_filtered = deconvolution_results_filtered[colnames(correlation_matrix),]
+    deconvolution_results_filtered = deconvolution_results_filtered[
+        colnames(correlation_matrix),]
     
     # correlation heatmap
     pheatmap::pheatmap(
@@ -620,18 +648,28 @@ configure_graphics = function(){
 
     Graphics_parameters         = list(
         NEC_NET                 = c(NEC= "red", NET = "lightblue"),
-        alpha        = c(not_significant = "gray", low = "white", medium = "yellow", high = "blue"),
-        beta         = c(not_significant = "gray", low = "white", medium = "yellow",high = "green"),
-        gamma        = c(not_significant = "gray", low = "white", medium = "yellow",high = "brown"),
-        delta        = c(not_significant = "gray", low = "white", medium = "yellow",high = "Purple"),
-        ductal     = c(not_significant = "gray", low = "white", medium = "yellow",high = "orange"),
-        acinar     = c(not_significant = "gray", low = "white", medium = "yellow",high = "cyan"),
+        alpha        = c(not_significant = "gray", low = "white", 
+                         medium = "yellow", high = "blue"),
+        beta         = c(not_significant = "gray", low = "white", 
+                         medium = "yellow",high = "green"),
+        gamma        = c(not_significant = "gray", low = "white", 
+                         medium = "yellow",high = "brown"),
+        delta        = c(not_significant = "gray", low = "white", 
+                         medium = "yellow",high = "Purple"),
+        ductal     = c(not_significant = "gray", low = "white", 
+                       medium = "yellow",high = "orange"),
+        acinar     = c(not_significant = "gray", low = "white", 
+                       medium = "yellow",high = "cyan"),
         Ratio = c(low = "darkgreen", medium = "yellow", high = "darkred"),
-        #progenitor = c(not_significant = "gray", low = "white", high = "orange"),
-        hisc   = c(not_significant = "gray",low = "white", medium = "yellow",high = "black"),
-        Confidence_score_de_dif = c(low = "green", medium = "white", high = "red"),
+        #progenitor = c(not_significant = "gray", low = "white", 
+        #               high = "orange"),
+        hisc   = c(not_significant = "gray",low = "white", 
+                   medium = "yellow",high = "black"),
+        Confidence_score_de_dif = c(low = "green", 
+                                    medium = "white", high = "red"),
         MKI67 = c(low = "green", medium = "yellow", high = "red"),
-        Confidence_score_dif = c(low = "green", medium = "white", high = "red"),
+        Confidence_score_dif = c(low = "green", 
+                                 medium = "white", high = "red"),
         Study = c(Groetzinger = "darkgreen", Scarpa = "darkred"),
         Aggregated_similarity = c(
             alpha = "blue",
@@ -649,7 +687,8 @@ configure_graphics = function(){
             #progenitor     = "orange",
             Not_significant= "gray"
         ),
-        Grading = c( G1 = "darkgreen",G2 = "Yellow", G3 = "darkred", G0 = "white")
+        Grading = c( G1 = "darkgreen",G2 = "Yellow", G3 = "darkred", 
+                     G0 = "white")
     )
     return(Graphics_parameters)
 }

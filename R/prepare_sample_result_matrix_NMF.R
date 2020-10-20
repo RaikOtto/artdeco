@@ -6,9 +6,11 @@ prepare_sample_result_matrix_NMF = function(
 ){
     
     rounding_precision = 1
-    #models = as.character(unlist(str_split(deconvolution_results$Model[1],pattern = "\\|")))
+    #models = as.character(unlist(str_split(
+    #                 deconvolution_results$Model[1],pattern = "\\|")))
     # deconvolution_results[,"R_sqr_dif"] = rep("",nrow(deconvolution_results))
-    deconvolution_results[,"Strength_subtype"] = rep("",nrow(deconvolution_results))
+    deconvolution_results[,"Strength_subtype"] = rep(
+        "",nrow(deconvolution_results))
     deconvolution_results[,"Subtype"] = rep("",nrow(deconvolution_results))
     
     ###
@@ -23,8 +25,10 @@ prepare_sample_result_matrix_NMF = function(
         cands_dif_2 = c("acinar","ductal")
     }
     
-    deconvolution_results[,"Confidence_score_dif"] = rep("",nrow(deconvolution_results))
-    deconvolution_results[,"Confidence_score_dif"] = round(abs(as.double(res_cor)),rounding_precision)
+    deconvolution_results[,"Confidence_score_dif"] = rep(
+        "",nrow(deconvolution_results))
+    deconvolution_results[,"Confidence_score_dif"] = round(
+        abs(as.double(res_cor)),rounding_precision)
     
     cands_dif = cands_dif_1[
         (cands_dif_1 %in% colnames(deconvolution_results)) &
@@ -51,22 +55,27 @@ prepare_sample_result_matrix_NMF = function(
         deconvolution_results[j,"Subtype"] = max_subtype
     }
     
-    deconvolution_results[,"Differentiation_score"] = rep("",nrow(deconvolution_results))
-    deconvolution_results[,"Differentiation_score"] = round(res_cor,rounding_precision)
+    deconvolution_results[,"Differentiation_score"] = rep(
+        "",nrow(deconvolution_results))
+    deconvolution_results[,"Differentiation_score"] = round(
+        res_cor,rounding_precision)
     
     ### de dif
     
     res_cor = prediction_stats_list[[2]]
     res_cor[ is.na(res_cor) ] = 0.0
     
-    deconvolution_results[,"Strength_de_differentiation"] = rep("",nrow(deconvolution_results))
-    deconvolution_results[,"Confidence_score_de_dif"] = rep("",nrow(deconvolution_results))
-    deconvolution_results[,"Confidence_score_de_dif"] = round(abs( as.double(res_cor) ),rounding_precision)
+    deconvolution_results[,"Strength_de_differentiation"] = rep(
+        "",nrow(deconvolution_results))
+    deconvolution_results[,"Confidence_score_de_dif"] = rep(
+        "",nrow(deconvolution_results))
+    deconvolution_results[,"Confidence_score_de_dif"] = round(
+        abs( as.double(res_cor) ),rounding_precision)
     
     for( j in 1:ncol(deconvolution_data)){
         
         de_strength = log( sum(deconvolution_results[j,cands_dif_2]) /
-                               sum(deconvolution_results[j,cands_dif_2]) + 1 )
+                           sum(deconvolution_results[j,cands_dif_2]) + 1)
         if (sum(deconvolution_results[j,cands_dif_2]) == 0)
             de_strength = 0
         deconvolution_results[j,"Strength_de_differentiation"] = 

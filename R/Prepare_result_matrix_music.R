@@ -17,23 +17,28 @@ prepare_result_matrix_music = function(
         if (nr_fit == 1){
             
             res_coeff_1 = prediction_res_coeff_list[[nr_fit]]
-            colnames(res_coeff_1) = str_replace_all(colnames(res_coeff_1) ,"^X","")
+            colnames(res_coeff_1) = str_replace_all(colnames(res_coeff_1), 
+                                                    "^X", "")
             
             res_coeff_1[ is.na(res_coeff_1) ] = 0.0
             
-            if ("alpha" %in% str_to_lower(rownames(res_coeff_1))) # important sanity check
+            # important sanity check
+            if ("alpha" %in% str_to_lower(rownames(res_coeff_1))) 
                 res_coeff_1 = t(res_coeff_1)
             
             colnames(res_coeff_1) = str_to_lower(colnames(res_coeff_1))
-            subtype_cands_1 = subtype_cands[subtype_cands %in% colnames(res_coeff_1)]
+            subtype_cands_1 = subtype_cands[subtype_cands %in% 
+                                                colnames(res_coeff_1)]
             
-            row_sums = rowSums(res_coeff_1[,subtype_cands[subtype_cands %in% colnames(res_coeff_1)]])
+            row_sums = rowSums(res_coeff_1[,subtype_cands[
+                subtype_cands %in% colnames(res_coeff_1)]])
             
             for (subtype in subtype_cands_1){
                 
                 if (!(subtype %in% colnames(res_coeff_1)) ) next
                 
-                result_matrix[ , subtype] = round((res_coeff_1[,subtype] / row_sums)*100,rounding_precision)
+                result_matrix[ , subtype] = round(
+                    (res_coeff_1[,subtype] / row_sums)*100,rounding_precision)
                 result_matrix[result_matrix[ , subtype] > 100,subtype] = 100
             }
         }
@@ -42,7 +47,8 @@ prepare_result_matrix_music = function(
         if ( nr_fit == 2 ){
             
             res_coeff_2 = prediction_res_coeff_list[[nr_fit]]
-            colnames(res_coeff_2) = str_replace_all(colnames(res_coeff_2) ,"^X","")
+            colnames(res_coeff_2) = str_replace_all(colnames(res_coeff_2), 
+                                                    "^X", "")
             res_coeff_2[ is.na(res_coeff_2) ] = 0.0
             
             res_coeff_2 = t(res_coeff_2)
@@ -54,12 +60,15 @@ prepare_result_matrix_music = function(
             subtype_cands_2 = subtype_cands[
                 subtype_cands %in% colnames(res_coeff_2)
                 ]
-            subtype_cands_2 = subtype_cands_2[!(subtype_cands_2 %in% subtype_cands_1) ]
-            row_sums = rowSums(res_coeff_2[,subtype_cands[subtype_cands %in% colnames(res_coeff_2)]])
+            subtype_cands_2 = subtype_cands_2[!(subtype_cands_2 %in% 
+                                                    subtype_cands_1) ]
+            row_sums = rowSums(res_coeff_2[,subtype_cands[
+                subtype_cands %in% colnames(res_coeff_2)]])
             
             for (subtype in subtype_cands_2){
                 
-                result_matrix[ , subtype] = round((as.double(res_coeff_2[,subtype]) / row_sums)*100,1)
+                result_matrix[ , subtype] = round(
+                    (as.double(res_coeff_2[,subtype]) / row_sums)*100,1)
                 result_matrix[result_matrix[ , subtype] > 100,subtype] = 100
             }
         }
@@ -105,7 +114,8 @@ prepare_result_matrix_music = function(
         result_matrix[j,"Subtype"] = max_subtype
     }
     
-    result_matrix$Strength_subtype <- as.numeric(result_matrix$Strength_subtype)
+    result_matrix$Strength_subtype <- as.numeric(
+        result_matrix$Strength_subtype)
     
     return(result_matrix)
 }

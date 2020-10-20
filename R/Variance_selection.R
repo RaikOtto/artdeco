@@ -10,7 +10,6 @@ variance_filtering = function(expr_raw){
     hgnc_list_uni = as.character( unique(hgnc_list) )
     
     max_list <<- as.integer( sapply( hgnc_list_uni, FUN = function(gene){
-      
       var_match = which( hgnc_list == gene )
       if (length(var_match) > 1){
             row_var_max = which.max( 
@@ -29,16 +28,16 @@ variance_filtering = function(expr_raw){
                     MARGIN = 2
                 )
             );
-      } else{
-        row_var_max = 1
-      }
+            } else{ 
+              row_var_max = 1
+              }
       return( var_match[row_var_max] )
     }))
     
     max_list[is.na(max_list)] = 0
     expr_raw = expr_raw[max_list,]
     rownames(expr_raw) = hgnc_list[as.integer(max_list)]
-    colnames(expr_raw) = str_replace(colnames(expr_raw), pattern = "^X", "" )
+    colnames(expr_raw) = str_replace(colnames(expr_raw), pattern = "^X", "")
     
     return( expr_raw )
 }

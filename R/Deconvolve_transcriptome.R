@@ -4,8 +4,9 @@
 #' of one or many query RNA-seq or microarray samples to samples
 #' with known differentiation stage contained in the training models.
 #'
-#' @param transcriptome_data A data frame that contains the gene expression data.
-#' Rows are expected to be HGNC symbols and columns are expected to contain the samples.
+#' @param transcriptome_data A data frame that contains the gene 
+#' expression data. Rows are expected to be HGNC symbols and columns are 
+#' expected to contain the samples.
 #' @param deconvolution_algorithm Which deconvolution algorithm to choose
 #' from. Options: 'music','bseqsc' (CIBERSORT), 'nmf'.
 #' @param models List of models to be used. Use show_models_NMF(),
@@ -53,7 +54,7 @@ Deconvolve_transcriptome = function(
             pattern = "^X",
             ""
     )
-    rownames(transcriptome_data) = str_to_upper(rownames(transcriptome_data) )
+    rownames(transcriptome_data) = str_to_upper(rownames(transcriptome_data))
     transcriptome_data = variance_filtering( expr_raw = transcriptome_data)
     
     deconvolution_data = new(
@@ -95,7 +96,8 @@ Deconvolve_transcriptome = function(
             collapse = ""
         )
         if( !file.exists(model_path))
-            stop(paste0(c("Could not find models ",model_path,", aborting"), collapse = ""))
+            stop(paste0(c("Could not find models ",model_path,", aborting"), 
+                        collapse = ""))
         
         model_and_parameter = readRDS(model_path)
         
@@ -140,7 +142,8 @@ Deconvolve_transcriptome = function(
         )
         
     } else {
-        stop("Algorithm type not recognized. Options are music, bseqsc and nmf, aborting.")
+        stop("Algorithm type not recognized. Options are music, bseqsc 
+              and nmf, aborting.")
     }
 
     if ( output_file != "" ){

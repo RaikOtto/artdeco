@@ -10,7 +10,8 @@ show_models_NMF()
 list of models
 }
 \description{
-\code{show_models_NMF} shows which models have been trained for the NMF method
+\code{show_models_NMF} shows which models have been trained for 
+the NMF method
 }
 \examples{
 show_models_NMF()

@@ -13,8 +13,9 @@ Deconvolve_transcriptome(
 )
 }
 \arguments{
-\item{transcriptome_data}{A data frame that contains the gene expression data.
-Rows are expected to be HGNC symbols and columns are expected to contain the samples.}
+\item{transcriptome_data}{A data frame that contains the gene 
+expression data. Rows are expected to be HGNC symbols and columns are 
+expected to contain the samples.}
 
 \item{deconvolution_algorithm}{Which deconvolution algorithm to choose
 from. Options: 'music','bseqsc' (CIBERSORT), 'nmf'.}

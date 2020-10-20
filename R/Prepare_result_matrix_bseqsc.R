@@ -9,7 +9,9 @@ prepare_result_matrix_bseqsc = function(
     subtype_cands = c("alpha","beta","gamma","delta","acinar","ductal","hisc")
     bseq_parameter = c("P_value","Correlation","RMSE","Sig_score")
     
-    result_matrix_template = matrix( rep(0.0, length(subtype_cands) * ncol(deconvolution_data)),ncol = length(subtype_cands) )
+    result_matrix_template = matrix( rep(0.0, length(subtype_cands) * 
+                                             ncol(deconvolution_data)),
+                                     ncol = length(subtype_cands) )
     colnames(result_matrix_template) = subtype_cands
     result_matrix_template = as.data.frame(result_matrix_template)
     rownames(result_matrix_template) = colnames(deconvolution_data)
@@ -17,7 +19,8 @@ prepare_result_matrix_bseqsc = function(
     
     if (length(models) > 1){
         for ( i in 1:( length(models) - 1)){
-            result_matrix_template = rbind(result_matrix_template, result_matrix_template_ori)
+            result_matrix_template = rbind(result_matrix_template, 
+                                           result_matrix_template_ori)
         }
     }
     
@@ -30,16 +33,19 @@ prepare_result_matrix_bseqsc = function(
 
     result_matrix_template$model = model_vec
     # move last column to first column
-    result_matrix_template <- result_matrix_template[,c(ncol(result_matrix_template),1:(ncol(result_matrix_template)-1))]
+    result_matrix_template <- result_matrix_template[,c(
+        ncol(result_matrix_template),1:(ncol(result_matrix_template)-1))]
     
     for( i in 1:length(bseq_parameter)){
-        result_matrix_template[,bseq_parameter[i]] = rep("",nrow(result_matrix_template))
+        result_matrix_template[,bseq_parameter[i]] = 
+            rep("",nrow(result_matrix_template))
     }
     
     for ( model in models ){
         
             res_coeff = prediction_res_coeff_list[[model]]
-            colnames(res_coeff) = str_replace_all(colnames(res_coeff) ,"^X","")
+            colnames(res_coeff) = str_replace_all(colnames(res_coeff), 
+                                                  "^X", "")
             res_coeff[ is.na(res_coeff) ] = 0.0
             
             res_coeff = t(res_coeff)
@@ -69,7 +75,8 @@ prepare_result_matrix_bseqsc = function(
     # so that columns subtype and strength_subtype are added
     # can be added; doesn't have to be added
     
-    result_matrix_template[,"Strength_subtype"] = rep("",nrow(result_matrix_template))
+    result_matrix_template[,"Strength_subtype"] = rep(
+        "",nrow(result_matrix_template))
     result_matrix_template[,"Subtype"] = rep("",nrow(result_matrix_template))
     
     cands_dif_1 = c("alpha","beta","gamma","delta","acinar","ductal")
@@ -103,11 +110,16 @@ prepare_result_matrix_bseqsc = function(
         result_matrix_template[j,"Subtype"] = max_subtype
     }
     
-    result_matrix_template$Strength_subtype <- as.numeric(result_matrix_template$Strength_subtype)
-    result_matrix_template$RMSE <- as.numeric(result_matrix_template$RMSE)
-    result_matrix_template$P_value <- as.numeric(result_matrix_template$P_value)
-    result_matrix_template$Correlation <- as.numeric(result_matrix_template$Correlation)
-    result_matrix_template$Sig_score <- as.numeric(result_matrix_template$Sig_score)
+    result_matrix_template$Strength_subtype <- as.numeric(
+        result_matrix_template$Strength_subtype)
+    result_matrix_template$RMSE <- as.numeric(
+        result_matrix_template$RMSE)
+    result_matrix_template$P_value <- as.numeric(
+        result_matrix_template$P_value)
+    result_matrix_template$Correlation <- as.numeric(
+        result_matrix_template$Correlation)
+    result_matrix_template$Sig_score <- as.numeric(
+        result_matrix_template$Sig_score)
     
     return(result_matrix_template)
 }

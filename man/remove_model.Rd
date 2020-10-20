@@ -13,7 +13,8 @@ remove_model(
 \arguments{
 \item{model_name}{Name of the model.}
 
-\item{lib_name}{Name of the library that contains the model (e.g. "NMF", "music" or "bseqsc").}
+\item{lib_name}{Name of the library that contains the model (e.g. "NMF", 
+"music" or "bseqsc").}
 
 \item{test_mode}{Testrun indicator. Default value FALSE.}
 }

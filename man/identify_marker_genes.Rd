@@ -18,7 +18,8 @@ identify_marker_genes(
 
 \item{subtype}{Subtype for which to determine the differentially expressed.}
 
-\item{training_nr_marker_genes}{Number of desired marker genes to describe a subtype.}
+\item{training_nr_marker_genes}{Number of desired marker genes to describe 
+a subtype.}
 }
 \value{
 Returns marker genes

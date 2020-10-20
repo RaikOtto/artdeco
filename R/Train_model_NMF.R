@@ -11,13 +11,14 @@
 #' labels of the training data samples (\code{transcriptome_data}).
 #' @param rank_estimate Rank of the NMF model. Will be set to amount of 
 #' different subtypes defined in the subtype_vector if not specified manually.
-#' @param exclude_non_interpretable_NMF_components Boolean parameter that indicates
-#' whether trained NMF components that cannot clearly be associated with either an endocrine
-#' or acinar & ductal or hisc subtyp shall be excluded. Default value FALSE.
-#' @param training_nr_marker_genes Amount of genes to be utilized as marker genes
-#' for each cell type. Default value 100.
-#' @param parallel_processes Amount of parallel processes used for training. Warning, RAM
-#' utilization increases linearly. Default value 1.
+#' @param exclude_non_interpretable_NMF_components Boolean parameter that 
+#' indicates whether trained NMF components that cannot clearly be associated 
+#' with either an endocrine or acinar & ductal or hisc subtyp shall be 
+#' excluded. Default value FALSE.
+#' @param training_nr_marker_genes Amount of genes to be utilized as 
+#' marker genes for each cell type. Default value 100.
+#' @param parallel_processes Amount of parallel processes used for training. 
+#' Warning, RAM utilization increases linearly. Default value 1.
 #' @param nrun Amount of times the NMF model will be trained. Default value 10.
 #' @import stringr NMF
 #' @usage
@@ -35,7 +36,8 @@
 #' data(Lawlor) # Data from Lawlor et al.
 #' data(meta_data)
 #' 
-#' subtype_vector = as.character(meta_data$Subtype) # extract the training sample subtype labels
+#' # extract the training sample subtype labels
+#' subtype_vector = as.character(meta_data$Subtype) 
 #' 
 #' add_deconvolution_training_model_NMF(
 #'     transcriptome_data = Lawlor,
@@ -60,7 +62,8 @@ add_deconvolution_training_model_NMF = function(
     parallel_processes = 1,
     nrun = 10
 ){
-    canonical_subtypes = c("alpha","beta","gamma","delta","acinar","ductal","hisc")
+    canonical_subtypes = c("alpha","beta","gamma","delta","acinar",
+                           "ductal","hisc")
 
     if( model_name == "")
         stop("Require model name, aborting")
@@ -74,7 +77,8 @@ add_deconvolution_training_model_NMF = function(
             c(
                 "Modelname ",
                 model_name,
-                " already exists, please choose different name or delete existing model")
+                " already exists, please choose different name or 
+                delete existing model")
             )
         )
     }
@@ -84,7 +88,8 @@ add_deconvolution_training_model_NMF = function(
     }
 
     if (length(subtype_vector) == 0)
-        stop(paste0("You have to provide the sample subtypes labels for model training"))
+        stop(paste0("You have to provide the sample subtypes labels for 
+                    model training"))
     #subtype_vector = str_to_lower(subtype_vector)
 
     print("Variance filtering")
@@ -94,7 +99,8 @@ add_deconvolution_training_model_NMF = function(
 
     row_var = apply(expression_training_mat, FUN = var, MARGIN = 1)
     expression_training_mat = expression_training_mat[row_var != 0,]
-    expression_training_mat = expression_training_mat[rowSums(expression_training_mat) >= 1,]
+    expression_training_mat = expression_training_mat[
+        rowSums(expression_training_mat) >= 1,]
     
     ### dif genes
     
@@ -124,7 +130,8 @@ add_deconvolution_training_model_NMF = function(
         rank_estimate = length(unique(subtype_vector))
 
     print("Commencing NMF training, this may take some time")
-    print(paste("Amount of parallel processes utilized: ", as.character(parallel_processes)), sep =" ")
+    print(paste("Amount of parallel processes utilized: ", 
+                as.character(parallel_processes)), sep =" ")
     
     training_options = paste0('tp',parallel_processes)
 
@@ -154,7 +161,8 @@ add_deconvolution_training_model_NMF = function(
                 next()
             
             colnames(W)[max_col_mean_index] = subtype
-            print(paste0(collapse="",c(subtype," subtype found as component ",max_col_mean_index),sep=""))
+            print(paste0(collapse="",c(subtype," subtype found as component ",
+                                       max_col_mean_index),sep=""))
             break()
         }
     }

@@ -145,18 +145,18 @@ estimateParameters = function(
     meandispfit = loess.sd(ldisp ~ lmu, nsigma = sigma)
 
     # return object
-    paramData = list(means = mu, 
-                     dispersion = phi.g, 
+    paramData = list(means = mu,
+                     dispersion = phi.g,
                      common.dispersion = phi.c, 
-                     size = size, 
-                     p0 = p0, 
-                     meansizefit = meansizefit, 
-                     meandispfit = meandispfit, 
-                     estS = estS, 
-                     estG = estG, 
-                     totalS = totalS, 
-                     totalG = totalG, 
-                     detectG = detectG, 
+                     size = size,
+                     p0 = p0,
+                     meansizefit = meansizefit,
+                     meandispfit = meandispfit,
+                     estS = estS,
+                     estG = estG,
+                     totalS = totalS,
+                     totalG = totalG,
+                     detectG = detectG,
                      sigma = sigma)
 
     return(paramData)
@@ -248,8 +248,9 @@ simulateCounts = function(
 #' Can be used as negative controls for benchmarking purposes.
 #' @param nGenes A integer specifing the number of genes to be simulated.
 #' @param numSamples A integer specifing the number of samples to be simulated.
-#' @param normMean A integer specifing the mean parameter of the normal distribution
-#'  which is used to generate mean expression values for the simulation.
+#' @param normMean A integer specifing the mean parameter of the 
+#' normal distribution which is used to generate mean expression values for 
+#' the simulation.
 #' @param normSD A integer specifing the standard deviation parameter of the
 #'  normal distribution which is used to to generate mean expression values for
 #'  the simulation.

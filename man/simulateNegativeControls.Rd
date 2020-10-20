@@ -18,8 +18,9 @@ simulateNegativeControls(
 
 \item{numSamples}{A integer specifing the number of samples to be simulated.}
 
-\item{normMean}{A integer specifing the mean parameter of the normal distribution
-which is used to generate mean expression values for the simulation.}
+\item{normMean}{A integer specifing the mean parameter of the 
+normal distribution which is used to generate mean expression values for 
+the simulation.}
 
 \item{normSD}{A integer specifing the standard deviation parameter of the
 normal distribution which is used to to generate mean expression values for

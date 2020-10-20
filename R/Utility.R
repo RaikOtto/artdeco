@@ -3,7 +3,8 @@
 #' \code{remove_model} removes a model from a library
 #'
 #' @param model_name Name of the model.
-#' @param lib_name Name of the library that contains the model (e.g. "NMF", "music" or "bseqsc").
+#' @param lib_name Name of the library that contains the model (e.g. "NMF", 
+#' "music" or "bseqsc").
 #' @param test_mode Testrun indicator. Default value FALSE.
 #' @usage
 #' remove_model(
@@ -33,8 +34,8 @@ remove_model = function(
         ""
     )
     
-    model_path <- paste0(system.file("Models", package = "artdeco"), 
-                         "/", lib_name, "/", model_name, ".RDS")
+    model_path <- paste0(system.file("Models", package = "artdeco"),
+                                     "/", lib_name, "/", model_name, ".RDS")
     #model_path = paste0(
     #    c(system.file("Models/bseqsc", package = "artdeco"),
     #      "/", paste0(model_name, ".RDS")
@@ -96,7 +97,7 @@ remove_model_bseqsc = function(
     
     model_path = paste0(
         c(system.file("Models/bseqsc", package = "artdeco"),
-          "/", paste0(model_name, ".RDS")
+                      "/", paste0(model_name, ".RDS")
         ), sep ="", collapse = ""
     )
     
@@ -155,7 +156,7 @@ remove_model_NMF = function(
     
     model_path = paste0(
         c(system.file("Models/NMF", package = "artdeco"),
-          "/", paste0(model_name, ".RDS")
+                      "/", paste0(model_name, ".RDS")
         ), sep ="", collapse = ""
     )
     
@@ -214,7 +215,7 @@ remove_model_music = function(
     
     model_path = paste0(
         c(system.file("Models/music", package = "artdeco"),
-          "/", paste0(model_name, ".RDS")
+                      "/", paste0(model_name, ".RDS")
         ), sep ="", collapse = ""
     )
     
@@ -267,9 +268,12 @@ show_models = function(
         model_path_music <- paste0(package_path,"/Models/music")
         model_path_bseqsc <- paste0(package_path,"/Models/bseqsc")
         
-        nmf_models <- stringr::str_replace_all(list.files(model_path_nmf), pattern = ".RDS", "")
-        music_models <- stringr::str_replace_all(list.files(model_path_music), pattern = ".RDS", "")
-        bseqsc_models <- stringr::str_replace_all(list.files(model_path_bseqsc), pattern = ".RDS", "")
+        nmf_models <- stringr::str_replace_all(list.files(model_path_nmf),
+                                               pattern = ".RDS", "")
+        music_models <- stringr::str_replace_all(list.files(model_path_music),
+                                                 pattern = ".RDS", "")
+        bseqsc_models <- stringr::str_replace_all(list.files(
+            model_path_bseqsc), pattern = ".RDS", "")
         
         models <- list(nmf_models, music_models, bseqsc_models)
         names(models) <- c("NMF", "music", "bseqsc")
@@ -339,7 +343,8 @@ show_models_bseqsc = function(
 
 #' show_models_NMF
 #'
-#' \code{show_models_NMF} shows which models have been trained for the NMF method
+#' \code{show_models_NMF} shows which models have been trained for 
+#' the NMF method
 #'
 #'@usage
 #' show_models_NMF()
@@ -501,7 +506,8 @@ quantify_similarity = function(
             parameter = parameter_list[[model]]
             parameter = parameter[[1]]
             names(parameter) = str_to_lower(names(parameter))
-            names(parameter)[names(parameter) %in% c("hesc","hisc")] = "stem_cell"
+            names(parameter)[names(parameter) %in% c("hesc","hisc")] = 
+                "stem_cell"
 
             parameter = as.double(
                 as.character(
@@ -523,16 +529,15 @@ quantify_similarity = function(
 
             meta_data[,subtype_label_absolute] = rep("low",nrow(meta_data))
             meta_data[,subtype_label_quant_absolute] = rep(0,nrow(meta_data))
-            meta_data[,subtype_label_quant_absolute] = similarity_quantified_absolute
-            meta_data[ 
-                similarity_quantified_absolute >= mean(similarity_quantified_absolute),
-                subtype_label_absolute
-            ] = "high"
+            meta_data[,subtype_label_quant_absolute] = 
+                similarity_quantified_absolute
+            meta_data[similarity_quantified_absolute >= 
+                          mean(similarity_quantified_absolute), 
+                      subtype_label_absolute] = "high"
             
             meta_data[
                 ( meta_data[ , subtype_label_absolute ] == "") |
-                ( is.na(meta_data[ , subtype_label_absolute ])
-                  ),
+                ( is.na(meta_data[ , subtype_label_absolute ])),
                 subtype_label_absolute
             ] = "none"
 
@@ -542,8 +547,10 @@ quantify_similarity = function(
                 subtype_sim_scalar / max( subtype_sim_scalar ) * 100,
                 0
             )
-            #similarity_quantified_relative = log(similarity_quantified_relative+1)
-            #similarity_quantified_relative = log(similarity_quantified_relative+1)
+            #similarity_quantified_relative = log(
+            #                    similarity_quantified_relative+1)
+            #similarity_quantified_relative = log(
+            #                    similarity_quantified_relative+1)
 
             # load data
             
@@ -552,14 +559,15 @@ quantify_similarity = function(
             ),0)
             meta_data[,subtype_label_relative] = rep("low",nrow(meta_data))
             meta_data[
-                similarity_quantified_relative>mean(similarity_quantified_relative),
+                similarity_quantified_relative>mean(
+                    similarity_quantified_relative),
                 subtype_label_relative
             ] = "high"
             
             meta_data[
                 (meta_data[ ,
-                            subtype_label_relative ] == "") | ( is.na(meta_data[ , subtype_label_relative
-                                                                                 ]) ),
+                            subtype_label_relative ] == "") | 
+                    ( is.na(meta_data[ , subtype_label_relative]) ),
                 subtype_label_relative
             ] = "none"
 

@@ -19,5 +19,6 @@ Deconvolve_bseq_sc(deconvolution_data, models_list, models, nr_permutations)
 Matrix containing the deconvolution results.
 }
 \description{
-\code{Deconvolve_bseq_sc} Utilizes BSeq-sc for deconvolution. Wrapper function.
+\code{Deconvolve_bseq_sc} Utilizes BSeq-sc for deconvolution. 
+Wrapper function.
 }

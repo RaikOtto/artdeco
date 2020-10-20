@@ -1,6 +1,7 @@
 #' Deconvolve_bseq_sc
 #' 
-#' \code{Deconvolve_bseq_sc} Utilizes BSeq-sc for deconvolution. Wrapper function.
+#' \code{Deconvolve_bseq_sc} Utilizes BSeq-sc for deconvolution. 
+#' Wrapper function.
 #' 
 #' @param deconvolution_data Data to be deconvolved.
 #' @param models_list List of models.
@@ -48,7 +49,7 @@ Deconvolve_bseq_sc = function(
     col_idx <- match(c("model", "alpha", "beta", "gamma", "delta", "acinar", 
                        "ductal", "hisc", "strength_subtype", "subtype", 
                        "sig_score", "p_value", "correlation", "rmse"), 
-                     str_to_lower(colnames(deconvolution_results)))
+                       str_to_lower(colnames(deconvolution_results)))
     deconvolution_results <- deconvolution_results[,col_idx]
     
     return(deconvolution_results)

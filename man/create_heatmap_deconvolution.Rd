@@ -24,27 +24,29 @@ that the row names have to contain the HGNC identifier.}
 \item{deconvolution_results}{The dataframe returned
 by the deconvolution analysis.}
 
-\item{aggregate_differentiated_stages}{Show the differentiation stage similarities
-aggregated over all differentiated stages - alpha, beta, gamma, delta
-accinar and ductal - or specific for each differentiation stage.
-Default value FALSE, alternative value TRUE.}
+\item{aggregate_differentiated_stages}{Show the differentiation stage 
+similarities aggregated over all differentiated stages - alpha, beta, 
+gamma, delta, accinar and ductal - or specific for each differentiation 
+stage. Default value FALSE, alternative value TRUE.}
 
-\item{confidence_threshold}{Threshold above which deconvolutions are deemed unsuccessful
-and corresponding results being masked on the the plots. Default value 1.1.}
+\item{confidence_threshold}{Threshold above which deconvolutions are 
+deemed unsuccessful and corresponding results being masked on the the 
+plots. Default value 1.1.}
 
-\item{show_colnames}{Whether to show the sample column names. Default value FALSE.}
+\item{show_colnames}{Whether to show the sample column names. Default 
+value FALSE.}
 
 \item{Graphics_parameters}{Pheatmap visualization paramters.
 You can customize visualization colors.
 Read the vignette for more information.}
 
 \item{high_threshold}{Threshold depending on which a deconvolution result
-is interpreted as 'high'. If not set, a statistical estimation will approximately
-identify a signficance threshold for a high similarity.}
+is interpreted as 'high'. If not set, a statistical estimation will 
+approximately identify a signficance threshold for a high similarity.}
 
 \item{low_threshold}{Threshold depending on which a deconvolution result
-is interpreted as 'low'. If not set, a statistical estimation will approximately
-identify a signficance threshold for a low similarity.}
+is interpreted as 'low'. If not set, a statistical estimation will 
+approximately identify a signficance threshold for a low similarity.}
 
 \item{utilize_sadanandam_genes}{Whether to utilize the same genes as the 
 Sadanandam et al publication which have been utilize to create the DECO
