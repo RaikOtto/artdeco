@@ -13,10 +13,13 @@ contain the samples.}
 
 \item{models_list}{List of models to be used.}
 
-\item{models}{Which model to use}
+\item{models}{Which model to use.}
 
-\item{nr_permutations}{Amount perturbations}
+\item{nr_permutations}{Amount perturbations.}
+}
+\value{
+Matrix containing the deconvolution results.
 }
 \description{
-\code{Deconvolve_music} Utilizes MuSiC for deconvolution. Wrapper function
+\code{Deconvolve_music} Utilizes MuSiC for deconvolution. Wrapper function.
 }

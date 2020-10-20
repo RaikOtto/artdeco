@@ -17,10 +17,10 @@ create_PCA_deconvolution(
 }
 \arguments{
 \item{visualization_data}{Transcriptome data that shall be visualized.
-Notice the convention that the row names have to contain the HGNC identifier}
+Notice the convention that the row names have to contain the HGNC identifier.}
 
 \item{deconvolution_results}{The dataframe returned
-by the deconvolution analysis}
+by the deconvolution analysis.}
 
 \item{aggregate_differentiated_stages}{Whether to aggregate the deconvolution
 results. Default vale FALSE.}
@@ -41,6 +41,9 @@ as 'low'. Default value 0.}
 \item{utilize_sadanandam_genes}{Whether to utilize the same genes as the 
 Sadanandam et al publication which have been utilize to create the DECO
 manuscript visualizations. Default value FALSE.}
+}
+\value{
+PCA plot
 }
 \description{
 \code{create_PCA_deconvolution}

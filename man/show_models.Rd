@@ -9,7 +9,7 @@ lib_name
 )
 }
 \arguments{
-\item{lib_name}{Specify the library (e.g. "NMF", "music", "bseqsc" or "all")}
+\item{lib_name}{Specify the library (e.g. "NMF", "music", "bseqsc" or "all").}
 }
 \value{
 list of models

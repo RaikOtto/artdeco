@@ -20,11 +20,11 @@ Counts have to be normalized beforehand.}
 
 \item{markerGenes}{Character vector containing marker genes which
 characterize the cell-type to be simulated. Gene identifiers need
-to be consistend with \code{referenceCellTypes}}
+to be consistend with \code{referenceCellTypes}.}
 
-\item{numSamples}{A integer specifing the number of samples to be simulated.}
+\item{numSamples}{An integer specifing the number of samples to be simulated.}
 
-\item{seed}{A integer specifing seed for simulation. Default is \code{NULL}.
+\item{seed}{An integer specifing seed for simulation. Default is \code{NULL}.
 Random seed will be generated if no seed is provided.}
 
 \item{verbose}{Logical, indicating whether status updates will be printed.

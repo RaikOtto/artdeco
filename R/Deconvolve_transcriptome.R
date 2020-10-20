@@ -7,11 +7,11 @@
 #' @param transcriptome_data A data frame that contains the gene expression data.
 #' Rows are expected to be HGNC symbols and columns are expected to contain the samples.
 #' @param deconvolution_algorithm Which deconvolution algorithm to choose
-#' from. Options: 'music','bseqsc' (CIBERSORT), 'nmf' 
+#' from. Options: 'music','bseqsc' (CIBERSORT), 'nmf'.
 #' @param models List of models to be used. Use show_models_NMF(),
 #' show_models_music() or show_models_bseqsc()
 #' to view available models or add new model via
-#' add_deconvolution_training_model_*()
+#' add_deconvolution_training_model_*().
 #' @param nr_permutations Utilized to calculate p-value
 #' Higher amount of permutations generally lead to more
 #' precise p-value estimates. Default value 1000.

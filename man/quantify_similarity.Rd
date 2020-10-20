@@ -13,15 +13,15 @@ quantify_similarity(
 )
 }
 \arguments{
-\item{meta_data}{deconvolution result dataframe}
+\item{meta_data}{Deconvolution result dataframe.}
 
-\item{subtypes}{list of cell subtypes}
+\item{subtypes}{List of cell subtypes.}
 
-\item{model}{Deconvolution model}
+\item{model}{Deconvolution model.}
 
-\item{fit}{Deconvolution fit}
+\item{fit}{Deconvolution fit.}
 
-\item{parameter_list}{List of parameters of the models}
+\item{parameter_list}{List of parameters of the models.}
 }
 \value{
 dataframe containing baseline adjusted similarities

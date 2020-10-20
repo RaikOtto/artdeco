@@ -6,14 +6,14 @@
 #' used for training. Has to contain the cell subtypes to which the
 #' similarity will be calculated. Note that the row names have
 #' to contain the HGNC symbols and the column names the sample names.
-#' @param model_name Name of the model
+#' @param model_name Name of the model.
 #' @param subtype_vector Character vector containing the subtype
-#' labels of the training data samples (\code{transcriptome_data})
+#' labels of the training data samples (\code{transcriptome_data}).
 #' @param marker_gene_list List that contains the marker genes
 #' for each subtype. Has to be in the type of list() with each
 #' subtype being an entry.
 #' @param training_p_value_threshold P-value at which a training
-#' is deemed successfull. Default value 0.05
+#' is deemed successfull. Default value 0.05.
 #' @param training_nr_permutations Amount of perturbation which
 #' results in a p-value. Higher number of perturbation generally
 #' improves the p-value estiamtes. Default 100.

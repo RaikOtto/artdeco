@@ -12,13 +12,13 @@ identify_marker_genes(
 )
 }
 \arguments{
-\item{expression_training_mat}{matrix that contains the expression data}
+\item{expression_training_mat}{Matrix that contains the expression data.}
 
-\item{subtype_vector}{Vector containing the subtype of the training samples}
+\item{subtype_vector}{Vector containing the subtype of the training samples.}
 
-\item{subtype}{Subtype for which to determine the differentially expressed}
+\item{subtype}{Subtype for which to determine the differentially expressed.}
 
-\item{training_nr_marker_genes}{Number of desired marker genes to describe a subtype}
+\item{training_nr_marker_genes}{Number of desired marker genes to describe a subtype.}
 }
 \value{
 Returns marker genes

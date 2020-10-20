@@ -16,10 +16,10 @@ used for training. Has to contain the cell subtypes to which the
 similarity will be calculated. Note that the row names have
 to contain the HGNC symbols and the column names the sample names.}
 
-\item{model_name}{Name of the model}
+\item{model_name}{Name of the model.}
 
 \item{subtype_vector}{Character vector containing the subtype
-labels of the training data samples (\code{transcriptome_data})}
+labels of the training data samples (\code{transcriptome_data}).}
 }
 \value{
 Stores a new model in the package directory

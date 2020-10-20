@@ -1,8 +1,8 @@
 #' identify_marker_genes
-#' @param expression_training_mat matrix that contains the expression data
-#' @param subtype_vector Vector containing the subtype of the training samples
-#' @param subtype Subtype for which to determine the differentially expressed
-#' @param training_nr_marker_genes Number of desired marker genes to describe a subtype
+#' @param expression_training_mat Matrix that contains the expression data.
+#' @param subtype_vector Vector containing the subtype of the training samples.
+#' @param subtype Subtype for which to determine the differentially expressed.
+#' @param training_nr_marker_genes Number of desired marker genes to describe a subtype.
 #' @import stringr limma
 #' @return Returns marker genes
 identify_marker_genes = function(

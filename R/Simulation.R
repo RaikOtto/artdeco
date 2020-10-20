@@ -11,9 +11,9 @@
 #'  Counts have to be normalized beforehand.
 #' @param markerGenes Character vector containing marker genes which
 #'  characterize the cell-type to be simulated. Gene identifiers need
-#'  to be consistend with \code{referenceCellTypes}
-#' @param numSamples A integer specifing the number of samples to be simulated.
-#' @param seed A integer specifing seed for simulation. Default is \code{NULL}.
+#'  to be consistend with \code{referenceCellTypes}.
+#' @param numSamples An integer specifing the number of samples to be simulated.
+#' @param seed An integer specifing seed for simulation. Default is \code{NULL}.
 #'  Random seed will be generated if no seed is provided.
 #' @param verbose Logical, indicating whether status updates will be printed.
 #'  Default is \code{TRUE}.
@@ -145,18 +145,18 @@ estimateParameters = function(
     meandispfit = loess.sd(ldisp ~ lmu, nsigma = sigma)
 
     # return object
-    paramData = list(means = mu,
-                     dispersion = phi.g,
-                     common.dispersion = phi.c,
-                     size = size,
-                     p0 = p0,
-                     meansizefit = meansizefit,
-                     meandispfit = meandispfit,
-                     estS = estS,
-                     estG = estG,
-                     totalS = totalS,
-                     totalG = totalG,
-                     detectG = detectG,
+    paramData = list(means = mu, 
+                     dispersion = phi.g, 
+                     common.dispersion = phi.c, 
+                     size = size, 
+                     p0 = p0, 
+                     meansizefit = meansizefit, 
+                     meandispfit = meandispfit, 
+                     estS = estS, 
+                     estG = estG, 
+                     totalS = totalS, 
+                     totalG = totalG, 
+                     detectG = detectG, 
                      sigma = sigma)
 
     return(paramData)

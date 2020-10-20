@@ -17,12 +17,12 @@ Deconvolve_transcriptome(
 Rows are expected to be HGNC symbols and columns are expected to contain the samples.}
 
 \item{deconvolution_algorithm}{Which deconvolution algorithm to choose
-from. Options: 'music','bseqsc' (CIBERSORT), 'nmf'}
+from. Options: 'music','bseqsc' (CIBERSORT), 'nmf'.}
 
 \item{models}{List of models to be used. Use show_models_NMF(),
 show_models_music() or show_models_bseqsc()
 to view available models or add new model via
-add_deconvolution_training_model_*()}
+add_deconvolution_training_model_*().}
 
 \item{nr_permutations}{Utilized to calculate p-value
 Higher amount of permutations generally lead to more

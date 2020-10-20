@@ -10,9 +10,12 @@ remove_model_NMF(
 )
 }
 \arguments{
-\item{model_name}{Name of the model}
+\item{model_name}{Name of the model.}
 
 \item{test_mode}{Testrun indicator. Default value FALSE.}
+}
+\value{
+Removal of model from package directory
 }
 \description{
 \code{remove_model_NMF} removes a model from the NMF library

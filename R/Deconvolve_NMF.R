@@ -1,8 +1,12 @@
 #' Deconvolve_NMF
-#' @param deconvolution_data Data to be deconvolved
-#' @param models_list List of models
-#' @param models Models utilized
-#' @param nr_permutations Amount of permutations 
+#' 
+#' \code{Deconvolve_NMF} Utilizes NMF for deconvolution. Wrapper function.
+#' 
+#' @param deconvolution_data Data to be deconvolved.
+#' @param models_list List of models.
+#' @param models Models utilized.
+#' @param nr_permutations Amount of permutations.
+#' @return Matrix containing the deconvolution results.
 #' @import NMF
 Deconvolve_NMF = function(
     deconvolution_data,

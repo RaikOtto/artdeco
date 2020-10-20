@@ -290,9 +290,9 @@ create_visualization_matrix = function(
 #' 
 #'
 #' @param visualization_data Transcriptome data that shall be visualized.
-#' Notice the convention that the row names have to contain the HGNC identifier
+#' Notice the convention that the row names have to contain the HGNC identifier.
 #' @param deconvolution_results The dataframe returned
-#' by the deconvolution analysis
+#' by the deconvolution analysis.
 #' @param aggregate_differentiated_stages Whether to aggregate the deconvolution
 #' results. Default vale FALSE.
 #' @param confidence_threshold Threshold at which to discard a prediction. 
@@ -318,6 +318,7 @@ create_visualization_matrix = function(
 #'    low_threshold,
 #'    utilize_sadanandam_genes
 #' )
+#' @return PCA plot
 #' @examples
 #' data(deconvolution_results, envir = environment())
 #' data(visualization_data, envir = environment())
@@ -436,16 +437,16 @@ create_PCA_deconvolution = function(
 #'
 #' @param visualization_data Matrix of the transcriptome data
 #' that shall be visualized. Notice the convention
-#' that the row names have to contain the HGNC identifier
+#' that the row names have to contain the HGNC identifier.
 #' @param deconvolution_results The dataframe returned
-#' by the deconvolution analysis
+#' by the deconvolution analysis.
 #' @param aggregate_differentiated_stages Show the differentiation stage similarities
 #' aggregated over all differentiated stages - alpha, beta, gamma, delta
 #' accinar and ductal - or specific for each differentiation stage.
 #' Default value FALSE, alternative value TRUE.
 #' @param confidence_threshold Threshold above which deconvolutions are deemed unsuccessful
-#' and corresponding results being masked on the the plots. Default value 1.1
-#' @param show_colnames Whether to show the sample column names. Default value FALSE
+#' and corresponding results being masked on the the plots. Default value 1.1.
+#' @param show_colnames Whether to show the sample column names. Default value FALSE.
 #' @param Graphics_parameters Pheatmap visualization paramters.
 #' You can customize visualization colors.
 #' Read the vignette for more information.

@@ -2,8 +2,8 @@
 #'
 #' \code{remove_model} removes a model from a library
 #'
-#' @param model_name Name of the model
-#' @param lib_name Name of the library that contains the model (e.g. "NMF", "music" or "bseqsc")
+#' @param model_name Name of the model.
+#' @param lib_name Name of the library that contains the model (e.g. "NMF", "music" or "bseqsc").
 #' @param test_mode Testrun indicator. Default value FALSE.
 #' @usage
 #' remove_model(
@@ -18,6 +18,7 @@
 #'     test_mode = TRUE
 #' )
 #' @import stringr
+#' @return Removal of model from package directory 
 #' @export
 remove_model = function(
     model_name,
@@ -66,7 +67,7 @@ remove_model = function(
 #'
 #' \code{remove_model_bseqsc} removes a model from the bseqsc library
 #'
-#' @param model_name Name of the model
+#' @param model_name Name of the model.
 #' @param test_mode Testrun indicator. Default value FALSE.
 #' @usage
 #' remove_model_bseqsc(
@@ -79,6 +80,7 @@ remove_model = function(
 #'     test_mode = TRUE
 #' )
 #' @import stringr
+#' @return Removal of model from package directory
 #' @export
 remove_model_bseqsc = function(
     model_name,
@@ -124,7 +126,7 @@ remove_model_bseqsc = function(
 #'
 #' \code{remove_model_NMF} removes a model from the NMF library
 #'
-#' @param model_name Name of the model
+#' @param model_name Name of the model.
 #' @param test_mode Testrun indicator. Default value FALSE.
 #' @usage
 #' remove_model_NMF(
@@ -137,6 +139,7 @@ remove_model_bseqsc = function(
 #'     test_mode = TRUE
 #' )
 #' @import stringr
+#' @return Removal of model from package directory
 #' @export
 remove_model_NMF = function(
     model_name,
@@ -182,7 +185,7 @@ remove_model_NMF = function(
 #'
 #' \code{remove_model_music} removes a model from the music library
 #'
-#' @param model_name Name of the model
+#' @param model_name Name of the model.
 #' @param test_mode Testrun indicator. Default value FALSE.
 #' @usage
 #' remove_model_music(
@@ -195,6 +198,7 @@ remove_model_NMF = function(
 #'     test_mode = TRUE
 #' )
 #' @import stringr
+#' @return Removal of model from package directory
 #' @export
 remove_model_music = function(
     model_name,
@@ -240,7 +244,7 @@ remove_model_music = function(
 #'
 #' \code{show_models} shows which models have been trained for what library
 #'
-#'@param lib_name Specify the library (e.g. "NMF", "music", "bseqsc" or "all")
+#'@param lib_name Specify the library (e.g. "NMF", "music", "bseqsc" or "all").
 #'@usage
 #' show_models(
 #' lib_name
@@ -365,11 +369,11 @@ show_models_NMF = function(
 #' \code{quantify_similarity} custom function that allows to
 #' alternate between different baselines for similarity
 #'
-#'@param meta_data deconvolution result dataframe
-#'@param subtypes list of cell subtypes
-#'@param model Deconvolution model
-#'@param fit Deconvolution fit
-#'@param parameter_list List of parameters of the models
+#'@param meta_data Deconvolution result dataframe.
+#'@param subtypes List of cell subtypes.
+#'@param model Deconvolution model.
+#'@param fit Deconvolution fit.
+#'@param parameter_list List of parameters of the models.
 #'@usage
 #' quantify_similarity(
 #'     meta_data,

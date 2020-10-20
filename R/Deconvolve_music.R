@@ -1,13 +1,14 @@
 #' Deconvolve_music
 #'
-#' \code{Deconvolve_music} Utilizes MuSiC for deconvolution. Wrapper function
+#' \code{Deconvolve_music} Utilizes MuSiC for deconvolution. Wrapper function.
 #'
 #' @param deconvolution_data A data frame that contains the gene expression 
 #' data. Rows are expected to be HGNC symbols and columns are expected to 
 #' contain the samples.
 #' @param models_list List of models to be used.
-#' @param models Which model to use
-#' @param nr_permutations Amount perturbations
+#' @param models Which model to use.
+#' @param nr_permutations Amount perturbations.
+#' @return Matrix containing the deconvolution results.
 #' @import xbioc
 Deconvolve_music = function(
     deconvolution_data,
@@ -17,7 +18,6 @@ Deconvolve_music = function(
 ){
     
     prediction_res_coeff_list = list()
-    library(xbioc)
     for (pred_model in models){
         
         print(paste0("Deconvolving with model: ",pred_model))
@@ -26,7 +26,6 @@ Deconvolve_music = function(
         pData(model_basis)$sampleID = colnames(exprs(model_basis))
         subtypes = as.character(unique(pData(model_basis)$cellType))
         
-        #library("xbioc")
         Est.prop.GSE50244 = MuSiC::music_prop(
             bulk.eset = deconvolution_data,
             sc.eset = model_basis,
