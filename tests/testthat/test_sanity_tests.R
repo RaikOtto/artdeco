@@ -20,13 +20,13 @@ test_that("Assert that data can be analyzed by Deconvolve_transcriptome", {
             c("model", "alpha", "beta", "gamma", "delta", "acinar", "ductal", "hisc","Strength_subtype", "Subtype", "score")
         )
     
-    expect_error(deconvolution_results_test = Deconvolve_transcriptome(
+    expect_error(deconvolution_results_test = Deconvolve_transcriptome( # algorithm does not exist
         transcriptome_data = visualization_data,
         deconvolution_algorithm = "DeconRNASeq"
     ))
-    expect_error(deconvolution_results_test = Deconvolve_transcriptome(
+    expect_error(deconvolution_results_test = Deconvolve_transcriptome( # model does not exist
         transcriptome_data = visualization_data,
-        models = "my_model"
+        models = "a_model"
     ))
     
 })
@@ -77,7 +77,7 @@ test_that("Adding, showing and removing models", {
     expect_equal(dim(Lawlor), c(20655, 638))
 
     # add new model
-    model_name = "My_model"
+    model_name = "Test_model"
     model_path = paste(
         c(system.file("Models/NMF", package="artdeco"),"/", model_name,".RDS"),
         collapse = ""
@@ -130,11 +130,9 @@ test_that("Adding, showing and removing models", {
     
 
     # remove model
-    if (file.exists(model_path))
-        remove_model_NMF(
-            model_name = model_name
-        ) # or remove_model(model_name = model_name, lib_name = "NMF")
+   remove_model_NMF(model_name = model_name) 
+   # remove_model(model_name = model_name, lib_name = "NMF")
     
-    expect_true(!file.exists(model_path))
+   expect_true(!file.exists(model_path))
 
 })
