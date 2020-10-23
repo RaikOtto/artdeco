@@ -18,7 +18,7 @@
 #' precise p-value estimates. Default value 1000.
 #' @param output_file Path of output file. If not specified,
 #' no hard-disk written output will occur.
-#' @import NMF
+#' @import NMF stringr
 #' @usage
 #' Deconvolve_transcriptome(
 #'     transcriptome_data,
