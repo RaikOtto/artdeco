@@ -33,22 +33,18 @@ GSE733338 GSE package. In the following, these will be analyzed by the artdeco
 
 ```{r}
 library("artdeco")
-library("GEOquery")
 
-# obtain path to testdata
-gse73338 = getGEO('GSE73338')
-transcriptome_data = exprs(gse73338$GSE73338_series_matrix.txt.gz)
-gene_names = featureData(gse73338$GSE73338_series_matrix.txt.gz)[[3]]
-rownames(transcriptome_data) = gene_names
+data("visualization_data")
+transcriptome_data = visualization_data
 
 # testrun
-deconvolution_results = Deconvolve_transcriptome(
+deconvolution_res = Deconvolve_transcriptome(
     transcriptome_data = transcriptome_data,
     deconvolution_algorithm = "nmf"
 )
 
 # show results
-deconvolution_results[1:2,]
+deconvolution_res[1:2,]
 ```
 The call returns a dataframe that contains the differentiation stage
 similarity predictions. 
@@ -89,6 +85,8 @@ It is important to interpret the simialrity predictions given the clustering of 
 library(devtools)
 install_github("vqv/ggbiplot")
 
+data(deconvolution_results, envir = environment())
+
 create_heatmap_deconvolution(
     deconvolution_results = deconvolution_results,
     visualization_data = transcriptome_data,
@@ -117,7 +115,7 @@ subtype_vector[1:6] # show subtype definition
 
 add_deconvolution_training_model_NMF(
     transcriptome_data = Lawlor,
-    model_name = "my_model",
+    model_name = "test_model",
     subtype_vector = subtype_vector,
     rank_estimate = 0,
     exclude_non_interpretable_NMF_components = FALSE,
@@ -132,10 +130,9 @@ as row names.
 Removing models is fairly straight forward; list the models after specifying the Machine-Learning algorihm
 i.e. 'NMF' or 'bseqsc' etc..
 ```{r}
-models = list.files(system.file("Models/NMF", package = "artdeco"))
-print(models)
+show_models(lib_name = "NMF")
 
-model_to_be_removed = "my_model"
+model_to_be_removed = "test_model"
 remove_model_NMF(
     model_name = model_to_be_removed,
     test_mode = TRUE

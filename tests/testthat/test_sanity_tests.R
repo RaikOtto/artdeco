@@ -115,10 +115,10 @@ test_that("Adding, showing and removing models", {
     # test existence of newly added model
     expect_true(file.exists(model_path))
     nmf_models <- show_models_NMF()
-    nmf_models_too <- show_models(lib_name = "NMF")
+    #nmf_models_too <- show_models(lib_name = "NMF")
     
     expect_identical(tail(nmf_models, 1), model_name)
-    expect_identical(tail(nmf_models_too, 1), model_name)
+    #expect_identical(tail(nmf_models_too, 1), model_name)
 
     # test if model is non-empty
     new_model <- readRDS(model_path)

@@ -41,11 +41,17 @@ as list of marker genes. Default 100.}
 }
 \value{
 Stores a new model in the package directory
+
+Please note when using this function, that you need to load the 
+corresponding library first and configure the \code{CIBERSORT} algorithm.
 }
 \description{
 \code{add_deconvolution_training_model_bseqsc} adds a new model
 }
 \examples{
+library(bseqsc) 
+bseqsc_config('/path/to/downloaded/source/CIBERSORT.R')
+
 data("Lawlor") # Data from Lawlor et al.
 data(meta_data)
 

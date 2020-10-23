@@ -624,7 +624,7 @@ create_heatmap_deconvolution = function(
         colnames(correlation_matrix),]
     
     # correlation heatmap
-    pheatmap::pheatmap(
+    pheatmap(
         correlation_matrix,
         annotation_col = deconvolution_results_filtered,
         annotation_colors = Graphics_parameters,

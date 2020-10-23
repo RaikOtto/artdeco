@@ -16,8 +16,7 @@ Imports:
     NMF,
     GEOquery,
     Biobase,
-    devtools,
-    xbioc
+    devtools
 Depends: 
     R (>= 3.6)
 License: Artistic-2.0

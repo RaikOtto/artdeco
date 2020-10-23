@@ -36,18 +36,11 @@ remove_model = function(
     
     model_path <- paste0(system.file("Models", package = "artdeco"),
                                      "/", lib_name, "/", model_name, ".RDS")
-    #model_path = paste0(
-    #    c(system.file("Models/bseqsc", package = "artdeco"),
-    #      "/", paste0(model_name, ".RDS")
-    #    ), sep ="", collapse = ""
-    #)
     
     # check if model exists
-    if ( 
-        file.exists(model_path)
-    ){
+    if (file.exists(model_path)){
         file.remove(model_path)
-    }else if ( test_mode){
+    }else if (test_mode){
         print("Test mode active")
     }else{
         stop(
@@ -97,14 +90,10 @@ remove_model_bseqsc = function(
     
     model_path = paste0(
         c(system.file("Models/bseqsc", package = "artdeco"),
-                      "/", paste0(model_name, ".RDS")
-        ), sep ="", collapse = ""
-    )
+                      "/", model_name, ".RDS"), sep ="", collapse = "")
     
     # check if model exists
-    if ( 
-        file.exists(model_path)
-    ){
+    if (file.exists(model_path)){
         file.remove(model_path)
     }else if ( test_mode){
         print("Test mode active")
@@ -156,14 +145,10 @@ remove_model_NMF = function(
     
     model_path = paste0(
         c(system.file("Models/NMF", package = "artdeco"),
-                      "/", paste0(model_name, ".RDS")
-        ), sep ="", collapse = ""
-    )
+          "/", model_name, ".RDS"), sep ="", collapse = "")
     
     # check if model exists
-    if ( 
-        file.exists(model_path)
-    ){
+    if (file.exists(model_path)){
         file.remove(model_path)
     }else if ( test_mode){
         print("Test mode active")
@@ -214,15 +199,11 @@ remove_model_music = function(
     )
     
     model_path = paste0(
-        c(system.file("Models/music", package = "artdeco"),
-                      "/", paste0(model_name, ".RDS")
-        ), sep ="", collapse = ""
-    )
+        c(system.file("Models/music", package = "artdeco"), 
+          "/", model_name, ".RDS"), sep ="", collapse = "")
     
     # check if model exists
-    if ( 
-        file.exists(model_path)
-    ){
+    if (file.exists(model_path)){
         file.remove(model_path)
     }else if ( test_mode){
         print("Test mode active")
@@ -261,26 +242,25 @@ show_models = function(
     lib_name = "NMF"
 ){
     
-    package_path = system.file("", package = "artdeco")
-    
     if (lib_name == "all"){
-        model_path_nmf <- paste0(package_path,"/Models/NMF")
-        model_path_music <- paste0(package_path,"/Models/music")
-        model_path_bseqsc <- paste0(package_path,"/Models/bseqsc")
+        model_path_nmf <- system.file("Models/NMF", package = "artdeco")
+        model_path_music <- system.file("/Models/music", package = "artdeco")
+        model_path_bseqsc <- system.file("/Models/bseqsc", package = "artdeco")
         
-        nmf_models <- stringr::str_replace_all(list.files(model_path_nmf),
+        nmf_models <- str_replace_all(list.files(model_path_nmf),
                                                pattern = ".RDS", "")
-        music_models <- stringr::str_replace_all(list.files(model_path_music),
+        music_models <- str_replace_all(list.files(model_path_music),
                                                  pattern = ".RDS", "")
-        bseqsc_models <- stringr::str_replace_all(list.files(
+        bseqsc_models <- str_replace_all(list.files(
             model_path_bseqsc), pattern = ".RDS", "")
         
         models <- list(nmf_models, music_models, bseqsc_models)
         names(models) <- c("NMF", "music", "bseqsc")
         
     } else {
-        model_path = paste0(package_path, "/Models/", lib_name)
-        models = stringr::str_replace_all(
+        model_path = system.file(paste("/Models/", lib_name, sep = ""), 
+                                 package = "artdeco")
+        models = str_replace_all(
             list.files(model_path),
             pattern = ".RDS",
             "")
@@ -302,11 +282,9 @@ show_models = function(
 #'@return list of models
 show_models_music = function(
 ){
+    model_path = system.file("Models/music", package = "artdeco")
     
-    package_path = system.file("", package = "artdeco")
-    model_path = paste(package_path,"Models/music", sep = "/")
-    
-    models = stringr::str_replace_all(
+    models = str_replace_all(
         list.files(model_path),
         pattern = ".RDS",
         ""
@@ -328,11 +306,9 @@ show_models_music = function(
 #'@return list of models
 show_models_bseqsc = function(
 ){
+    model_path = system.file("Models/bseqsc", package = "artdeco")
 
-    package_path = system.file("", package = "artdeco")
-    model_path = paste(package_path,"Models/bseqsc", sep = "/")
-
-    models = stringr::str_replace_all(
+    models = str_replace_all(
         list.files(model_path),
         pattern = ".RDS",
         ""
@@ -355,11 +331,9 @@ show_models_bseqsc = function(
 #'@return list of models
 show_models_NMF = function(
 ){
+    model_path = system.file("Models/NMF", package = "artdeco")
     
-    package_path = system.file("", package = "artdeco")
-    model_path = paste(package_path,"Models/NMF", sep = "/")
-    
-    models = stringr::str_replace_all(
+    models = str_replace_all(
         list.files(model_path),
         pattern = ".RDS",
         ""
