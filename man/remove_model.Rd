@@ -26,7 +26,7 @@ Removal of model from package directory
 }
 \examples{
 remove_model(
-    model_name = "My_model",
+    model_name = "my_model",
     lib_name = "bseqsc",
     test_mode = TRUE
 )

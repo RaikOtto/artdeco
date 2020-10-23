@@ -55,6 +55,7 @@ to contain the samples.
 \examples{
 data(deconvolution_results, envir = environment())
 data(visualization_data, envir = environment())
+
 create_PCA_deconvolution(
     visualization_data = visualization_data,
     deconvolution_results = deconvolution_results,

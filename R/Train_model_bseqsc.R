@@ -31,9 +31,6 @@
 #'     training_nr_marker_genes
 #' )
 #' @examples
-#' library(bseqsc) 
-#' bseqsc_config('/path/to/downloaded/source/CIBERSORT.R')
-#' 
 #' data("Lawlor") # Data from Lawlor et al.
 #' data(meta_data)
 #' 
@@ -48,10 +45,6 @@
 #'     training_nr_marker_genes = 100
 #' )
 #' @return Stores a new model in the package directory
-#' 
-#' Please note when using this function, that you need to load the 
-#' corresponding library first and configure the \code{CIBERSORT} algorithm.
-#' 
 #' @export
 add_deconvolution_training_model_bseqsc = function(
     transcriptome_data,

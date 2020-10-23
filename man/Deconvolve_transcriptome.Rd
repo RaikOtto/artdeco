@@ -34,10 +34,6 @@ no hard-disk written output will occur.}
 }
 \value{
 Similarity measurements of differentiation stages.
-
-Please note when using the \code{music} or \code{bseqsc} algorithm, that
-you need to load the corresponding libraries first. See the Wiki of the 
-artdeco Github page for more information.
 }
 \description{
 \code{Deconvolve_transcriptome} measures the similarity

@@ -23,17 +23,11 @@ labels of the training data samples (\code{transcriptome_data}).}
 }
 \value{
 Stores a new model in the package directory
-
-Please note when using this function, that you need to load the 
-corresponding library first.
 }
 \description{
 \code{add_deconvolution_training_model_music} adds a new model
 }
 \examples{
-library("MuSiC")
-library("xbioc")
-
 data("Lawlor") # Data from Lawlor et al.
 data(meta_data)
 

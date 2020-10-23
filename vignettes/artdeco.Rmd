@@ -29,7 +29,7 @@ Start an R session e.g. using RStudio
 
 97 representative NEN samples are utilized for this vignette from the
 GSE733338 GSE package. In the following, these will be analyzed by the artdeco
- algorithm to demonstrate the utilization of artdeco.
+algorithm to demonstrate the utilization of artdeco.
 
 ```{r}
 library("artdeco")
@@ -38,13 +38,13 @@ data("visualization_data")
 transcriptome_data = visualization_data
 
 # testrun
-deconvolution_res = Deconvolve_transcriptome(
+deconvolution_results = Deconvolve_transcriptome(
     transcriptome_data = transcriptome_data,
     deconvolution_algorithm = "nmf"
 )
 
 # show results
-deconvolution_res[1:2,]
+deconvolution_results[1:2,]
 ```
 The call returns a dataframe that contains the differentiation stage
 similarity predictions. 
@@ -85,8 +85,6 @@ It is important to interpret the simialrity predictions given the clustering of 
 library(devtools)
 install_github("vqv/ggbiplot")
 
-data(deconvolution_results, envir = environment())
-
 create_heatmap_deconvolution(
     deconvolution_results = deconvolution_results,
     visualization_data = transcriptome_data,
@@ -110,12 +108,13 @@ data(Lawlor) # Data from Lawlor et al.
 Lawlor[1:5,1:5]
 data(meta_data)
 
-subtype_vector = as.character(meta_data$Subtype) # extract the training sample subtype labels
+# extract the training sample subtype labels
+subtype_vector = as.character(meta_data$Subtype) 
 subtype_vector[1:6] # show subtype definition
 
 add_deconvolution_training_model_NMF(
     transcriptome_data = Lawlor,
-    model_name = "test_model",
+    model_name = "my_model",
     subtype_vector = subtype_vector,
     rank_estimate = 0,
     exclude_non_interpretable_NMF_components = FALSE,
@@ -132,7 +131,7 @@ i.e. 'NMF' or 'bseqsc' etc..
 ```{r}
 show_models(lib_name = "NMF")
 
-model_to_be_removed = "test_model"
+model_to_be_removed = "my_model"
 remove_model_NMF(
     model_name = model_to_be_removed,
     test_mode = TRUE

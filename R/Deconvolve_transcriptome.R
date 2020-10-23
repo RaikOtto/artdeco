@@ -34,10 +34,6 @@
 #' )
 #' @return Similarity measurements of differentiation stages.
 #' 
-#' Please note when using the \code{music} or \code{bseqsc} algorithm, that
-#' you need to load the corresponding libraries first. See the Wiki of the 
-#' artdeco Github page for more information.
-#' 
 #' @import NMF Biobase stringr
 #' @export
 Deconvolve_transcriptome = function(

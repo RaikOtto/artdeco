@@ -17,9 +17,6 @@
 #'     subtype_vector
 #' )
 #' @examples
-#' library("MuSiC")
-#' library("xbioc")
-#' 
 #' data("Lawlor") # Data from Lawlor et al.
 #' data(meta_data)
 #' 
@@ -31,10 +28,6 @@
 #'     subtype_vector = subtype_vector
 #' )
 #' @return Stores a new model in the package directory
-#' 
-#' Please note when using this function, that you need to load the 
-#' corresponding library first.
-#' 
 #' @export
 add_deconvolution_training_model_music = function(
     transcriptome_data,

@@ -22,7 +22,7 @@ Removal of model from package directory
 }
 \examples{
 remove_model_NMF(
-    model_name = "My_model",
+    model_name = "my_model",
     test_mode = TRUE
 )
 }

@@ -14,7 +14,7 @@
 #' )
 #' @examples
 #' remove_model(
-#'     model_name = "My_model",
+#'     model_name = "my_model",
 #'     lib_name = "bseqsc",
 #'     test_mode = TRUE
 #' )
@@ -70,7 +70,7 @@ remove_model = function(
 #' )
 #' @examples
 #' remove_model_bseqsc(
-#'     model_name = "My_model",
+#'     model_name = "my_model",
 #'     test_mode = TRUE
 #' )
 #' @import stringr
@@ -125,7 +125,7 @@ remove_model_bseqsc = function(
 #' )
 #' @examples
 #' remove_model_NMF(
-#'     model_name = "My_model",
+#'     model_name = "my_model",
 #'     test_mode = TRUE
 #' )
 #' @import stringr
@@ -180,7 +180,7 @@ remove_model_NMF = function(
 #' )
 #' @examples
 #' remove_model_music(
-#'     model_name = "My_model",
+#'     model_name = "my_model",
 #'     test_mode = TRUE
 #' )
 #' @import stringr
