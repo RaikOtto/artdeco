@@ -7,7 +7,7 @@ neoplasia (PANnen) based on bulk RNA-seq or on mRNA array experiments of cancer-
 ## Installation
 Start an R session e.g. using RStudio
 
-```{r}
+```R
 if (!requireNamespace("remotes", quietly=TRUE))
     install.packages("remotes")
 
