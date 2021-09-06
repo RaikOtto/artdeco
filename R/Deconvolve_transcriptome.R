@@ -13,6 +13,8 @@
 #' show_models_music() or show_models_bseqsc()
 #' to view available models or add new model via
 #' add_deconvolution_training_model_*().
+#' @param Cibersort_absolute_mode Whether to retrieve the CIBERSORT
+#' predictions as relative (default) or absolute values
 #' @param nr_permutations Utilized to calculate p-value
 #' Higher amount of permutations generally lead to more
 #' precise p-value estimates. Default value 1000.
@@ -25,6 +27,7 @@
 #'     deconvolution_algorithm,
 #'     models,
 #'     nr_permutations,
+#'     Deconvolve_transcriptome,
 #'     output_file
 #' )
 #' @examples
@@ -44,6 +47,7 @@ Deconvolve_transcriptome = function(
         "Alpha_Beta_Gamma_Delta_Acinar_Ductal_Hisc_Baron"
     ),
     nr_permutations = 1000,
+    Cibersort_absolute_mode = FALSE,
     output_file = ""
 ){
 
@@ -129,6 +133,7 @@ Deconvolve_transcriptome = function(
             deconvolution_data = deconvolution_data,
             models_list = models_list,
             models = models,
+            Cibersort_absolute_mode = Cibersort_absolute_mode,
             nr_permutations = nr_permutations
         )
         
