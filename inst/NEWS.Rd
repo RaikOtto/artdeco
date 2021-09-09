@@ -1,5 +1,14 @@
 \name{NEWS}
 \title{NEWS file for the \pkg{ARTDECO} bioconductor package }
+\section{Changes in version 0.99.4 [2021-09-09]}{
+    \subsection{Version update}{
+        \itemize{
+            \item Added absolute cell type proportion predictions as parameter
+        }
+    }
+}
+\name{NEWS}
+\title{NEWS file for the \pkg{ARTDECO} bioconductor package }
 \section{Changes in version 0.99.1 [2019-10-10]}{
     \subsection{Version update}{
         \itemize{

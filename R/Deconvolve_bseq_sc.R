@@ -6,12 +6,14 @@
 #' @param deconvolution_data Data to be deconvolved.
 #' @param models_list List of models.
 #' @param models Models utilized.
+#' @param Cibersort_absolute_mode CIBRSORT absolute mode
 #' @param nr_permutations Amount of permutations.
 #' @return Matrix containing the deconvolution results.
 Deconvolve_bseq_sc = function(
     deconvolution_data,
     models_list,
     models,
+    Cibersort_absolute_mode,
     nr_permutations
 ){
     
@@ -28,7 +30,7 @@ Deconvolve_bseq_sc = function(
             deconvolution_data,
             model_basis,
             verbose = FALSE,
-            absolute = FALSE,
+            absolute = Cibersort_absolute_mode,
             log = FALSE,
             perm = nr_permutations
         )
