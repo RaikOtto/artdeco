@@ -343,7 +343,6 @@ create_visualization_matrix = function(
 #' @examples
 #' data(deconvolution_results, envir = environment())
 #' data(visualization_data, envir = environment())
-#' 
 #' create_PCA_deconvolution(
 #'     visualization_data = visualization_data,
 #'     deconvolution_results = deconvolution_results,
@@ -625,7 +624,7 @@ create_heatmap_deconvolution = function(
         colnames(correlation_matrix),]
     
     # correlation heatmap
-    pheatmap(
+    pheatmap::pheatmap(
         correlation_matrix,
         annotation_col = deconvolution_results_filtered,
         annotation_colors = Graphics_parameters,

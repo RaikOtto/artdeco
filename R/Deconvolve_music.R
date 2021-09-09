@@ -9,6 +9,7 @@
 #' @param models Which model to use.
 #' @param nr_permutations Amount perturbations.
 #' @return Matrix containing the deconvolution results.
+#' @import xbioc
 Deconvolve_music = function(
     deconvolution_data,
     models_list,
