@@ -17,6 +17,7 @@ Deconvolve_NMF = function(
     
     prediction_res_coeff_list = list()
     prediction_stats_list = list()
+    subtype_cands = c()
     
     for (pred_model in models){
         
@@ -53,7 +54,10 @@ Deconvolve_NMF = function(
         
         prediction_res_coeff_list[[pred_model]] = proportions
         prediction_stats_list[[pred_model]]     = residuals
+        
+        subtype_cands = c(subtype_cands, rownames(proportions))
     }
+    subtype_cands = unique(subtype_cands)
     
     # create results matrix called meta_data
     
@@ -61,11 +65,11 @@ Deconvolve_NMF = function(
         prediction_res_coeff_list = prediction_res_coeff_list,
         prediction_stats_list = prediction_stats_list,
         deconvolution_data = deconvolution_data,
-        models = models
+        models = models,
+        subtype_cands = subtype_cands
     )
     
-    col_idx <- match(c("model", "alpha", "beta", "gamma", "delta", "acinar", 
-                       "ductal", "hisc", "Strength_subtype", "Subtype", 
+    col_idx <- match(c("model", subtype_cands, "Strength_subtype", "Subtype", 
                        "score"), colnames(deconvolution_results))
     
     deconvolution_results <- deconvolution_results[,col_idx]
