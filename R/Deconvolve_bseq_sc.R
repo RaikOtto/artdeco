@@ -48,8 +48,14 @@ Deconvolve_bseq_sc = function(
         models = models
     )
     
-    col_idx <- match(c("model", "alpha", "beta", "gamma", "delta", "acinar", 
-                       "ductal", "hisc", "strength_subtype", "subtype", 
+    subtype_cands = c()
+    for (model in models){
+        cands = rownames(as.data.frame(prediction_res_coeff_list[model]))
+        subtype_cands = c(subtype_cands, cands)
+    }
+    subtype_cands = unique(subtype_cands)
+    
+    col_idx <- match(c("model", subtype_cands, "strength_subtype", "subtype", 
                        "sig_score", "p_value", "correlation", "rmse"), 
                        str_to_lower(colnames(deconvolution_results)))
     deconvolution_results <- deconvolution_results[,col_idx]

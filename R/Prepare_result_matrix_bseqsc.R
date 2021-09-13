@@ -6,7 +6,13 @@ prepare_result_matrix_bseqsc = function(
 ){
 
     rounding_precision = 1
-    subtype_cands = c("alpha","beta","gamma","delta","acinar","ductal","hisc")
+    #subtype_cands = c("alpha","beta","gamma","delta","acinar","ductal","hisc")
+    subtype_cands = c()
+    for (model in models){
+        cands = rownames(as.data.frame(prediction_res_coeff_list[model]))
+        subtype_cands = c(subtype_cands, cands)
+    }
+    subtype_cands = unique(subtype_cands)
     bseq_parameter = c("P_value","Correlation","RMSE","Sig_score")
     
     result_matrix_template = matrix( rep(0.0, length(subtype_cands) * 
