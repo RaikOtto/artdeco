@@ -1,7 +1,8 @@
 prepare_result_matrix_music = function(
     prediction_res_coeff_list,
     deconvolution_data,
-    models
+    models,
+    subtype_cands
 ){
     
     rounding_precision = 1
@@ -9,8 +10,6 @@ prepare_result_matrix_music = function(
         row.names = colnames(deconvolution_data),
         "model" = rep( paste0(c(models),collapse="|"), ncol(deconvolution_data))
     )
-    
-    subtype_cands = c("alpha","beta","gamma","delta","acinar","ductal","hisc")
     
     for (nr_fit in 1:length(models)){
         

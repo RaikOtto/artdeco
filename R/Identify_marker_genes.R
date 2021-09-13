@@ -22,7 +22,7 @@ identify_marker_genes = function(
     colnames(design) = c("Case","Ctrl")
     
     Case = "Case"; Ctrl = "Ctrl"
-
+    
     vfit = lmFit(expression_training_mat,design)
     contr.matrix = makeContrasts(
         contrast = Case - Ctrl,

@@ -145,7 +145,7 @@ add_deconvolution_training_model_bseqsc = function(
     colnames(pData(test_mat)) = "subtype_vector"
     
     if ( model_name != "my_model" ){
-        fit = bseqsc::bseqsc_proportions(
+        fit = bseqsc_proportions(
             test_mat,
             Basis,
             verbose = TRUE,

@@ -1,5 +1,19 @@
 \name{NEWS}
 \title{NEWS file for the \pkg{ARTDECO} bioconductor package }
+\section{Changes in version 1.0.3 [2021-09-13]}{
+    \subsection{Version update}{
+        \itemize{
+            \item Dynamic cell type reporting enables for NMF and MuSiC
+        }
+    }
+}
+\section{Changes in version 1.0.2 [2021-09-13]}{
+    \subsection{Version update}{
+        \itemize{
+            \item Dynamic cell type reporting enables for BSeq-sc
+        }
+    }
+}
 \section{Changes in version 0.99.4 [2021-09-09]}{
     \subsection{Version update}{
         \itemize{

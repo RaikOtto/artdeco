@@ -9,6 +9,7 @@
 #' @param models Which model to use.
 #' @param nr_permutations Amount perturbations.
 #' @return Matrix containing the deconvolution results.
+#' @import xbioc
 Deconvolve_music = function(
     deconvolution_data,
     models_list,
@@ -17,6 +18,7 @@ Deconvolve_music = function(
 ){
     
     prediction_res_coeff_list = list()
+    result_subtypes = c()
     for (pred_model in models){
         
         print(paste0("Deconvolving with model: ",pred_model))
@@ -24,6 +26,7 @@ Deconvolve_music = function(
         model_basis = model_basis[[1]]
         pData(model_basis)$sampleID = colnames(exprs(model_basis))
         subtypes = as.character(unique(pData(model_basis)$cellType))
+        result_subtypes = c(result_subtypes, subtypes)
         
         Est.prop.GSE50244 = MuSiC::music_prop(
             bulk.eset = deconvolution_data,
@@ -39,18 +42,19 @@ Deconvolve_music = function(
             Est.prop.GSE50244$Est.prop.allgene # cell type proportions
     }
     
+    result_subtypes = unique(result_subtypes)
+    
     # create results matrix called meta_data
     
     deconvolution_results = prepare_result_matrix_music(
         prediction_res_coeff_list = prediction_res_coeff_list,
         deconvolution_data = deconvolution_data,
-        models = models
+        models = models,
+        subtype_cands = result_subtypes
     )
     
     selection_candidates = c(
-        "model","alpha", "beta", "gamma",
-        "delta", "acinar", "ductal", "hisc",
-        "Strength_subtype", "Subtype")
+        "model",result_subtypes,"Strength_subtype", "Subtype")
     selection_candidates = selection_candidates[
         selection_candidates %in% colnames(deconvolution_results)]
     

@@ -2,11 +2,11 @@ prepare_result_matrix_NMF = function(
     prediction_res_coeff_list,
     deconvolution_data,
     prediction_stats_list,
-    models
+    models,
+    subtype_cands
 ){
     
     rounding_precision = 1
-    subtype_cands = c("alpha","beta","gamma","delta","acinar","ductal","hisc")
     nmf_parameter = c("score")
     
     result_matrix_template = matrix( rep(0.0, length(subtype_cands) * 
