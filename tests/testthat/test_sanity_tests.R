@@ -17,17 +17,14 @@ test_that("Assert that data can be analyzed by Deconvolve_transcriptome", {
 
     expect_identical(
             colnames(deconvolution_results_test),
-            c("model", "alpha", "beta", "gamma", "delta", "acinar", "ductal", 
-              "hisc","Strength_subtype", "Subtype", "score")
+            c("model", "alpha", "delta", "beta", "acinar", "gamma", "ductal", "hisc","Strength_subtype", "Subtype", "score")
         )
     
-    # algorithm does not exist
-    expect_error(deconvolution_results_test = Deconvolve_transcriptome( 
+    expect_error(deconvolution_results_test = Deconvolve_transcriptome( # algorithm does not exist
         transcriptome_data = visualization_data,
         deconvolution_algorithm = "DeconRNASeq"
     ))
-    # model does not exist
-    expect_error(deconvolution_results_test = Deconvolve_transcriptome( 
+    expect_error(deconvolution_results_test = Deconvolve_transcriptome( # model does not exist
         transcriptome_data = visualization_data,
         models = "a_model"
     ))
@@ -39,6 +36,7 @@ test_that("Assert that data can be analyzed by Deconvolve_transcriptome", {
 test_that("Test if visualization works", {
 
     library("artdeco")
+    library("stringr")
     
     deconvolution_results = deconvolution_results[
         colnames(deconvolution_results) != "Strength_subtype"
@@ -50,8 +48,7 @@ test_that("Test if visualization works", {
         deconvolution_results = deconvolution_results
     )
     
-    expect_identical(decon_heatmap$tree_col$labels, 
-                     colnames(visualization_data))
+    expect_identical(decon_heatmap$tree_col$labels, colnames(visualization_data))
     
     decon_pca <- create_PCA_deconvolution(
         visualization_data = visualization_data,
@@ -74,14 +71,13 @@ test_that("Adding, showing and removing models", {
     
     rownames(meta_data) = as.character(meta_data$Name)
 
-    # extract the training sample subtype labels
-    subtype_vector = as.character(meta_data$Subtype) 
+    subtype_vector = as.character(meta_data$Subtype) # extract the training sample subtype labels
 
     data("Lawlor")
     expect_equal(dim(Lawlor), c(20655, 638))
 
     # add new model
-    model_name = "my_model"
+    model_name = "Test_model"
     model_path = paste(
         c(system.file("Models/NMF", package="artdeco"),"/", model_name,".RDS"),
         collapse = ""
@@ -121,8 +117,8 @@ test_that("Adding, showing and removing models", {
     nmf_models <- show_models_NMF()
     nmf_models_too <- show_models(lib_name = "NMF")
     
-    expect_true(model_name %in% nmf_models)
-    expect_true(model_name %in% nmf_models_too)
+    expect_identical(tail(nmf_models, 1), model_name)
+    expect_identical(tail(nmf_models_too, 1), model_name)
 
     # test if model is non-empty
     new_model <- readRDS(model_path)
@@ -134,9 +130,9 @@ test_that("Adding, showing and removing models", {
     
 
     # remove model
-    remove_model_NMF(model_name = model_name) 
-    # remove_model(model_name = model_name, lib_name = "NMF")
+   remove_model_NMF(model_name = model_name) 
+   # remove_model(model_name = model_name, lib_name = "NMF")
     
-    expect_true(!file.exists(model_path))
+   expect_true(!file.exists(model_path))
 
 })

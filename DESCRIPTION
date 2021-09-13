@@ -16,7 +16,8 @@ Imports:
     NMF,
     GEOquery,
     Biobase,
-    devtools
+    devtools,
+    xbioc
 Depends: 
     R (>= 3.6)
 License: Artistic-2.0
@@ -31,8 +32,7 @@ Suggests:
     knitr,
     rmarkdown,
     RUnit,
-    markdown,
-    xbioc
+    markdown
 biocViews:
     Sequencing,
     RNASeq,
