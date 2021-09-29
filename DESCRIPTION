@@ -1,10 +1,6 @@
 Package: artdeco
 Title: Alikeness Based on Regression on Transciptome DECOnvolution
-<<<<<<< HEAD
-Version: 1.01
-=======
 Version: 1.0.3
->>>>>>> bf2d027c3dcd8342bee6dd8bc7aa8808f218a37d
 Authors@R: c(person("Raik", "Otto", role = c("aut", "cre"), email = 'raik.otto@hu-berlin.de'))
 Description: This packages determines the similarity cancer sample
  transcriptomes to samples with known differentiation stage. Training data input 
