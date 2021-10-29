@@ -63,7 +63,10 @@ prepare_result_matrix_bseqsc = function(
     result_matrix_template$Correlation <- as.numeric(
         result_matrix_template$Correlation)
     
-    result_matrix_template = round(result_matrix_template, rounding_precision)
+    result_matrix_template[,colnames(result_matrix_template) != "P_value"] =
+        round(result_matrix_template[,
+        colnames(result_matrix_template) != "P_value"],
+        rounding_precision)
     
     return(result_matrix_template)
 }

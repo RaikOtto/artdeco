@@ -57,9 +57,7 @@ Deconvolve_bseq_sc = function(
     
     col_idx <- match(
         c(
-            "model",
             str_to_lower(subtype_cands),
-            "sig_score",
             "p_value",
             "correlation",
             "rmse"
