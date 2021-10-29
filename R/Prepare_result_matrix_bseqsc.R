@@ -81,43 +81,7 @@ prepare_result_matrix_bseqsc = function(
     # so that columns subtype and strength_subtype are added
     # can be added; doesn't have to be added
     
-    result_matrix_template[,"Strength_subtype"] = rep(
-        "",nrow(result_matrix_template))
-    result_matrix_template[,"Subtype"] = rep("",nrow(result_matrix_template))
     
-    cands_dif_1 = c("alpha","beta","gamma","delta","acinar","ductal")
-    if("hisc" %in% colnames(result_matrix_template)){
-        cands_dif_2 = "hisc"
-    } else {
-        cands_dif_2 = c("acinar","ductal")
-    }
-    
-    cands_dif = cands_dif_1[
-        (cands_dif_1 %in% colnames(result_matrix_template)) &
-            !(cands_dif_1 %in% cands_dif_2)
-        ]
-    
-    for( j in 1:nrow(result_matrix_template)){
-        
-        max_subtype = colnames(result_matrix_template[cands_dif])[
-            which.max(result_matrix_template[j,cands_dif])
-            ]
-        subtype_strength = result_matrix_template[j,max_subtype] /
-            sum(result_matrix_template[j,cands_dif])
-        if (sum(result_matrix_template[j,cands_dif]) == 0)
-            subtype_strength = result_matrix_template[j,max_subtype]
-        subtype_strength = round(subtype_strength * 100,rounding_precision)
-        
-        result_matrix_template[j,"Strength_subtype"] = subtype_strength
-        
-        if (subtype_strength == 0)
-            max_subtype = "not_significant"
-        
-        result_matrix_template[j,"Subtype"] = max_subtype
-    }
-    
-    result_matrix_template$Strength_subtype <- as.numeric(
-        result_matrix_template$Strength_subtype)
     result_matrix_template$RMSE <- as.numeric(
         result_matrix_template$RMSE)
     result_matrix_template$P_value <- as.numeric(

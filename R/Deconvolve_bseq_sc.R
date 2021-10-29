@@ -29,7 +29,7 @@ Deconvolve_bseq_sc = function(
         bseqsc_fit = bseqsc::bseqsc_proportions(
             deconvolution_data,
             model_basis,
-            verbose = FALSE,
+            verbose = TRUE,
             absolute = Cibersort_absolute_mode,
             log = FALSE,
             perm = nr_permutations
@@ -55,9 +55,16 @@ Deconvolve_bseq_sc = function(
     }
     subtype_cands = unique(subtype_cands)
     
-    col_idx <- match(c("model", subtype_cands, "strength_subtype", "subtype", 
-                       "sig_score", "p_value", "correlation", "rmse"), 
-                       str_to_lower(colnames(deconvolution_results)))
+    col_idx <- match(
+        c(
+            "model",
+            str_to_lower(subtype_cands),
+            "sig_score",
+            "p_value",
+            "correlation",
+            "rmse"
+        ),
+        str_to_lower(colnames(deconvolution_results)))
     deconvolution_results <- deconvolution_results[,col_idx]
     
     return(deconvolution_results)

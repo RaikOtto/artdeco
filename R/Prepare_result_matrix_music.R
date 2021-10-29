@@ -22,8 +22,8 @@ prepare_result_matrix_music = function(
             res_coeff_1[ is.na(res_coeff_1) ] = 0.0
             
             # important sanity check
-            if ("alpha" %in% str_to_lower(rownames(res_coeff_1))) 
-                res_coeff_1 = t(res_coeff_1)
+            #if ("alpha" %in% str_to_lower(rownames(res_coeff_1))) 
+            #    res_coeff_1 = t(res_coeff_1)
             
             colnames(res_coeff_1) = str_to_lower(colnames(res_coeff_1))
             subtype_cands_1 = subtype_cands[subtype_cands %in% 
@@ -78,43 +78,6 @@ prepare_result_matrix_music = function(
     # add code from prepare_sample_result_matrix_NMF
     # so that columns subtype and strength_subtype are added
     # can be added; doesn't have to be added
-    
-    result_matrix[,"Strength_subtype"] = rep("",nrow(result_matrix))
-    result_matrix[,"Subtype"] = rep("",nrow(result_matrix))
-    
-    cands_dif_1 = c("alpha","beta","gamma","delta","acinar","ductal")
-    if("hisc" %in% colnames(result_matrix)){
-        cands_dif_2 = "hisc"
-    } else {
-        cands_dif_2 = c("acinar","ductal")
-    }
-    
-    cands_dif = cands_dif_1[
-        (cands_dif_1 %in% colnames(result_matrix)) &
-            !(cands_dif_1 %in% cands_dif_2)
-        ]
-    
-    for( j in 1:nrow(result_matrix)){
-        
-        max_subtype = colnames(result_matrix[cands_dif])[
-            which.max(result_matrix[j,cands_dif])
-            ]
-        subtype_strength = result_matrix[j,max_subtype] /
-            sum(result_matrix[j,cands_dif])
-        if (sum(result_matrix[j,cands_dif]) == 0)
-            subtype_strength = result_matrix[j,max_subtype]
-        subtype_strength = round(subtype_strength * 100,rounding_precision)
-        
-        result_matrix[j,"Strength_subtype"] = subtype_strength
-        
-        if (subtype_strength == 0)
-            max_subtype = "not_significant"
-        
-        result_matrix[j,"Subtype"] = max_subtype
-    }
-    
-    result_matrix$Strength_subtype <- as.numeric(
-        result_matrix$Strength_subtype)
     
     return(result_matrix)
 }
