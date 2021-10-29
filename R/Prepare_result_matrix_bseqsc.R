@@ -40,10 +40,10 @@ prepare_result_matrix_bseqsc = function(
     res_coeff = t(res_coeff)
     colnames(res_coeff) = str_to_lower(colnames(res_coeff))
 
-    matcher = match(str_to_lower(subtype_cands_found), str_to_lower(colnames(res_coeff)))
+    matcher = match(str_to_lower(subtype_cands), str_to_lower(colnames(res_coeff)))
     
     result_matrix_template[,
-        subtype_cands_found
+        subtype_cands
     ] = res_coeff[,matcher]
     
     prediction_stats = as.data.frame(prediction_stats_list[1])
